@@ -6,7 +6,6 @@
 <title>CashFlow Pro</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.10.3/Recharts.js"></script>
 <style>
@@ -52,703 +51,2467 @@ h1{font-size:22px;font-weight:800;letter-spacing:-.3px}
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel">
-const { useState, useEffect, useMemo } = React;
-const { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-        ResponsiveContainer, ReferenceLine, BarChart, Bar } = Recharts;
+<script>
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
+function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
+function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
+var _React = React,
+  useState = _React.useState,
+  useEffect = _React.useEffect,
+  useMemo = _React.useMemo;
+var _Recharts = Recharts,
+  AreaChart = _Recharts.AreaChart,
+  Area = _Recharts.Area,
+  XAxis = _Recharts.XAxis,
+  YAxis = _Recharts.YAxis,
+  CartesianGrid = _Recharts.CartesianGrid,
+  Tooltip = _Recharts.Tooltip,
+  ResponsiveContainer = _Recharts.ResponsiveContainer,
+  ReferenceLine = _Recharts.ReferenceLine,
+  BarChart = _Recharts.BarChart,
+  Bar = _Recharts.Bar;
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
-const fmt     = n => new Intl.NumberFormat("he-IL",{style:"currency",currency:"ILS",minimumFractionDigits:0,maximumFractionDigits:0}).format(n||0);
-const fmtDate = d => d ? new Date(d).toLocaleDateString("he-IL",{day:"2-digit",month:"2-digit",year:"numeric"}) : "—";
-const toISO   = d => { if(!d) return ""; const dt=d instanceof Date?d:new Date(d); return isNaN(dt)?"":dt.toISOString().split("T")[0]; };
-const addDays = (d,n) => { const r=new Date(d); r.setDate(r.getDate()+n); return r; };
-const eom     = d => { const dt=new Date(d); return new Date(dt.getFullYear(),dt.getMonth()+1,0); };
-const uid     = () => Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-const excelDate = v => { if(!v) return ""; if(v instanceof Date) return toISO(v); if(typeof v==="number") return toISO(new Date(Math.round((v-25569)*86400000))); return toISO(new Date(v)); };
-const typeLabel = t => ({check:"המחאה",invoice:"חשבונית",income:"הכנסה",fixed:"הוצאה קבועה"}[t]||t);
+var fmt = function fmt(n) {
+  return new Intl.NumberFormat("he-IL", {
+    style: "currency",
+    currency: "ILS",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(n || 0);
+};
+var fmtDate = function fmtDate(d) {
+  return d ? new Date(d).toLocaleDateString("he-IL", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  }) : "—";
+};
+var toISO = function toISO(d) {
+  if (!d) return "";
+  var dt = d instanceof Date ? d : new Date(d);
+  return isNaN(dt) ? "" : dt.toISOString().split("T")[0];
+};
+var addDays = function addDays(d, n) {
+  var r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
+};
+var eom = function eom(d) {
+  var dt = new Date(d);
+  return new Date(dt.getFullYear(), dt.getMonth() + 1, 0);
+};
+var uid = function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+};
+var excelDate = function excelDate(v) {
+  if (!v) return "";
+  if (v instanceof Date) return toISO(v);
+  if (typeof v === "number") return toISO(new Date(Math.round((v - 25569) * 86400000)));
+  return toISO(new Date(v));
+};
+var typeLabel = function typeLabel(t) {
+  return {
+    check: "המחאה",
+    invoice: "חשבונית",
+    income: "הכנסה",
+    fixed: "הוצאה קבועה"
+  }[t] || t;
+};
 
 // ── localStorage storage (sync) ───────────────────────────────────────────────
-const lsLoad = (k,fb) => { try{ const v=localStorage.getItem(k); return v?JSON.parse(v):fb; }catch{ return fb; } };
-const lsSave = (k,v)  => { try{ localStorage.setItem(k,JSON.stringify(v)); }catch{} };
+var lsLoad = function lsLoad(k, fb) {
+  try {
+    var v = localStorage.getItem(k);
+    return v ? JSON.parse(v) : fb;
+  } catch (_unused) {
+    return fb;
+  }
+};
+var lsSave = function lsSave(k, v) {
+  try {
+    localStorage.setItem(k, JSON.stringify(v));
+  } catch (_unused2) {}
+};
 
 // ── Tab config ────────────────────────────────────────────────────────────────
-const TABS = [
-  {id:"dashboard",icon:"📊",label:"דשבורד"},
-  {id:"forecast", icon:"📅",label:"תזרים עתידי"},
-  {id:"suppliers",icon:"🏢",label:"ספקים"},
-  {id:"ledger",   icon:"📒",label:"כרטסת ספק"},
-  {id:"aging",    icon:"⏱", label:"גיול חשבוניות"},
-  {id:"import",   icon:"📥",label:"יבוא נתונים"},
-  {id:"recurring",icon:"🔄",label:"קבועות"},
-];
+var TABS = [{
+  id: "dashboard",
+  icon: "📊",
+  label: "דשבורד"
+}, {
+  id: "forecast",
+  icon: "📅",
+  label: "תזרים עתידי"
+}, {
+  id: "suppliers",
+  icon: "🏢",
+  label: "ספקים"
+}, {
+  id: "ledger",
+  icon: "📒",
+  label: "כרטסת ספק"
+}, {
+  id: "aging",
+  icon: "⏱",
+  label: "גיול חשבוניות"
+}, {
+  id: "import",
+  icon: "📥",
+  label: "יבוא נתונים"
+}, {
+  id: "recurring",
+  icon: "🔄",
+  label: "קבועות"
+}];
 
 // ── Root ──────────────────────────────────────────────────────────────────────
 function App() {
-  const [tab,setTab]               = useState("dashboard");
-  const [suppliers,setSuppliers]   = useState(()=>lsLoad("cf-sup",[]));
-  const [checks,setChecks]         = useState(()=>lsLoad("cf-chk",[]));
-  const [invoices,setInvoices]     = useState(()=>lsLoad("cf-inv",[]));
-  const [fixedItems,setFixedItems] = useState(()=>lsLoad("cf-fix",[]));
-  const [openingBal,setOpeningBal] = useState(()=>lsLoad("cf-ob",0));
-  const [selSup,setSelSup]         = useState(null);
-
-  useEffect(()=>lsSave("cf-sup",suppliers),[suppliers]);
-  useEffect(()=>lsSave("cf-chk",checks),[checks]);
-  useEffect(()=>lsSave("cf-inv",invoices),[invoices]);
-  useEffect(()=>lsSave("cf-fix",fixedItems),[fixedItems]);
-  useEffect(()=>lsSave("cf-ob",openingBal),[openingBal]);
-
-  const today = useMemo(()=>{ const d=new Date(); d.setHours(0,0,0,0); return d; },[]);
-
-  const forecast = useMemo(()=>{
-    const DAYS=120, events=[];
-    checks.forEach(c=>{ if(!c.date) return; const d=new Date(c.date); d.setHours(0,0,0,0); if(d>=today) events.push({date:toISO(d),amount:-Math.abs(c.amount||0),type:"check",label:c.supplierName||"המחאה"}); });
-    invoices.forEach(inv=>{ if(!inv.date) return; const sup=suppliers.find(s=>s.id===inv.supplierId||s.name===inv.supplierName); const terms=sup?(sup.paymentTerms||30):30; const pay=addDays(eom(new Date(inv.date)),terms); if(pay>=today) events.push({date:toISO(pay),amount:-Math.abs(inv.amount||0),type:"invoice",label:inv.supplierName||"חשבונית"}); });
-    for(let i=0;i<DAYS;i++){ const d=addDays(today,i); fixedItems.forEach(fi=>{ const sign=fi.type==="income"?1:-1; if(fi.recurrence==="monthly"&&d.getDate()===(fi.dayOfMonth||1)) events.push({date:toISO(d),amount:sign*Math.abs(fi.amount||0),type:fi.type==="income"?"income":"fixed",label:fi.name}); else if(fi.recurrence==="once"&&toISO(d)===fi.date) events.push({date:toISO(d),amount:sign*Math.abs(fi.amount||0),type:fi.type==="income"?"income":"fixed",label:fi.name}); }); }
-    events.sort((a,b)=>a.date.localeCompare(b.date));
-    const byDate={}; events.forEach(e=>{(byDate[e.date]=byDate[e.date]||[]).push(e);});
-    let bal=openingBal; const chartData=[];
-    for(let i=0;i<DAYS;i++){ const d=addDays(today,i),key=toISO(d); (byDate[key]||[]).forEach(e=>{bal+=e.amount;}); chartData.push({date:key,balance:Math.round(bal),label:d.toLocaleDateString("he-IL",{day:"numeric",month:"short"})}); }
-    const negDays=chartData.filter(c=>c.balance<0).map(c=>c.date);
-    const minBal=chartData.length?Math.min(...chartData.map(c=>c.balance)):0;
-    return {events,byDate,chartData,negDays,minBal};
-  },[checks,invoices,suppliers,fixedItems,openingBal,today]);
-
-  const kpis = useMemo(()=>({
-    ob:openingBal,
-    totalChecks:checks.reduce((s,c)=>s+(c.amount||0),0),
-    totalInvoices:invoices.reduce((s,i)=>s+(i.amount||0),0),
-    supCount:suppliers.length,
-    minForecast:forecast.minBal,
-    negDays:forecast.negDays.length,
-  }),[checks,invoices,suppliers,openingBal,forecast]);
-
-  const ctx={suppliers,setSuppliers,checks,setChecks,invoices,setInvoices,fixedItems,setFixedItems,openingBal,setOpeningBal,forecast,kpis,selSup,setSelSup,setTab,today};
-
-  return (
-    <div style={{display:"flex",height:"100vh",overflow:"hidden"}}>
-      <nav style={{width:220,background:"#05090f",borderLeft:"1px solid var(--bd)",display:"flex",flexDirection:"column",flexShrink:0,overflow:"auto"}}>
-        <div style={{padding:"20px 16px 16px",borderBottom:"1px solid var(--bd)"}}>
-          <div style={{fontSize:9,color:"var(--mu)",letterSpacing:3,marginBottom:4}}>ניהול תזרים מזומנים</div>
-          <div style={{fontSize:19,fontWeight:900,color:"var(--gold)",letterSpacing:-.5}}>CashFlow Pro</div>
-        </div>
-        <div style={{flex:1,padding:"10px 8px",display:"flex",flexDirection:"column",gap:2}}>
-          {TABS.map(t=>{
-            const act=tab===t.id;
-            return <button key={t.id} onClick={()=>setTab(t.id)} style={{background:act?"var(--glow)":"transparent",color:act?"var(--gold)":"var(--mu2)",border:"none",borderRadius:9,padding:"9px 12px",textAlign:"right",fontSize:13.5,fontWeight:act?700:400,display:"flex",alignItems:"center",gap:9,cursor:"pointer",borderRight:act?"2px solid var(--gold)":"2px solid transparent",transition:"all .15s"}}>
-              <span style={{fontSize:16}}>{t.icon}</span>{t.label}
-            </button>;
-          })}
-        </div>
-        <div style={{padding:"10px 12px 16px",display:"flex",flexDirection:"column",gap:8}}>
-          {kpis.negDays>0&&<div style={{padding:"9px 12px",background:"rgba(224,84,84,.07)",border:"1px solid rgba(224,84,84,.2)",borderRadius:9}}><div style={{fontSize:11,color:"var(--err)",fontWeight:700}}>⚠ {kpis.negDays} ימי חוסר צפויים</div></div>}
-          <div style={{padding:"9px 12px",background:"var(--glow)",border:"1px solid rgba(212,168,83,.15)",borderRadius:9}}>
-            <div style={{fontSize:10,color:"var(--mu)",marginBottom:3}}>יתרה נוכחית</div>
-            <div className="mono" style={{fontSize:14,fontWeight:700,color:openingBal>=0?"var(--ok)":"var(--err)"}}>{fmt(openingBal)}</div>
-          </div>
-        </div>
-      </nav>
-      <main style={{flex:1,overflow:"auto",padding:"26px 32px"}}>
-        {tab==="dashboard"&&<Dashboard ctx={ctx}/>}
-        {tab==="forecast" &&<ForecastTab ctx={ctx}/>}
-        {tab==="suppliers"&&<SuppliersTab ctx={ctx}/>}
-        {tab==="ledger"   &&<LedgerTab ctx={ctx}/>}
-        {tab==="aging"    &&<AgingTab ctx={ctx}/>}
-        {tab==="import"   &&<ImportTab ctx={ctx}/>}
-        {tab==="recurring"&&<RecurringTab ctx={ctx}/>}
-      </main>
-    </div>
-  );
+  var _useState = useState("dashboard"),
+    _useState2 = _slicedToArray(_useState, 2),
+    tab = _useState2[0],
+    setTab = _useState2[1];
+  var _useState3 = useState(function () {
+      return lsLoad("cf-sup", []);
+    }),
+    _useState4 = _slicedToArray(_useState3, 2),
+    suppliers = _useState4[0],
+    setSuppliers = _useState4[1];
+  var _useState5 = useState(function () {
+      return lsLoad("cf-chk", []);
+    }),
+    _useState6 = _slicedToArray(_useState5, 2),
+    checks = _useState6[0],
+    setChecks = _useState6[1];
+  var _useState7 = useState(function () {
+      return lsLoad("cf-inv", []);
+    }),
+    _useState8 = _slicedToArray(_useState7, 2),
+    invoices = _useState8[0],
+    setInvoices = _useState8[1];
+  var _useState9 = useState(function () {
+      return lsLoad("cf-fix", []);
+    }),
+    _useState0 = _slicedToArray(_useState9, 2),
+    fixedItems = _useState0[0],
+    setFixedItems = _useState0[1];
+  var _useState1 = useState(function () {
+      return lsLoad("cf-ob", 0);
+    }),
+    _useState10 = _slicedToArray(_useState1, 2),
+    openingBal = _useState10[0],
+    setOpeningBal = _useState10[1];
+  var _useState11 = useState(null),
+    _useState12 = _slicedToArray(_useState11, 2),
+    selSup = _useState12[0],
+    setSelSup = _useState12[1];
+  useEffect(function () {
+    return lsSave("cf-sup", suppliers);
+  }, [suppliers]);
+  useEffect(function () {
+    return lsSave("cf-chk", checks);
+  }, [checks]);
+  useEffect(function () {
+    return lsSave("cf-inv", invoices);
+  }, [invoices]);
+  useEffect(function () {
+    return lsSave("cf-fix", fixedItems);
+  }, [fixedItems]);
+  useEffect(function () {
+    return lsSave("cf-ob", openingBal);
+  }, [openingBal]);
+  var today = useMemo(function () {
+    var d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+  var forecast = useMemo(function () {
+    var DAYS = 120,
+      events = [];
+    checks.forEach(function (c) {
+      if (!c.date) return;
+      var d = new Date(c.date);
+      d.setHours(0, 0, 0, 0);
+      if (d >= today) events.push({
+        date: toISO(d),
+        amount: -Math.abs(c.amount || 0),
+        type: "check",
+        label: c.supplierName || "המחאה"
+      });
+    });
+    invoices.forEach(function (inv) {
+      if (!inv.date) return;
+      var sup = suppliers.find(function (s) {
+        return s.id === inv.supplierId || s.name === inv.supplierName;
+      });
+      var terms = sup ? sup.paymentTerms || 30 : 30;
+      var pay = addDays(eom(new Date(inv.date)), terms);
+      if (pay >= today) events.push({
+        date: toISO(pay),
+        amount: -Math.abs(inv.amount || 0),
+        type: "invoice",
+        label: inv.supplierName || "חשבונית"
+      });
+    });
+    var _loop = function _loop() {
+      var d = addDays(today, i);
+      fixedItems.forEach(function (fi) {
+        var sign = fi.type === "income" ? 1 : -1;
+        if (fi.recurrence === "monthly" && d.getDate() === (fi.dayOfMonth || 1)) events.push({
+          date: toISO(d),
+          amount: sign * Math.abs(fi.amount || 0),
+          type: fi.type === "income" ? "income" : "fixed",
+          label: fi.name
+        });else if (fi.recurrence === "once" && toISO(d) === fi.date) events.push({
+          date: toISO(d),
+          amount: sign * Math.abs(fi.amount || 0),
+          type: fi.type === "income" ? "income" : "fixed",
+          label: fi.name
+        });
+      });
+    };
+    for (var i = 0; i < DAYS; i++) {
+      _loop();
+    }
+    events.sort(function (a, b) {
+      return a.date.localeCompare(b.date);
+    });
+    var byDate = {};
+    events.forEach(function (e) {
+      (byDate[e.date] = byDate[e.date] || []).push(e);
+    });
+    var bal = openingBal;
+    var chartData = [];
+    for (var _i = 0; _i < DAYS; _i++) {
+      var d = addDays(today, _i),
+        key = toISO(d);
+      (byDate[key] || []).forEach(function (e) {
+        bal += e.amount;
+      });
+      chartData.push({
+        date: key,
+        balance: Math.round(bal),
+        label: d.toLocaleDateString("he-IL", {
+          day: "numeric",
+          month: "short"
+        })
+      });
+    }
+    var negDays = chartData.filter(function (c) {
+      return c.balance < 0;
+    }).map(function (c) {
+      return c.date;
+    });
+    var minBal = chartData.length ? Math.min.apply(Math, _toConsumableArray(chartData.map(function (c) {
+      return c.balance;
+    }))) : 0;
+    return {
+      events: events,
+      byDate: byDate,
+      chartData: chartData,
+      negDays: negDays,
+      minBal: minBal
+    };
+  }, [checks, invoices, suppliers, fixedItems, openingBal, today]);
+  var kpis = useMemo(function () {
+    return {
+      ob: openingBal,
+      totalChecks: checks.reduce(function (s, c) {
+        return s + (c.amount || 0);
+      }, 0),
+      totalInvoices: invoices.reduce(function (s, i) {
+        return s + (i.amount || 0);
+      }, 0),
+      supCount: suppliers.length,
+      minForecast: forecast.minBal,
+      negDays: forecast.negDays.length
+    };
+  }, [checks, invoices, suppliers, openingBal, forecast]);
+  var ctx = {
+    suppliers: suppliers,
+    setSuppliers: setSuppliers,
+    checks: checks,
+    setChecks: setChecks,
+    invoices: invoices,
+    setInvoices: setInvoices,
+    fixedItems: fixedItems,
+    setFixedItems: setFixedItems,
+    openingBal: openingBal,
+    setOpeningBal: setOpeningBal,
+    forecast: forecast,
+    kpis: kpis,
+    selSup: selSup,
+    setSelSup: setSelSup,
+    setTab: setTab,
+    today: today
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      height: "100vh",
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("nav", {
+    style: {
+      width: 220,
+      background: "#05090f",
+      borderLeft: "1px solid var(--bd)",
+      display: "flex",
+      flexDirection: "column",
+      flexShrink: 0,
+      overflow: "auto"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "20px 16px 16px",
+      borderBottom: "1px solid var(--bd)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 9,
+      color: "var(--mu)",
+      letterSpacing: 3,
+      marginBottom: 4
+    }
+  }, "\u05E0\u05D9\u05D4\u05D5\u05DC \u05EA\u05D6\u05E8\u05D9\u05DD \u05DE\u05D6\u05D5\u05DE\u05E0\u05D9\u05DD"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 19,
+      fontWeight: 900,
+      color: "var(--gold)",
+      letterSpacing: -.5
+    }
+  }, "CashFlow Pro")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      padding: "10px 8px",
+      display: "flex",
+      flexDirection: "column",
+      gap: 2
+    }
+  }, TABS.map(function (t) {
+    var act = tab === t.id;
+    return /*#__PURE__*/React.createElement("button", {
+      key: t.id,
+      onClick: function onClick() {
+        return setTab(t.id);
+      },
+      style: {
+        background: act ? "var(--glow)" : "transparent",
+        color: act ? "var(--gold)" : "var(--mu2)",
+        border: "none",
+        borderRadius: 9,
+        padding: "9px 12px",
+        textAlign: "right",
+        fontSize: 13.5,
+        fontWeight: act ? 700 : 400,
+        display: "flex",
+        alignItems: "center",
+        gap: 9,
+        cursor: "pointer",
+        borderRight: act ? "2px solid var(--gold)" : "2px solid transparent",
+        transition: "all .15s"
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 16
+      }
+    }, t.icon), t.label);
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "10px 12px 16px",
+      display: "flex",
+      flexDirection: "column",
+      gap: 8
+    }
+  }, kpis.negDays > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "9px 12px",
+      background: "rgba(224,84,84,.07)",
+      border: "1px solid rgba(224,84,84,.2)",
+      borderRadius: 9
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "var(--err)",
+      fontWeight: 700
+    }
+  }, "\u26A0 ", kpis.negDays, " \u05D9\u05DE\u05D9 \u05D7\u05D5\u05E1\u05E8 \u05E6\u05E4\u05D5\u05D9\u05D9\u05DD")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "9px 12px",
+      background: "var(--glow)",
+      border: "1px solid rgba(212,168,83,.15)",
+      borderRadius: 9
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: "var(--mu)",
+      marginBottom: 3
+    }
+  }, "\u05D9\u05EA\u05E8\u05D4 \u05E0\u05D5\u05DB\u05D7\u05D9\u05EA"), /*#__PURE__*/React.createElement("div", {
+    className: "mono",
+    style: {
+      fontSize: 14,
+      fontWeight: 700,
+      color: openingBal >= 0 ? "var(--ok)" : "var(--err)"
+    }
+  }, fmt(openingBal))))), /*#__PURE__*/React.createElement("main", {
+    style: {
+      flex: 1,
+      overflow: "auto",
+      padding: "26px 32px"
+    }
+  }, tab === "dashboard" && /*#__PURE__*/React.createElement(Dashboard, {
+    ctx: ctx
+  }), tab === "forecast" && /*#__PURE__*/React.createElement(ForecastTab, {
+    ctx: ctx
+  }), tab === "suppliers" && /*#__PURE__*/React.createElement(SuppliersTab, {
+    ctx: ctx
+  }), tab === "ledger" && /*#__PURE__*/React.createElement(LedgerTab, {
+    ctx: ctx
+  }), tab === "aging" && /*#__PURE__*/React.createElement(AgingTab, {
+    ctx: ctx
+  }), tab === "import" && /*#__PURE__*/React.createElement(ImportTab, {
+    ctx: ctx
+  }), tab === "recurring" && /*#__PURE__*/React.createElement(RecurringTab, {
+    ctx: ctx
+  })));
 }
 
 // ── Shared ────────────────────────────────────────────────────────────────────
-function Modal({title,onClose,children}){
-  return <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.65)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:999}} onClick={e=>e.target===e.currentTarget&&onClose()}>
-    <div className="card" style={{width:440,padding:28,boxShadow:"0 24px 64px rgba(0,0,0,.6)"}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-        <h3 style={{fontSize:16,fontWeight:700}}>{title}</h3>
-        <button className="btn-g" style={{padding:"4px 10px",fontSize:16}} onClick={onClose}>✕</button>
-      </div>
-      {children}
-    </div>
-  </div>;
+function Modal(_ref) {
+  var title = _ref.title,
+    onClose = _ref.onClose,
+    children = _ref.children;
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,.65)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 999
+    },
+    onClick: function onClick(e) {
+      return e.target === e.currentTarget && onClose();
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      width: 440,
+      padding: 28,
+      boxShadow: "0 24px 64px rgba(0,0,0,.6)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: 16,
+      fontWeight: 700
+    }
+  }, title), /*#__PURE__*/React.createElement("button", {
+    className: "btn-g",
+    style: {
+      padding: "4px 10px",
+      fontSize: 16
+    },
+    onClick: onClose
+  }, "\u2715")), children));
 }
-
-function KpiCard({icon,label,value,color,onClick,note}){
-  return <div className="card" onClick={onClick} style={{padding:"18px 20px",cursor:onClick?"pointer":"default",transition:"border-color .2s"}} onMouseEnter={e=>onClick&&(e.currentTarget.style.borderColor="var(--gold)")} onMouseLeave={e=>(e.currentTarget.style.borderColor="var(--bd)")}>
-    <div style={{fontSize:24,marginBottom:10}}>{icon}</div>
-    <div className="mono" style={{fontSize:18,fontWeight:700,color:color||"var(--tx)"}}>{value}</div>
-    <div style={{fontSize:12,color:"var(--mu2)",marginTop:5}}>{label}</div>
-    {note&&<div style={{fontSize:10,color:"rgba(212,168,83,.4)",marginTop:4}}>{note}</div>}
-  </div>;
+function KpiCard(_ref2) {
+  var icon = _ref2.icon,
+    label = _ref2.label,
+    value = _ref2.value,
+    color = _ref2.color,
+    onClick = _ref2.onClick,
+    note = _ref2.note;
+  return /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    onClick: onClick,
+    style: {
+      padding: "18px 20px",
+      cursor: onClick ? "pointer" : "default",
+      transition: "border-color .2s"
+    },
+    onMouseEnter: function onMouseEnter(e) {
+      return onClick && (e.currentTarget.style.borderColor = "var(--gold)");
+    },
+    onMouseLeave: function onMouseLeave(e) {
+      return e.currentTarget.style.borderColor = "var(--bd)";
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 24,
+      marginBottom: 10
+    }
+  }, icon), /*#__PURE__*/React.createElement("div", {
+    className: "mono",
+    style: {
+      fontSize: 18,
+      fontWeight: 700,
+      color: color || "var(--tx)"
+    }
+  }, value), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "var(--mu2)",
+      marginTop: 5
+    }
+  }, label), note && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: "rgba(212,168,83,.4)",
+      marginTop: 4
+    }
+  }, note));
 }
-
-function ChartTip({active,payload}){
-  if(!active||!payload?.length) return null;
-  const v=payload[0].value;
-  return <div style={{background:"var(--s2)",border:"1px solid var(--bd)",borderRadius:9,padding:"10px 14px"}}>
-    <div style={{fontSize:11,color:"var(--mu2)",marginBottom:3}}>{payload[0]?.payload?.label}</div>
-    <div className="mono" style={{fontSize:15,fontWeight:700,color:v>=0?"var(--ok)":"var(--err)"}}>{fmt(v)}</div>
-  </div>;
+function ChartTip(_ref3) {
+  var _payload$;
+  var active = _ref3.active,
+    payload = _ref3.payload;
+  if (!active || !(payload !== null && payload !== void 0 && payload.length)) return null;
+  var v = payload[0].value;
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "var(--s2)",
+      border: "1px solid var(--bd)",
+      borderRadius: 9,
+      padding: "10px 14px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "var(--mu2)",
+      marginBottom: 3
+    }
+  }, (_payload$ = payload[0]) === null || _payload$ === void 0 || (_payload$ = _payload$.payload) === null || _payload$ === void 0 ? void 0 : _payload$.label), /*#__PURE__*/React.createElement("div", {
+    className: "mono",
+    style: {
+      fontSize: 15,
+      fontWeight: 700,
+      color: v >= 0 ? "var(--ok)" : "var(--err)"
+    }
+  }, fmt(v)));
 }
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
-function Dashboard({ctx}){
-  const {kpis,forecast,openingBal,setOpeningBal,checks,invoices}=ctx;
-  const [editBal,setEditBal]=useState(false);
-  const [balVal,setBalVal]=useState(openingBal);
-
-  const monthlyBars=useMemo(()=>{
-    const now=new Date();
-    return Array.from({length:6},(_,i)=>{
-      const d=new Date(now.getFullYear(),now.getMonth()-5+i,1);
-      const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
-      const label=d.toLocaleDateString("he-IL",{month:"short",year:"2-digit"});
-      return {label,inv:invoices.filter(x=>x.date?.startsWith(key)).reduce((s,x)=>s+(x.amount||0),0),chk:checks.filter(x=>x.date?.startsWith(key)).reduce((s,x)=>s+(x.amount||0),0)};
+function Dashboard(_ref4) {
+  var ctx = _ref4.ctx;
+  var kpis = ctx.kpis,
+    forecast = ctx.forecast,
+    openingBal = ctx.openingBal,
+    setOpeningBal = ctx.setOpeningBal,
+    checks = ctx.checks,
+    invoices = ctx.invoices;
+  var _useState13 = useState(false),
+    _useState14 = _slicedToArray(_useState13, 2),
+    editBal = _useState14[0],
+    setEditBal = _useState14[1];
+  var _useState15 = useState(openingBal),
+    _useState16 = _slicedToArray(_useState15, 2),
+    balVal = _useState16[0],
+    setBalVal = _useState16[1];
+  var monthlyBars = useMemo(function () {
+    var now = new Date();
+    return Array.from({
+      length: 6
+    }, function (_, i) {
+      var d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
+      var key = "".concat(d.getFullYear(), "-").concat(String(d.getMonth() + 1).padStart(2, "0"));
+      var label = d.toLocaleDateString("he-IL", {
+        month: "short",
+        year: "2-digit"
+      });
+      return {
+        label: label,
+        inv: invoices.filter(function (x) {
+          var _x$date;
+          return (_x$date = x.date) === null || _x$date === void 0 ? void 0 : _x$date.startsWith(key);
+        }).reduce(function (s, x) {
+          return s + (x.amount || 0);
+        }, 0),
+        chk: checks.filter(function (x) {
+          var _x$date2;
+          return (_x$date2 = x.date) === null || _x$date2 === void 0 ? void 0 : _x$date2.startsWith(key);
+        }).reduce(function (s, x) {
+          return s + (x.amount || 0);
+        }, 0)
+      };
     });
-  },[invoices,checks]);
-
-  return <div>
-    <h1>דשבורד</h1>
-    <div className="sub">סקירה כללית ותחזית תזרים</div>
-    <div className="g3" style={{marginBottom:20}}>
-      <KpiCard icon="💰" label="יתרה נוכחית" value={fmt(kpis.ob)} color={kpis.ob>=0?"var(--ok)":"var(--err)"} onClick={()=>{setBalVal(kpis.ob);setEditBal(true);}} note="לחץ לעדכון"/>
-      <KpiCard icon="🧾" label="סה״כ חשבוניות" value={fmt(kpis.totalInvoices)} color="var(--warn)"/>
-      <KpiCard icon="📄" label="סה״כ המחאות" value={fmt(kpis.totalChecks)} color="var(--inf)"/>
-      <KpiCard icon="⏳" label="יתרה לתשלום" value={fmt(Math.max(0,kpis.totalInvoices-kpis.totalChecks))} color="var(--err)"/>
-      <KpiCard icon={kpis.minForecast<0?"⚠":"✅"} label="מינימום תחזית 120י׳" value={fmt(kpis.minForecast)} color={kpis.minForecast<0?"var(--err)":"var(--ok)"}/>
-      <KpiCard icon="🏢" label="ספקים פעילים" value={kpis.supCount} color="var(--mu2)"/>
-    </div>
-
-    {editBal&&<Modal title="עדכון יתרת חשבון בנק" onClose={()=>setEditBal(false)}>
-      <label>יתרה נוכחית (₪)</label>
-      <input type="number" value={balVal} onChange={e=>setBalVal(+e.target.value)} style={{marginBottom:16}} autoFocus/>
-      <div style={{display:"flex",gap:8}}>
-        <button className="btn-p" onClick={()=>{setOpeningBal(+balVal);setEditBal(false);}}>שמור</button>
-        <button className="btn-g" onClick={()=>setEditBal(false)}>ביטול</button>
-      </div>
-    </Modal>}
-
-    <div className="card" style={{padding:"22px 24px",marginBottom:18}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
-        <h2 style={{fontSize:15,fontWeight:700}}>תחזית תזרים — 120 ימים קדימה</h2>
-        {forecast.negDays.length>0&&<span className="tag t-fixed">⚠ {forecast.negDays.length} ימי חוסר</span>}
-      </div>
-      <ResponsiveContainer width="100%" height={230}>
-        <AreaChart data={forecast.chartData} margin={{top:5,right:5,bottom:0,left:5}}>
-          <defs><linearGradient id="gp" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#d4a853" stopOpacity={0.25}/><stop offset="95%" stopColor="#d4a853" stopOpacity={0}/></linearGradient></defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#172030"/>
-          <XAxis dataKey="label" tick={{fill:"#4e6a8a",fontSize:10}} tickLine={false} axisLine={false} interval={14}/>
-          <YAxis tick={{fill:"#4e6a8a",fontSize:10}} tickLine={false} axisLine={false} tickFormatter={v=>`₪${(Math.abs(v)/1000).toFixed(0)}K`} width={52}/>
-          <Tooltip content={<ChartTip/>}/>
-          <ReferenceLine y={0} stroke="#e05454" strokeDasharray="4 4" strokeOpacity={0.5}/>
-          <Area type="monotone" dataKey="balance" stroke="#d4a853" strokeWidth={2} fill="url(#gp)" dot={false} activeDot={{r:4,fill:"#d4a853"}}/>
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
-
-    {monthlyBars.some(m=>m.inv>0||m.chk>0)&&<div className="card" style={{padding:"22px 24px",marginBottom:18}}>
-      <h2 style={{fontSize:15,fontWeight:700,marginBottom:18}}>חשבוניות מול תשלומים — 6 חודשים אחרונים</h2>
-      <ResponsiveContainer width="100%" height={180}>
-        <BarChart data={monthlyBars} margin={{top:5,right:5,bottom:0,left:5}}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#172030"/>
-          <XAxis dataKey="label" tick={{fill:"#4e6a8a",fontSize:11}} tickLine={false} axisLine={false}/>
-          <YAxis tick={{fill:"#4e6a8a",fontSize:10}} tickLine={false} axisLine={false} tickFormatter={v=>`₪${(v/1000).toFixed(0)}K`} width={52}/>
-          <Tooltip formatter={(v,n)=>[fmt(v),n==="inv"?"חשבוניות":"המחאות"]} contentStyle={{background:"var(--s2)",border:"1px solid var(--bd)",borderRadius:8}}/>
-          <Bar dataKey="inv" fill="#d4a030" opacity={0.85} radius={[3,3,0,0]}/>
-          <Bar dataKey="chk" fill="#4d96e8" opacity={0.85} radius={[3,3,0,0]}/>
-        </BarChart>
-      </ResponsiveContainer>
-      <div style={{display:"flex",gap:18,justifyContent:"center",marginTop:10}}>
-        {[["#d4a030","חשבוניות"],["#4d96e8","המחאות"]].map(([c,l])=><div key={l} style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:"var(--mu2)"}}><div style={{width:10,height:10,borderRadius:2,background:c}}/>{l}</div>)}
-      </div>
-    </div>}
-
-    {forecast.negDays.length>0&&<div style={{background:"rgba(224,84,84,.04)",border:"1px solid rgba(224,84,84,.18)",borderRadius:12,padding:20}}>
-      <h3 style={{color:"var(--err)",fontSize:14,marginBottom:12,fontWeight:700}}>⚠ ימים עם יתרה שלילית</h3>
-      <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
-        {forecast.negDays.slice(0,18).map(d=><span key={d} style={{background:"rgba(224,84,84,.1)",color:"var(--err)",padding:"3px 10px",borderRadius:999,fontSize:12}}>{fmtDate(d)}</span>)}
-        {forecast.negDays.length>18&&<span style={{color:"var(--mu2)",fontSize:12,alignSelf:"center"}}>+{forecast.negDays.length-18} נוספים</span>}
-      </div>
-    </div>}
-  </div>;
+  }, [invoices, checks]);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05D3\u05E9\u05D1\u05D5\u05E8\u05D3"), /*#__PURE__*/React.createElement("div", {
+    className: "sub"
+  }, "\u05E1\u05E7\u05D9\u05E8\u05D4 \u05DB\u05DC\u05DC\u05D9\u05EA \u05D5\u05EA\u05D7\u05D6\u05D9\u05EA \u05EA\u05D6\u05E8\u05D9\u05DD"), /*#__PURE__*/React.createElement("div", {
+    className: "g3",
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement(KpiCard, {
+    icon: "\uD83D\uDCB0",
+    label: "\u05D9\u05EA\u05E8\u05D4 \u05E0\u05D5\u05DB\u05D7\u05D9\u05EA",
+    value: fmt(kpis.ob),
+    color: kpis.ob >= 0 ? "var(--ok)" : "var(--err)",
+    onClick: function onClick() {
+      setBalVal(kpis.ob);
+      setEditBal(true);
+    },
+    note: "\u05DC\u05D7\u05E5 \u05DC\u05E2\u05D3\u05DB\u05D5\u05DF"
+  }), /*#__PURE__*/React.createElement(KpiCard, {
+    icon: "\uD83E\uDDFE",
+    label: "\u05E1\u05D4\u05F4\u05DB \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA",
+    value: fmt(kpis.totalInvoices),
+    color: "var(--warn)"
+  }), /*#__PURE__*/React.createElement(KpiCard, {
+    icon: "\uD83D\uDCC4",
+    label: "\u05E1\u05D4\u05F4\u05DB \u05D4\u05DE\u05D7\u05D0\u05D5\u05EA",
+    value: fmt(kpis.totalChecks),
+    color: "var(--inf)"
+  }), /*#__PURE__*/React.createElement(KpiCard, {
+    icon: "\u23F3",
+    label: "\u05D9\u05EA\u05E8\u05D4 \u05DC\u05EA\u05E9\u05DC\u05D5\u05DD",
+    value: fmt(Math.max(0, kpis.totalInvoices - kpis.totalChecks)),
+    color: "var(--err)"
+  }), /*#__PURE__*/React.createElement(KpiCard, {
+    icon: kpis.minForecast < 0 ? "⚠" : "✅",
+    label: "\u05DE\u05D9\u05E0\u05D9\u05DE\u05D5\u05DD \u05EA\u05D7\u05D6\u05D9\u05EA 120\u05D9\u05F3",
+    value: fmt(kpis.minForecast),
+    color: kpis.minForecast < 0 ? "var(--err)" : "var(--ok)"
+  }), /*#__PURE__*/React.createElement(KpiCard, {
+    icon: "\uD83C\uDFE2",
+    label: "\u05E1\u05E4\u05E7\u05D9\u05DD \u05E4\u05E2\u05D9\u05DC\u05D9\u05DD",
+    value: kpis.supCount,
+    color: "var(--mu2)"
+  })), editBal && /*#__PURE__*/React.createElement(Modal, {
+    title: "\u05E2\u05D3\u05DB\u05D5\u05DF \u05D9\u05EA\u05E8\u05EA \u05D7\u05E9\u05D1\u05D5\u05DF \u05D1\u05E0\u05E7",
+    onClose: function onClose() {
+      return setEditBal(false);
+    }
+  }, /*#__PURE__*/React.createElement("label", null, "\u05D9\u05EA\u05E8\u05D4 \u05E0\u05D5\u05DB\u05D7\u05D9\u05EA (\u20AA)"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: balVal,
+    onChange: function onChange(e) {
+      return setBalVal(+e.target.value);
+    },
+    style: {
+      marginBottom: 16
+    },
+    autoFocus: true
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn-p",
+    onClick: function onClick() {
+      setOpeningBal(+balVal);
+      setEditBal(false);
+    }
+  }, "\u05E9\u05DE\u05D5\u05E8"), /*#__PURE__*/React.createElement("button", {
+    className: "btn-g",
+    onClick: function onClick() {
+      return setEditBal(false);
+    }
+  }, "\u05D1\u05D9\u05D8\u05D5\u05DC"))), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: "22px 24px",
+      marginBottom: 18
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 18
+    }
+  }, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: 15,
+      fontWeight: 700
+    }
+  }, "\u05EA\u05D7\u05D6\u05D9\u05EA \u05EA\u05D6\u05E8\u05D9\u05DD \u2014 120 \u05D9\u05DE\u05D9\u05DD \u05E7\u05D3\u05D9\u05DE\u05D4"), forecast.negDays.length > 0 && /*#__PURE__*/React.createElement("span", {
+    className: "tag t-fixed"
+  }, "\u26A0 ", forecast.negDays.length, " \u05D9\u05DE\u05D9 \u05D7\u05D5\u05E1\u05E8")), /*#__PURE__*/React.createElement(ResponsiveContainer, {
+    width: "100%",
+    height: 230
+  }, /*#__PURE__*/React.createElement(AreaChart, {
+    data: forecast.chartData,
+    margin: {
+      top: 5,
+      right: 5,
+      bottom: 0,
+      left: 5
+    }
+  }, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("linearGradient", {
+    id: "gp",
+    x1: "0",
+    y1: "0",
+    x2: "0",
+    y2: "1"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "5%",
+    stopColor: "#d4a853",
+    stopOpacity: 0.25
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "95%",
+    stopColor: "#d4a853",
+    stopOpacity: 0
+  }))), /*#__PURE__*/React.createElement(CartesianGrid, {
+    strokeDasharray: "3 3",
+    stroke: "#172030"
+  }), /*#__PURE__*/React.createElement(XAxis, {
+    dataKey: "label",
+    tick: {
+      fill: "#4e6a8a",
+      fontSize: 10
+    },
+    tickLine: false,
+    axisLine: false,
+    interval: 14
+  }), /*#__PURE__*/React.createElement(YAxis, {
+    tick: {
+      fill: "#4e6a8a",
+      fontSize: 10
+    },
+    tickLine: false,
+    axisLine: false,
+    tickFormatter: function tickFormatter(v) {
+      return "\u20AA".concat((Math.abs(v) / 1000).toFixed(0), "K");
+    },
+    width: 52
+  }), /*#__PURE__*/React.createElement(Tooltip, {
+    content: /*#__PURE__*/React.createElement(ChartTip, null)
+  }), /*#__PURE__*/React.createElement(ReferenceLine, {
+    y: 0,
+    stroke: "#e05454",
+    strokeDasharray: "4 4",
+    strokeOpacity: 0.5
+  }), /*#__PURE__*/React.createElement(Area, {
+    type: "monotone",
+    dataKey: "balance",
+    stroke: "#d4a853",
+    strokeWidth: 2,
+    fill: "url(#gp)",
+    dot: false,
+    activeDot: {
+      r: 4,
+      fill: "#d4a853"
+    }
+  })))), monthlyBars.some(function (m) {
+    return m.inv > 0 || m.chk > 0;
+  }) && /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: "22px 24px",
+      marginBottom: 18
+    }
+  }, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: 15,
+      fontWeight: 700,
+      marginBottom: 18
+    }
+  }, "\u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA \u05DE\u05D5\u05DC \u05EA\u05E9\u05DC\u05D5\u05DE\u05D9\u05DD \u2014 6 \u05D7\u05D5\u05D3\u05E9\u05D9\u05DD \u05D0\u05D7\u05E8\u05D5\u05E0\u05D9\u05DD"), /*#__PURE__*/React.createElement(ResponsiveContainer, {
+    width: "100%",
+    height: 180
+  }, /*#__PURE__*/React.createElement(BarChart, {
+    data: monthlyBars,
+    margin: {
+      top: 5,
+      right: 5,
+      bottom: 0,
+      left: 5
+    }
+  }, /*#__PURE__*/React.createElement(CartesianGrid, {
+    strokeDasharray: "3 3",
+    stroke: "#172030"
+  }), /*#__PURE__*/React.createElement(XAxis, {
+    dataKey: "label",
+    tick: {
+      fill: "#4e6a8a",
+      fontSize: 11
+    },
+    tickLine: false,
+    axisLine: false
+  }), /*#__PURE__*/React.createElement(YAxis, {
+    tick: {
+      fill: "#4e6a8a",
+      fontSize: 10
+    },
+    tickLine: false,
+    axisLine: false,
+    tickFormatter: function tickFormatter(v) {
+      return "\u20AA".concat((v / 1000).toFixed(0), "K");
+    },
+    width: 52
+  }), /*#__PURE__*/React.createElement(Tooltip, {
+    formatter: function formatter(v, n) {
+      return [fmt(v), n === "inv" ? "חשבוניות" : "המחאות"];
+    },
+    contentStyle: {
+      background: "var(--s2)",
+      border: "1px solid var(--bd)",
+      borderRadius: 8
+    }
+  }), /*#__PURE__*/React.createElement(Bar, {
+    dataKey: "inv",
+    fill: "#d4a030",
+    opacity: 0.85,
+    radius: [3, 3, 0, 0]
+  }), /*#__PURE__*/React.createElement(Bar, {
+    dataKey: "chk",
+    fill: "#4d96e8",
+    opacity: 0.85,
+    radius: [3, 3, 0, 0]
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 18,
+      justifyContent: "center",
+      marginTop: 10
+    }
+  }, [["#d4a030", "חשבוניות"], ["#4d96e8", "המחאות"]].map(function (_ref5) {
+    var _ref6 = _slicedToArray(_ref5, 2),
+      c = _ref6[0],
+      l = _ref6[1];
+    return /*#__PURE__*/React.createElement("div", {
+      key: l,
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        fontSize: 12,
+        color: "var(--mu2)"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 10,
+        height: 10,
+        borderRadius: 2,
+        background: c
+      }
+    }), l);
+  }))), forecast.negDays.length > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "rgba(224,84,84,.04)",
+      border: "1px solid rgba(224,84,84,.18)",
+      borderRadius: 12,
+      padding: 20
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      color: "var(--err)",
+      fontSize: 14,
+      marginBottom: 12,
+      fontWeight: 700
+    }
+  }, "\u26A0 \u05D9\u05DE\u05D9\u05DD \u05E2\u05DD \u05D9\u05EA\u05E8\u05D4 \u05E9\u05DC\u05D9\u05DC\u05D9\u05EA"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 7
+    }
+  }, forecast.negDays.slice(0, 18).map(function (d) {
+    return /*#__PURE__*/React.createElement("span", {
+      key: d,
+      style: {
+        background: "rgba(224,84,84,.1)",
+        color: "var(--err)",
+        padding: "3px 10px",
+        borderRadius: 999,
+        fontSize: 12
+      }
+    }, fmtDate(d));
+  }), forecast.negDays.length > 18 && /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "var(--mu2)",
+      fontSize: 12,
+      alignSelf: "center"
+    }
+  }, "+", forecast.negDays.length - 18, " \u05E0\u05D5\u05E1\u05E4\u05D9\u05DD"))));
 }
 
 // ── Forecast Tab ──────────────────────────────────────────────────────────────
-function ForecastTab({ctx}){
-  const {forecast,openingBal}=ctx;
-  const [mode,setMode]=useState("table");
-  const [filter,setFilter]=useState("all");
-
-  const rows=useMemo(()=>{
-    let bal=openingBal;
-    return forecast.events.map(e=>{bal+=e.amount;return{...e,bal};});
-  },[forecast.events,openingBal]);
-
-  const filtered=filter==="all"?rows:rows.filter(r=>r.type===filter);
-
-  return <div>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:22}}>
-      <div><h1>תזרים עתידי</h1><div className="sub">תחזית 120 יום קדימה</div></div>
-      <div style={{display:"flex",gap:8}}>
-        <button className={mode==="table"?"btn-p":"btn-g"} onClick={()=>setMode("table")}>טבלה</button>
-        <button className={mode==="chart"?"btn-p":"btn-g"} onClick={()=>setMode("chart")}>גרף</button>
-      </div>
-    </div>
-
-    {mode==="chart"&&<div className="card" style={{padding:"22px 24px"}}>
-      <ResponsiveContainer width="100%" height={360}>
-        <AreaChart data={forecast.chartData} margin={{top:5,right:5,bottom:0,left:5}}>
-          <defs><linearGradient id="fg2" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#d4a853" stopOpacity={0.25}/><stop offset="95%" stopColor="#d4a853" stopOpacity={0}/></linearGradient></defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#172030"/>
-          <XAxis dataKey="label" tick={{fill:"#4e6a8a",fontSize:10}} tickLine={false} axisLine={false} interval={7}/>
-          <YAxis tick={{fill:"#4e6a8a",fontSize:10}} tickLine={false} axisLine={false} tickFormatter={v=>`₪${(Math.abs(v)/1000).toFixed(0)}K`} width={58}/>
-          <Tooltip content={<ChartTip/>}/>
-          <ReferenceLine y={0} stroke="#e05454" strokeDasharray="4 4" strokeOpacity={0.6}/>
-          <Area type="monotone" dataKey="balance" stroke="#d4a853" strokeWidth={2} fill="url(#fg2)" dot={false} activeDot={{r:4,fill:"#d4a853"}}/>
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>}
-
-    {mode==="table"&&<>
-      <div style={{display:"flex",gap:8,marginBottom:14,flexWrap:"wrap"}}>
-        {[["all","הכל"],["check","המחאות"],["invoice","חשבוניות"],["income","הכנסות"],["fixed","קבועות"]].map(([v,l])=>
-          <button key={v} onClick={()=>setFilter(v)} className={filter===v?"btn-p":"btn-g"} style={{padding:"5px 12px",fontSize:13}}>{l}</button>
-        )}
-      </div>
-      <div className="card" style={{overflow:"hidden"}}>
-        <table>
-          <thead><tr><th>תאריך</th><th>סוג</th><th>תיאור</th><th>שינוי</th><th>יתרה מצטברת</th></tr></thead>
-          <tbody>
-            <tr>
-              <td colSpan={4} style={{color:"var(--mu2)",fontSize:12}}>יתרת פתיחה</td>
-              <td className="mono" style={{color:"var(--gold)",fontWeight:700}}>{fmt(openingBal)}</td>
-            </tr>
-            {filtered.map((r,i)=><tr key={i}>
-              <td style={{color:"var(--mu2)",fontSize:12,whiteSpace:"nowrap"}}>{fmtDate(r.date)}</td>
-              <td><span className={`tag t-${r.type}`}>{typeLabel(r.type)}</span></td>
-              <td style={{maxWidth:200,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r.label}</td>
-              <td className="mono" style={{color:r.amount<0?"var(--err)":"var(--ok)",fontWeight:600,whiteSpace:"nowrap"}}>{r.amount<0?"−":"+"}{fmt(Math.abs(r.amount))}</td>
-              <td className="mono" style={{fontWeight:700,color:r.bal<0?"var(--err)":"var(--tx)"}}>{fmt(r.bal)}</td>
-            </tr>)}
-            {filtered.length===0&&<tr><td colSpan={5} style={{textAlign:"center",color:"var(--mu2)",padding:50}}>אין נתונים. ייבא קבצים כדי לראות תחזית.</td></tr>}
-          </tbody>
-        </table>
-      </div>
-    </>}
-  </div>;
+function ForecastTab(_ref7) {
+  var ctx = _ref7.ctx;
+  var forecast = ctx.forecast,
+    openingBal = ctx.openingBal;
+  var _useState17 = useState("table"),
+    _useState18 = _slicedToArray(_useState17, 2),
+    mode = _useState18[0],
+    setMode = _useState18[1];
+  var _useState19 = useState("all"),
+    _useState20 = _slicedToArray(_useState19, 2),
+    filter = _useState20[0],
+    setFilter = _useState20[1];
+  var rows = useMemo(function () {
+    var bal = openingBal;
+    return forecast.events.map(function (e) {
+      bal += e.amount;
+      return _objectSpread(_objectSpread({}, e), {}, {
+        bal: bal
+      });
+    });
+  }, [forecast.events, openingBal]);
+  var filtered = filter === "all" ? rows : rows.filter(function (r) {
+    return r.type === filter;
+  });
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      marginBottom: 22
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05EA\u05D6\u05E8\u05D9\u05DD \u05E2\u05EA\u05D9\u05D3\u05D9"), /*#__PURE__*/React.createElement("div", {
+    className: "sub"
+  }, "\u05EA\u05D7\u05D6\u05D9\u05EA 120 \u05D9\u05D5\u05DD \u05E7\u05D3\u05D9\u05DE\u05D4")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: mode === "table" ? "btn-p" : "btn-g",
+    onClick: function onClick() {
+      return setMode("table");
+    }
+  }, "\u05D8\u05D1\u05DC\u05D4"), /*#__PURE__*/React.createElement("button", {
+    className: mode === "chart" ? "btn-p" : "btn-g",
+    onClick: function onClick() {
+      return setMode("chart");
+    }
+  }, "\u05D2\u05E8\u05E3"))), mode === "chart" && /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: "22px 24px"
+    }
+  }, /*#__PURE__*/React.createElement(ResponsiveContainer, {
+    width: "100%",
+    height: 360
+  }, /*#__PURE__*/React.createElement(AreaChart, {
+    data: forecast.chartData,
+    margin: {
+      top: 5,
+      right: 5,
+      bottom: 0,
+      left: 5
+    }
+  }, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("linearGradient", {
+    id: "fg2",
+    x1: "0",
+    y1: "0",
+    x2: "0",
+    y2: "1"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "5%",
+    stopColor: "#d4a853",
+    stopOpacity: 0.25
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "95%",
+    stopColor: "#d4a853",
+    stopOpacity: 0
+  }))), /*#__PURE__*/React.createElement(CartesianGrid, {
+    strokeDasharray: "3 3",
+    stroke: "#172030"
+  }), /*#__PURE__*/React.createElement(XAxis, {
+    dataKey: "label",
+    tick: {
+      fill: "#4e6a8a",
+      fontSize: 10
+    },
+    tickLine: false,
+    axisLine: false,
+    interval: 7
+  }), /*#__PURE__*/React.createElement(YAxis, {
+    tick: {
+      fill: "#4e6a8a",
+      fontSize: 10
+    },
+    tickLine: false,
+    axisLine: false,
+    tickFormatter: function tickFormatter(v) {
+      return "\u20AA".concat((Math.abs(v) / 1000).toFixed(0), "K");
+    },
+    width: 58
+  }), /*#__PURE__*/React.createElement(Tooltip, {
+    content: /*#__PURE__*/React.createElement(ChartTip, null)
+  }), /*#__PURE__*/React.createElement(ReferenceLine, {
+    y: 0,
+    stroke: "#e05454",
+    strokeDasharray: "4 4",
+    strokeOpacity: 0.6
+  }), /*#__PURE__*/React.createElement(Area, {
+    type: "monotone",
+    dataKey: "balance",
+    stroke: "#d4a853",
+    strokeWidth: 2,
+    fill: "url(#fg2)",
+    dot: false,
+    activeDot: {
+      r: 4,
+      fill: "#d4a853"
+    }
+  })))), mode === "table" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      marginBottom: 14,
+      flexWrap: "wrap"
+    }
+  }, [["all", "הכל"], ["check", "המחאות"], ["invoice", "חשבוניות"], ["income", "הכנסות"], ["fixed", "קבועות"]].map(function (_ref8) {
+    var _ref9 = _slicedToArray(_ref8, 2),
+      v = _ref9[0],
+      l = _ref9[1];
+    return /*#__PURE__*/React.createElement("button", {
+      key: v,
+      onClick: function onClick() {
+        return setFilter(v);
+      },
+      className: filter === v ? "btn-p" : "btn-g",
+      style: {
+        padding: "5px 12px",
+        fontSize: 13
+      }
+    }, l);
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05D5\u05D2"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D9\u05D0\u05D5\u05E8"), /*#__PURE__*/React.createElement("th", null, "\u05E9\u05D9\u05E0\u05D5\u05D9"), /*#__PURE__*/React.createElement("th", null, "\u05D9\u05EA\u05E8\u05D4 \u05DE\u05E6\u05D8\u05D1\u05E8\u05EA"))), /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
+    colSpan: 4,
+    style: {
+      color: "var(--mu2)",
+      fontSize: 12
+    }
+  }, "\u05D9\u05EA\u05E8\u05EA \u05E4\u05EA\u05D9\u05D7\u05D4"), /*#__PURE__*/React.createElement("td", {
+    className: "mono",
+    style: {
+      color: "var(--gold)",
+      fontWeight: 700
+    }
+  }, fmt(openingBal))), filtered.map(function (r, i) {
+    return /*#__PURE__*/React.createElement("tr", {
+      key: i
+    }, /*#__PURE__*/React.createElement("td", {
+      style: {
+        color: "var(--mu2)",
+        fontSize: 12,
+        whiteSpace: "nowrap"
+      }
+    }, fmtDate(r.date)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("span", {
+      className: "tag t-".concat(r.type)
+    }, typeLabel(r.type))), /*#__PURE__*/React.createElement("td", {
+      style: {
+        maxWidth: 200,
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap"
+      }
+    }, r.label), /*#__PURE__*/React.createElement("td", {
+      className: "mono",
+      style: {
+        color: r.amount < 0 ? "var(--err)" : "var(--ok)",
+        fontWeight: 600,
+        whiteSpace: "nowrap"
+      }
+    }, r.amount < 0 ? "−" : "+", fmt(Math.abs(r.amount))), /*#__PURE__*/React.createElement("td", {
+      className: "mono",
+      style: {
+        fontWeight: 700,
+        color: r.bal < 0 ? "var(--err)" : "var(--tx)"
+      }
+    }, fmt(r.bal)));
+  }), filtered.length === 0 && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
+    colSpan: 5,
+    style: {
+      textAlign: "center",
+      color: "var(--mu2)",
+      padding: 50
+    }
+  }, "\u05D0\u05D9\u05DF \u05E0\u05EA\u05D5\u05E0\u05D9\u05DD. \u05D9\u05D9\u05D1\u05D0 \u05E7\u05D1\u05E6\u05D9\u05DD \u05DB\u05D3\u05D9 \u05DC\u05E8\u05D0\u05D5\u05EA \u05EA\u05D7\u05D6\u05D9\u05EA.")))))));
 }
 
 // ── Suppliers Tab ─────────────────────────────────────────────────────────────
-function SuppliersTab({ctx}){
-  const {suppliers,setSuppliers,checks,invoices,setSelSup,setTab}=ctx;
-  const blank={name:"",paymentTerms:"30",paymentMethod:"המחאה",phone:"",email:"",notes:""};
-  const [form,setForm]=useState(blank);
-  const [editId,setEditId]=useState(null);
-  const [search,setSearch]=useState("");
-  const up=k=>v=>setForm(f=>({...f,[k]:v}));
-
-  const submit=()=>{
-    if(!form.name.trim()) return;
-    if(editId){setSuppliers(s=>s.map(x=>x.id===editId?{...x,...form,paymentTerms:+form.paymentTerms}:x));setEditId(null);}
-    else setSuppliers(s=>[...s,{...form,id:uid(),paymentTerms:+form.paymentTerms}]);
+function SuppliersTab(_ref0) {
+  var ctx = _ref0.ctx;
+  var suppliers = ctx.suppliers,
+    setSuppliers = ctx.setSuppliers,
+    checks = ctx.checks,
+    invoices = ctx.invoices,
+    setSelSup = ctx.setSelSup,
+    setTab = ctx.setTab;
+  var blank = {
+    name: "",
+    paymentTerms: "30",
+    paymentMethod: "המחאה",
+    phone: "",
+    email: "",
+    notes: ""
+  };
+  var _useState21 = useState(blank),
+    _useState22 = _slicedToArray(_useState21, 2),
+    form = _useState22[0],
+    setForm = _useState22[1];
+  var _useState23 = useState(null),
+    _useState24 = _slicedToArray(_useState23, 2),
+    editId = _useState24[0],
+    setEditId = _useState24[1];
+  var _useState25 = useState(""),
+    _useState26 = _slicedToArray(_useState25, 2),
+    search = _useState26[0],
+    setSearch = _useState26[1];
+  var up = function up(k) {
+    return function (v) {
+      return setForm(function (f) {
+        return _objectSpread(_objectSpread({}, f), {}, _defineProperty({}, k, v));
+      });
+    };
+  };
+  var submit = function submit() {
+    if (!form.name.trim()) return;
+    if (editId) {
+      setSuppliers(function (s) {
+        return s.map(function (x) {
+          return x.id === editId ? _objectSpread(_objectSpread(_objectSpread({}, x), form), {}, {
+            paymentTerms: +form.paymentTerms
+          }) : x;
+        });
+      });
+      setEditId(null);
+    } else setSuppliers(function (s) {
+      return [].concat(_toConsumableArray(s), [_objectSpread(_objectSpread({}, form), {}, {
+        id: uid(),
+        paymentTerms: +form.paymentTerms
+      })]);
+    });
     setForm(blank);
   };
-
-  const stats=sup=>{
-    const tInv=invoices.filter(i=>i.supplierId===sup.id||i.supplierName===sup.name).reduce((s,i)=>s+(i.amount||0),0);
-    const tChk=checks.filter(c=>c.supplierId===sup.id||c.supplierName===sup.name).reduce((s,c)=>s+(c.amount||0),0);
-    return{tInv,tChk,bal:tInv-tChk};
+  var stats = function stats(sup) {
+    var tInv = invoices.filter(function (i) {
+      return i.supplierId === sup.id || i.supplierName === sup.name;
+    }).reduce(function (s, i) {
+      return s + (i.amount || 0);
+    }, 0);
+    var tChk = checks.filter(function (c) {
+      return c.supplierId === sup.id || c.supplierName === sup.name;
+    }).reduce(function (s, c) {
+      return s + (c.amount || 0);
+    }, 0);
+    return {
+      tInv: tInv,
+      tChk: tChk,
+      bal: tInv - tChk
+    };
   };
-
-  const list=suppliers.filter(s=>!search||s.name.includes(search));
-
-  return <div>
-    <h1>ניהול ספקים</h1>
-    <div className="sub">הגדר ספקים ותנאי תשלום לחישוב תחזית מדויק</div>
-
-    <div className="card" style={{padding:20,marginBottom:20}}>
-      <h3 style={{fontSize:15,fontWeight:700,marginBottom:14}}>{editId?"✏ עריכת ספק":"➕ הוסף ספק"}</h3>
-      <div style={{display:"grid",gridTemplateColumns:"2fr 1fr 1fr 1fr 1fr",gap:12,marginBottom:12}}>
-        <div><label>שם ספק *</label><input value={form.name} onChange={e=>up("name")(e.target.value)} placeholder="שם הספק"/></div>
-        <div><label>תנאי תשלום (ימים)</label><input type="number" value={form.paymentTerms} onChange={e=>up("paymentTerms")(e.target.value)}/></div>
-        <div><label>אמצעי תשלום</label><select value={form.paymentMethod} onChange={e=>up("paymentMethod")(e.target.value)}>{["המחאה","העברה בנקאית","אשראי","מזומן","אחר"].map(m=><option key={m}>{m}</option>)}</select></div>
-        <div><label>טלפון</label><input value={form.phone||""} onChange={e=>up("phone")(e.target.value)} placeholder="050-0000000"/></div>
-        <div><label>אימייל</label><input value={form.email||""} onChange={e=>up("email")(e.target.value)} placeholder="supplier@..."/></div>
-      </div>
-      <div style={{marginBottom:12}}><label>הערות</label><input value={form.notes||""} onChange={e=>up("notes")(e.target.value)}/></div>
-      <div style={{display:"flex",gap:8}}>
-        <button className="btn-p" onClick={submit}>{editId?"עדכן":"הוסף ספק"}</button>
-        {editId&&<button className="btn-g" onClick={()=>{setEditId(null);setForm(blank);}}>ביטול</button>}
-      </div>
-    </div>
-
-    <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 חיפוש…" style={{maxWidth:280,marginBottom:14}}/>
-
-    <div className="card" style={{overflow:"hidden"}}>
-      <table>
-        <thead><tr><th>שם ספק</th><th>תנאי תשלום</th><th>אמצעי תשלום</th><th>חשבוניות</th><th>שולם</th><th>יתרה</th><th>פעולות</th></tr></thead>
-        <tbody>
-          {list.map(sup=>{
-            const st=stats(sup);
-            return <tr key={sup.id}>
-              <td style={{fontWeight:700}}>{sup.name}{sup.phone&&<div style={{fontSize:11,color:"var(--mu2)"}}>{sup.phone}</div>}</td>
-              <td><span className="mono" style={{fontSize:12,color:"var(--mu2)"}}>שוטף+{sup.paymentTerms}</span></td>
-              <td style={{fontSize:13,color:"var(--mu2)"}}>{sup.paymentMethod}</td>
-              <td className="mono" style={{color:"var(--warn)",fontWeight:600}}>{fmt(st.tInv)}</td>
-              <td className="mono" style={{color:"var(--ok)",fontWeight:600}}>{fmt(st.tChk)}</td>
-              <td className="mono" style={{fontWeight:700,color:st.bal>0?"var(--err)":"var(--ok)"}}>{fmt(st.bal)}</td>
-              <td><div style={{display:"flex",gap:5}}>
-                <button className="btn-g" style={{padding:"3px 9px",fontSize:12}} onClick={()=>{setSelSup(sup.id);setTab("ledger");}}>כרטסת</button>
-                <button className="btn-g" style={{padding:"3px 9px",fontSize:12}} onClick={()=>{setForm({name:sup.name,paymentTerms:String(sup.paymentTerms||30),paymentMethod:sup.paymentMethod||"המחאה",phone:sup.phone||"",email:sup.email||"",notes:sup.notes||""});setEditId(sup.id);}}>עריכה</button>
-                <button className="btn-d" style={{padding:"3px 9px",fontSize:12}} onClick={()=>confirm("למחוק ספק זה?")&&setSuppliers(s=>s.filter(x=>x.id!==sup.id))}>מחק</button>
-              </div></td>
-            </tr>;
-          })}
-          {list.length===0&&<tr><td colSpan={7} style={{textAlign:"center",color:"var(--mu2)",padding:50}}>{search?"לא נמצאו":"הוסף ספק ראשון"}</td></tr>}
-        </tbody>
-      </table>
-    </div>
-  </div>;
+  var list = suppliers.filter(function (s) {
+    return !search || s.name.includes(search);
+  });
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05E0\u05D9\u05D4\u05D5\u05DC \u05E1\u05E4\u05E7\u05D9\u05DD"), /*#__PURE__*/React.createElement("div", {
+    className: "sub"
+  }, "\u05D4\u05D2\u05D3\u05E8 \u05E1\u05E4\u05E7\u05D9\u05DD \u05D5\u05EA\u05E0\u05D0\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD \u05DC\u05D7\u05D9\u05E9\u05D5\u05D1 \u05EA\u05D7\u05D6\u05D9\u05EA \u05DE\u05D3\u05D5\u05D9\u05E7"), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: 20,
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: 15,
+      fontWeight: 700,
+      marginBottom: 14
+    }
+  }, editId ? "✏ עריכת ספק" : "➕ הוסף ספק"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr",
+      gap: 12,
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05E9\u05DD \u05E1\u05E4\u05E7 *"), /*#__PURE__*/React.createElement("input", {
+    value: form.name,
+    onChange: function onChange(e) {
+      return up("name")(e.target.value);
+    },
+    placeholder: "\u05E9\u05DD \u05D4\u05E1\u05E4\u05E7"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05EA\u05E0\u05D0\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD (\u05D9\u05DE\u05D9\u05DD)"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: form.paymentTerms,
+    onChange: function onChange(e) {
+      return up("paymentTerms")(e.target.value);
+    }
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05D0\u05DE\u05E6\u05E2\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD"), /*#__PURE__*/React.createElement("select", {
+    value: form.paymentMethod,
+    onChange: function onChange(e) {
+      return up("paymentMethod")(e.target.value);
+    }
+  }, ["המחאה", "העברה בנקאית", "אשראי", "מזומן", "אחר"].map(function (m) {
+    return /*#__PURE__*/React.createElement("option", {
+      key: m
+    }, m);
+  }))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05D8\u05DC\u05E4\u05D5\u05DF"), /*#__PURE__*/React.createElement("input", {
+    value: form.phone || "",
+    onChange: function onChange(e) {
+      return up("phone")(e.target.value);
+    },
+    placeholder: "050-0000000"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05D0\u05D9\u05DE\u05D9\u05D9\u05DC"), /*#__PURE__*/React.createElement("input", {
+    value: form.email || "",
+    onChange: function onChange(e) {
+      return up("email")(e.target.value);
+    },
+    placeholder: "supplier@..."
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("label", null, "\u05D4\u05E2\u05E8\u05D5\u05EA"), /*#__PURE__*/React.createElement("input", {
+    value: form.notes || "",
+    onChange: function onChange(e) {
+      return up("notes")(e.target.value);
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn-p",
+    onClick: submit
+  }, editId ? "עדכן" : "הוסף ספק"), editId && /*#__PURE__*/React.createElement("button", {
+    className: "btn-g",
+    onClick: function onClick() {
+      setEditId(null);
+      setForm(blank);
+    }
+  }, "\u05D1\u05D9\u05D8\u05D5\u05DC"))), /*#__PURE__*/React.createElement("input", {
+    value: search,
+    onChange: function onChange(e) {
+      return setSearch(e.target.value);
+    },
+    placeholder: "\uD83D\uDD0D \u05D7\u05D9\u05E4\u05D5\u05E9\u2026",
+    style: {
+      maxWidth: 280,
+      marginBottom: 14
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05E9\u05DD \u05E1\u05E4\u05E7"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05E0\u05D0\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05D0\u05DE\u05E6\u05E2\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA"), /*#__PURE__*/React.createElement("th", null, "\u05E9\u05D5\u05DC\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05D9\u05EA\u05E8\u05D4"), /*#__PURE__*/React.createElement("th", null, "\u05E4\u05E2\u05D5\u05DC\u05D5\u05EA"))), /*#__PURE__*/React.createElement("tbody", null, list.map(function (sup) {
+    var st = stats(sup);
+    return /*#__PURE__*/React.createElement("tr", {
+      key: sup.id
+    }, /*#__PURE__*/React.createElement("td", {
+      style: {
+        fontWeight: 700
+      }
+    }, sup.name, sup.phone && /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        color: "var(--mu2)"
+      }
+    }, sup.phone)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("span", {
+      className: "mono",
+      style: {
+        fontSize: 12,
+        color: "var(--mu2)"
+      }
+    }, "\u05E9\u05D5\u05D8\u05E3+", sup.paymentTerms)), /*#__PURE__*/React.createElement("td", {
+      style: {
+        fontSize: 13,
+        color: "var(--mu2)"
+      }
+    }, sup.paymentMethod), /*#__PURE__*/React.createElement("td", {
+      className: "mono",
+      style: {
+        color: "var(--warn)",
+        fontWeight: 600
+      }
+    }, fmt(st.tInv)), /*#__PURE__*/React.createElement("td", {
+      className: "mono",
+      style: {
+        color: "var(--ok)",
+        fontWeight: 600
+      }
+    }, fmt(st.tChk)), /*#__PURE__*/React.createElement("td", {
+      className: "mono",
+      style: {
+        fontWeight: 700,
+        color: st.bal > 0 ? "var(--err)" : "var(--ok)"
+      }
+    }, fmt(st.bal)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        gap: 5
+      }
+    }, /*#__PURE__*/React.createElement("button", {
+      className: "btn-g",
+      style: {
+        padding: "3px 9px",
+        fontSize: 12
+      },
+      onClick: function onClick() {
+        setSelSup(sup.id);
+        setTab("ledger");
+      }
+    }, "\u05DB\u05E8\u05D8\u05E1\u05EA"), /*#__PURE__*/React.createElement("button", {
+      className: "btn-g",
+      style: {
+        padding: "3px 9px",
+        fontSize: 12
+      },
+      onClick: function onClick() {
+        setForm({
+          name: sup.name,
+          paymentTerms: String(sup.paymentTerms || 30),
+          paymentMethod: sup.paymentMethod || "המחאה",
+          phone: sup.phone || "",
+          email: sup.email || "",
+          notes: sup.notes || ""
+        });
+        setEditId(sup.id);
+      }
+    }, "\u05E2\u05E8\u05D9\u05DB\u05D4"), /*#__PURE__*/React.createElement("button", {
+      className: "btn-d",
+      style: {
+        padding: "3px 9px",
+        fontSize: 12
+      },
+      onClick: function onClick() {
+        return confirm("למחוק ספק זה?") && setSuppliers(function (s) {
+          return s.filter(function (x) {
+            return x.id !== sup.id;
+          });
+        });
+      }
+    }, "\u05DE\u05D7\u05E7"))));
+  }), list.length === 0 && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
+    colSpan: 7,
+    style: {
+      textAlign: "center",
+      color: "var(--mu2)",
+      padding: 50
+    }
+  }, search ? "לא נמצאו" : "הוסף ספק ראשון"))))));
 }
 
 // ── Ledger Tab ────────────────────────────────────────────────────────────────
-function LedgerTab({ctx}){
-  const {suppliers,checks,invoices,selSup,setSelSup,today}=ctx;
-  const [sid,setSid]=useState(selSup||(suppliers[0]?.id||""));
-  useEffect(()=>{if(selSup)setSid(selSup);},[selSup]);
-
-  const sup=suppliers.find(s=>s.id===sid);
-  const sInv=sup?[...invoices.filter(i=>i.supplierId===sup.id||i.supplierName===sup.name)].sort((a,b)=>(a.date||"").localeCompare(b.date||"")):[];
-  const sChk=sup?[...checks.filter(c=>c.supplierId===sup.id||c.supplierName===sup.name)].sort((a,b)=>(a.date||"").localeCompare(b.date||"")):[];
-  const tInv=sInv.reduce((s,i)=>s+(i.amount||0),0);
-  const tChk=sChk.reduce((s,c)=>s+(c.amount||0),0);
-
-  return <div>
-    <h1>כרטסת ספק</h1>
-    <div className="sub">כל החשבוניות וההמחאות לפי ספק</div>
-
-    <div style={{display:"flex",alignItems:"center",gap:20,marginBottom:24,flexWrap:"wrap"}}>
-      <select value={sid} onChange={e=>{setSid(e.target.value);setSelSup(e.target.value);}} style={{maxWidth:250}}>
-        <option value="">— בחר ספק —</option>
-        {suppliers.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
-      </select>
-      {sup&&<div style={{display:"flex",gap:24,flexWrap:"wrap"}}>
-        {[{l:"חשבוניות",v:fmt(tInv),c:"var(--warn)"},{l:"שולם",v:fmt(tChk),c:"var(--ok)"},{l:"יתרה לתשלום",v:fmt(tInv-tChk),c:(tInv-tChk)>0?"var(--err)":"var(--ok)"},{l:"תנאי תשלום",v:`שוטף+${sup.paymentTerms||30}`,c:"var(--mu2)"}].map((k,i)=>
-          <div key={i} style={{textAlign:"center"}}>
-            <div style={{fontSize:11,color:"var(--mu2)",marginBottom:2}}>{k.l}</div>
-            <div className="mono" style={{fontSize:14,fontWeight:700,color:k.c}}>{k.v}</div>
-          </div>
-        )}
-      </div>}
-    </div>
-
-    {sup?<div className="g2">
-      <div className="card" style={{overflow:"hidden"}}>
-        <div style={{padding:"13px 18px",borderBottom:"1px solid var(--bd)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <span style={{fontWeight:700}}>🧾 חשבוניות ({sInv.length})</span>
-          <span className="mono" style={{color:"var(--warn)",fontWeight:700}}>{fmt(tInv)}</span>
-        </div>
-        <table>
-          <thead><tr><th>תאריך</th><th>מס׳ חשבונית</th><th>סכום</th><th>תשלום צפוי</th></tr></thead>
-          <tbody>
-            {sInv.map(inv=>{
-              const pay=addDays(eom(new Date(inv.date)),sup.paymentTerms||30);
-              const late=pay<today;
-              return <tr key={inv.id}>
-                <td style={{fontSize:12,color:"var(--mu2)",whiteSpace:"nowrap"}}>{fmtDate(inv.date)}</td>
-                <td style={{fontSize:12}}>{inv.invoiceNumber||"—"}</td>
-                <td className="mono" style={{color:"var(--warn)",fontWeight:700}}>{fmt(inv.amount)}</td>
-                <td style={{fontSize:12,color:late?"var(--err)":"var(--inf)",whiteSpace:"nowrap"}}>{fmtDate(pay)}{late?" ⚠":""}</td>
-              </tr>;
-            })}
-            {!sInv.length&&<tr><td colSpan={4} style={{textAlign:"center",color:"var(--mu2)",padding:28}}>אין חשבוניות</td></tr>}
-          </tbody>
-        </table>
-      </div>
-      <div className="card" style={{overflow:"hidden"}}>
-        <div style={{padding:"13px 18px",borderBottom:"1px solid var(--bd)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <span style={{fontWeight:700}}>📄 המחאות ({sChk.length})</span>
-          <span className="mono" style={{color:"var(--ok)",fontWeight:700}}>{fmt(tChk)}</span>
-        </div>
-        <table>
-          <thead><tr><th>תאריך</th><th>מס׳ המחאה</th><th>סכום</th></tr></thead>
-          <tbody>
-            {sChk.map(c=><tr key={c.id}>
-              <td style={{fontSize:12,color:"var(--mu2)",whiteSpace:"nowrap"}}>{fmtDate(c.date)}</td>
-              <td style={{fontSize:12}}>{c.checkNumber||"—"}</td>
-              <td className="mono" style={{color:"var(--ok)",fontWeight:700}}>{fmt(c.amount)}</td>
-            </tr>)}
-            {!sChk.length&&<tr><td colSpan={3} style={{textAlign:"center",color:"var(--mu2)",padding:28}}>אין המחאות</td></tr>}
-          </tbody>
-        </table>
-      </div>
-    </div>:<div style={{textAlign:"center",color:"var(--mu2)",padding:80,fontSize:16}}>בחר ספק לצפייה בכרטסת</div>}
-  </div>;
+function LedgerTab(_ref1) {
+  var _suppliers$;
+  var ctx = _ref1.ctx;
+  var suppliers = ctx.suppliers,
+    checks = ctx.checks,
+    invoices = ctx.invoices,
+    selSup = ctx.selSup,
+    setSelSup = ctx.setSelSup,
+    today = ctx.today;
+  var _useState27 = useState(selSup || ((_suppliers$ = suppliers[0]) === null || _suppliers$ === void 0 ? void 0 : _suppliers$.id) || ""),
+    _useState28 = _slicedToArray(_useState27, 2),
+    sid = _useState28[0],
+    setSid = _useState28[1];
+  useEffect(function () {
+    if (selSup) setSid(selSup);
+  }, [selSup]);
+  var sup = suppliers.find(function (s) {
+    return s.id === sid;
+  });
+  var sInv = sup ? _toConsumableArray(invoices.filter(function (i) {
+    return i.supplierId === sup.id || i.supplierName === sup.name;
+  })).sort(function (a, b) {
+    return (a.date || "").localeCompare(b.date || "");
+  }) : [];
+  var sChk = sup ? _toConsumableArray(checks.filter(function (c) {
+    return c.supplierId === sup.id || c.supplierName === sup.name;
+  })).sort(function (a, b) {
+    return (a.date || "").localeCompare(b.date || "");
+  }) : [];
+  var tInv = sInv.reduce(function (s, i) {
+    return s + (i.amount || 0);
+  }, 0);
+  var tChk = sChk.reduce(function (s, c) {
+    return s + (c.amount || 0);
+  }, 0);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05DB\u05E8\u05D8\u05E1\u05EA \u05E1\u05E4\u05E7"), /*#__PURE__*/React.createElement("div", {
+    className: "sub"
+  }, "\u05DB\u05DC \u05D4\u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA \u05D5\u05D4\u05D4\u05DE\u05D7\u05D0\u05D5\u05EA \u05DC\u05E4\u05D9 \u05E1\u05E4\u05E7"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 20,
+      marginBottom: 24,
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement("select", {
+    value: sid,
+    onChange: function onChange(e) {
+      setSid(e.target.value);
+      setSelSup(e.target.value);
+    },
+    style: {
+      maxWidth: 250
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "\u2014 \u05D1\u05D7\u05E8 \u05E1\u05E4\u05E7 \u2014"), suppliers.map(function (s) {
+    return /*#__PURE__*/React.createElement("option", {
+      key: s.id,
+      value: s.id
+    }, s.name);
+  })), sup && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 24,
+      flexWrap: "wrap"
+    }
+  }, [{
+    l: "חשבוניות",
+    v: fmt(tInv),
+    c: "var(--warn)"
+  }, {
+    l: "שולם",
+    v: fmt(tChk),
+    c: "var(--ok)"
+  }, {
+    l: "יתרה לתשלום",
+    v: fmt(tInv - tChk),
+    c: tInv - tChk > 0 ? "var(--err)" : "var(--ok)"
+  }, {
+    l: "תנאי תשלום",
+    v: "\u05E9\u05D5\u05D8\u05E3+".concat(sup.paymentTerms || 30),
+    c: "var(--mu2)"
+  }].map(function (k, i) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      style: {
+        textAlign: "center"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        color: "var(--mu2)",
+        marginBottom: 2
+      }
+    }, k.l), /*#__PURE__*/React.createElement("div", {
+      className: "mono",
+      style: {
+        fontSize: 14,
+        fontWeight: 700,
+        color: k.c
+      }
+    }, k.v));
+  }))), sup ? /*#__PURE__*/React.createElement("div", {
+    className: "g2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "13px 18px",
+      borderBottom: "1px solid var(--bd)",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontWeight: 700
+    }
+  }, "\uD83E\uDDFE \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA (", sInv.length, ")"), /*#__PURE__*/React.createElement("span", {
+    className: "mono",
+    style: {
+      color: "var(--warn)",
+      fontWeight: 700
+    }
+  }, fmt(tInv))), /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05DE\u05E1\u05F3 \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05EA"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05DB\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05E9\u05DC\u05D5\u05DD \u05E6\u05E4\u05D5\u05D9"))), /*#__PURE__*/React.createElement("tbody", null, sInv.map(function (inv) {
+    var pay = addDays(eom(new Date(inv.date)), sup.paymentTerms || 30);
+    var late = pay < today;
+    return /*#__PURE__*/React.createElement("tr", {
+      key: inv.id
+    }, /*#__PURE__*/React.createElement("td", {
+      style: {
+        fontSize: 12,
+        color: "var(--mu2)",
+        whiteSpace: "nowrap"
+      }
+    }, fmtDate(inv.date)), /*#__PURE__*/React.createElement("td", {
+      style: {
+        fontSize: 12
+      }
+    }, inv.invoiceNumber || "—"), /*#__PURE__*/React.createElement("td", {
+      className: "mono",
+      style: {
+        color: "var(--warn)",
+        fontWeight: 700
+      }
+    }, fmt(inv.amount)), /*#__PURE__*/React.createElement("td", {
+      style: {
+        fontSize: 12,
+        color: late ? "var(--err)" : "var(--inf)",
+        whiteSpace: "nowrap"
+      }
+    }, fmtDate(pay), late ? " ⚠" : ""));
+  }), !sInv.length && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
+    colSpan: 4,
+    style: {
+      textAlign: "center",
+      color: "var(--mu2)",
+      padding: 28
+    }
+  }, "\u05D0\u05D9\u05DF \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA"))))), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "13px 18px",
+      borderBottom: "1px solid var(--bd)",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontWeight: 700
+    }
+  }, "\uD83D\uDCC4 \u05D4\u05DE\u05D7\u05D0\u05D5\u05EA (", sChk.length, ")"), /*#__PURE__*/React.createElement("span", {
+    className: "mono",
+    style: {
+      color: "var(--ok)",
+      fontWeight: 700
+    }
+  }, fmt(tChk))), /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05DE\u05E1\u05F3 \u05D4\u05DE\u05D7\u05D0\u05D4"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05DB\u05D5\u05DD"))), /*#__PURE__*/React.createElement("tbody", null, sChk.map(function (c) {
+    return /*#__PURE__*/React.createElement("tr", {
+      key: c.id
+    }, /*#__PURE__*/React.createElement("td", {
+      style: {
+        fontSize: 12,
+        color: "var(--mu2)",
+        whiteSpace: "nowrap"
+      }
+    }, fmtDate(c.date)), /*#__PURE__*/React.createElement("td", {
+      style: {
+        fontSize: 12
+      }
+    }, c.checkNumber || "—"), /*#__PURE__*/React.createElement("td", {
+      className: "mono",
+      style: {
+        color: "var(--ok)",
+        fontWeight: 700
+      }
+    }, fmt(c.amount)));
+  }), !sChk.length && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
+    colSpan: 3,
+    style: {
+      textAlign: "center",
+      color: "var(--mu2)",
+      padding: 28
+    }
+  }, "\u05D0\u05D9\u05DF \u05D4\u05DE\u05D7\u05D0\u05D5\u05EA")))))) : /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      color: "var(--mu2)",
+      padding: 80,
+      fontSize: 16
+    }
+  }, "\u05D1\u05D7\u05E8 \u05E1\u05E4\u05E7 \u05DC\u05E6\u05E4\u05D9\u05D9\u05D4 \u05D1\u05DB\u05E8\u05D8\u05E1\u05EA"));
 }
 
 // ── Aging Tab ─────────────────────────────────────────────────────────────────
-function AgingTab({ctx}){
-  const {invoices,checks,suppliers,today}=ctx;
-
-  const rows=useMemo(()=>suppliers.map(sup=>{
-    const sInv=invoices.filter(i=>i.supplierId===sup.id||i.supplierName===sup.name);
-    let pool=checks.filter(c=>c.supplierId===sup.id||c.supplierName===sup.name).reduce((s,c)=>s+(c.amount||0),0);
-    const bkts={"0-30":0,"31-60":0,"61-90":0,"90+":0};
-    [...sInv].sort((a,b)=>(a.date||"").localeCompare(b.date||"")).forEach(inv=>{
-      const age=Math.floor((today-new Date(inv.date))/86400000);
-      const amt=inv.amount||0,cov=Math.min(pool,amt);pool-=cov;const open=amt-cov;
-      if(open<=0) return;
-      if(age<=30)bkts["0-30"]+=open;else if(age<=60)bkts["31-60"]+=open;else if(age<=90)bkts["61-90"]+=open;else bkts["90+"]+=open;
+function AgingTab(_ref10) {
+  var ctx = _ref10.ctx;
+  var invoices = ctx.invoices,
+    checks = ctx.checks,
+    suppliers = ctx.suppliers,
+    today = ctx.today;
+  var rows = useMemo(function () {
+    return suppliers.map(function (sup) {
+      var sInv = invoices.filter(function (i) {
+        return i.supplierId === sup.id || i.supplierName === sup.name;
+      });
+      var pool = checks.filter(function (c) {
+        return c.supplierId === sup.id || c.supplierName === sup.name;
+      }).reduce(function (s, c) {
+        return s + (c.amount || 0);
+      }, 0);
+      var bkts = {
+        "0-30": 0,
+        "31-60": 0,
+        "61-90": 0,
+        "90+": 0
+      };
+      _toConsumableArray(sInv).sort(function (a, b) {
+        return (a.date || "").localeCompare(b.date || "");
+      }).forEach(function (inv) {
+        var age = Math.floor((today - new Date(inv.date)) / 86400000);
+        var amt = inv.amount || 0,
+          cov = Math.min(pool, amt);
+        pool -= cov;
+        var open = amt - cov;
+        if (open <= 0) return;
+        if (age <= 30) bkts["0-30"] += open;else if (age <= 60) bkts["31-60"] += open;else if (age <= 90) bkts["61-90"] += open;else bkts["90+"] += open;
+      });
+      var total = Object.values(bkts).reduce(function (s, v) {
+        return s + v;
+      }, 0);
+      return {
+        sup: sup,
+        bkts: bkts,
+        total: total
+      };
+    }).filter(function (r) {
+      return r.total > 0;
     });
-    const total=Object.values(bkts).reduce((s,v)=>s+v,0);
-    return{sup,bkts,total};
-  }).filter(r=>r.total>0),[invoices,checks,suppliers,today]);
-
-  const totals=useMemo(()=>{
-    const t={"0-30":0,"31-60":0,"61-90":0,"90+":0,all:0};
-    rows.forEach(r=>{Object.keys(r.bkts).forEach(k=>{t[k]+=r.bkts[k];});t.all+=r.total;});
+  }, [invoices, checks, suppliers, today]);
+  var totals = useMemo(function () {
+    var t = {
+      "0-30": 0,
+      "31-60": 0,
+      "61-90": 0,
+      "90+": 0,
+      all: 0
+    };
+    rows.forEach(function (r) {
+      Object.keys(r.bkts).forEach(function (k) {
+        t[k] += r.bkts[k];
+      });
+      t.all += r.total;
+    });
     return t;
-  },[rows]);
-
-  const bc={"0-30":"var(--ok)","31-60":"var(--warn)","61-90":"var(--err)","90+":"#b91c1c"};
-
-  return <div>
-    <h1>גיול חשבוניות פתוחות</h1>
-    <div className="sub">ניתוח חשבוניות שטרם שולמו לפי גיל</div>
-
-    <div className="g4" style={{marginBottom:20}}>
-      {[["0-30","עד 30 יום"],["31-60","31–60 יום"],["61-90","61–90 יום"],["90+","מעל 90 יום"]].map(([k,l])=>
-        <div key={k} className="card" style={{padding:"16px 18px"}}>
-          <div style={{fontSize:11,color:"var(--mu2)",marginBottom:6}}>{l}</div>
-          <div className="mono" style={{fontSize:16,fontWeight:700,color:bc[k]}}>{fmt(totals[k])}</div>
-        </div>
-      )}
-    </div>
-
-    {rows.length>0?<div className="card" style={{overflow:"hidden"}}>
-      <table>
-        <thead><tr>
-          <th>ספק</th>
-          <th style={{color:bc["0-30"]}}>0–30</th>
-          <th style={{color:bc["31-60"]}}>31–60</th>
-          <th style={{color:bc["61-90"]}}>61–90</th>
-          <th style={{color:bc["90+"]}}>90+</th>
-          <th>סה"כ פתוח</th>
-        </tr></thead>
-        <tbody>
-          {rows.map(({sup,bkts,total})=><tr key={sup.id}>
-            <td style={{fontWeight:700}}>{sup.name}</td>
-            {Object.entries(bkts).map(([k,v])=><td key={k} className="mono" style={{color:v>0?bc[k]:"var(--mu)",fontWeight:v>0?700:400}}>{v>0?fmt(v):"—"}</td>)}
-            <td className="mono" style={{fontWeight:800,color:"var(--err)"}}>{fmt(total)}</td>
-          </tr>)}
-          <tr style={{borderTop:"2px solid var(--bd)"}}>
-            <td style={{fontWeight:700,color:"var(--mu2)"}}>סה"כ</td>
-            {["0-30","31-60","61-90","90+"].map(k=><td key={k} className="mono" style={{fontWeight:700,color:bc[k]}}>{fmt(totals[k])}</td>)}
-            <td className="mono" style={{fontWeight:800,color:"var(--err)",fontSize:15}}>{fmt(totals.all)}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>:<div style={{textAlign:"center",color:"var(--ok)",padding:80,fontSize:16}}>✅ אין חשבוניות פתוחות</div>}
-  </div>;
+  }, [rows]);
+  var bc = {
+    "0-30": "var(--ok)",
+    "31-60": "var(--warn)",
+    "61-90": "var(--err)",
+    "90+": "#b91c1c"
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05D2\u05D9\u05D5\u05DC \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA \u05E4\u05EA\u05D5\u05D7\u05D5\u05EA"), /*#__PURE__*/React.createElement("div", {
+    className: "sub"
+  }, "\u05E0\u05D9\u05EA\u05D5\u05D7 \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA \u05E9\u05D8\u05E8\u05DD \u05E9\u05D5\u05DC\u05DE\u05D5 \u05DC\u05E4\u05D9 \u05D2\u05D9\u05DC"), /*#__PURE__*/React.createElement("div", {
+    className: "g4",
+    style: {
+      marginBottom: 20
+    }
+  }, [["0-30", "עד 30 יום"], ["31-60", "31–60 יום"], ["61-90", "61–90 יום"], ["90+", "מעל 90 יום"]].map(function (_ref11) {
+    var _ref12 = _slicedToArray(_ref11, 2),
+      k = _ref12[0],
+      l = _ref12[1];
+    return /*#__PURE__*/React.createElement("div", {
+      key: k,
+      className: "card",
+      style: {
+        padding: "16px 18px"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        color: "var(--mu2)",
+        marginBottom: 6
+      }
+    }, l), /*#__PURE__*/React.createElement("div", {
+      className: "mono",
+      style: {
+        fontSize: 16,
+        fontWeight: 700,
+        color: bc[k]
+      }
+    }, fmt(totals[k])));
+  })), rows.length > 0 ? /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05E1\u05E4\u05E7"), /*#__PURE__*/React.createElement("th", {
+    style: {
+      color: bc["0-30"]
+    }
+  }, "0\u201330"), /*#__PURE__*/React.createElement("th", {
+    style: {
+      color: bc["31-60"]
+    }
+  }, "31\u201360"), /*#__PURE__*/React.createElement("th", {
+    style: {
+      color: bc["61-90"]
+    }
+  }, "61\u201390"), /*#__PURE__*/React.createElement("th", {
+    style: {
+      color: bc["90+"]
+    }
+  }, "90+"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05D4\"\u05DB \u05E4\u05EA\u05D5\u05D7"))), /*#__PURE__*/React.createElement("tbody", null, rows.map(function (_ref13) {
+    var sup = _ref13.sup,
+      bkts = _ref13.bkts,
+      total = _ref13.total;
+    return /*#__PURE__*/React.createElement("tr", {
+      key: sup.id
+    }, /*#__PURE__*/React.createElement("td", {
+      style: {
+        fontWeight: 700
+      }
+    }, sup.name), Object.entries(bkts).map(function (_ref14) {
+      var _ref15 = _slicedToArray(_ref14, 2),
+        k = _ref15[0],
+        v = _ref15[1];
+      return /*#__PURE__*/React.createElement("td", {
+        key: k,
+        className: "mono",
+        style: {
+          color: v > 0 ? bc[k] : "var(--mu)",
+          fontWeight: v > 0 ? 700 : 400
+        }
+      }, v > 0 ? fmt(v) : "—");
+    }), /*#__PURE__*/React.createElement("td", {
+      className: "mono",
+      style: {
+        fontWeight: 800,
+        color: "var(--err)"
+      }
+    }, fmt(total)));
+  }), /*#__PURE__*/React.createElement("tr", {
+    style: {
+      borderTop: "2px solid var(--bd)"
+    }
+  }, /*#__PURE__*/React.createElement("td", {
+    style: {
+      fontWeight: 700,
+      color: "var(--mu2)"
+    }
+  }, "\u05E1\u05D4\"\u05DB"), ["0-30", "31-60", "61-90", "90+"].map(function (k) {
+    return /*#__PURE__*/React.createElement("td", {
+      key: k,
+      className: "mono",
+      style: {
+        fontWeight: 700,
+        color: bc[k]
+      }
+    }, fmt(totals[k]));
+  }), /*#__PURE__*/React.createElement("td", {
+    className: "mono",
+    style: {
+      fontWeight: 800,
+      color: "var(--err)",
+      fontSize: 15
+    }
+  }, fmt(totals.all)))))) : /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      color: "var(--ok)",
+      padding: 80,
+      fontSize: 16
+    }
+  }, "\u2705 \u05D0\u05D9\u05DF \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA \u05E4\u05EA\u05D5\u05D7\u05D5\u05EA"));
 }
 
 // ── Import Tab ────────────────────────────────────────────────────────────────
-function ImportTab({ctx}){
-  const {suppliers,setSuppliers,checks,setChecks,invoices,setInvoices}=ctx;
-  const [preview,setPreview]=useState(null);
-  const [map,setMap]=useState({});
-  const [msg,setMsg]=useState("");
-
-  const detect=(cols,...cands)=>{
-    for(const c of cands){const f=cols.find(col=>col.toLowerCase().includes(c));if(f)return f;}
-    return cols[0]||"";
+function ImportTab(_ref16) {
+  var ctx = _ref16.ctx;
+  var suppliers = ctx.suppliers,
+    setSuppliers = ctx.setSuppliers,
+    checks = ctx.checks,
+    setChecks = ctx.setChecks,
+    invoices = ctx.invoices,
+    setInvoices = ctx.setInvoices;
+  var _useState29 = useState(null),
+    _useState30 = _slicedToArray(_useState29, 2),
+    preview = _useState30[0],
+    setPreview = _useState30[1];
+  var _useState31 = useState({}),
+    _useState32 = _slicedToArray(_useState31, 2),
+    map = _useState32[0],
+    setMap = _useState32[1];
+  var _useState33 = useState(""),
+    _useState34 = _slicedToArray(_useState33, 2),
+    msg = _useState34[0],
+    setMsg = _useState34[1];
+  var detect = function detect(cols) {
+    for (var _len = arguments.length, cands = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      cands[_key - 1] = arguments[_key];
+    }
+    var _loop2 = function _loop2() {
+        var c = _cands[_i2];
+        var f = cols.find(function (col) {
+          return col.toLowerCase().includes(c);
+        });
+        if (f) return {
+          v: f
+        };
+      },
+      _ret;
+    for (var _i2 = 0, _cands = cands; _i2 < _cands.length; _i2++) {
+      _ret = _loop2();
+      if (_ret) return _ret.v;
+    }
+    return cols[0] || "";
   };
-
-  const parseFile=(file,type)=>{
-    const r=new FileReader();
-    r.onload=e=>{
-      const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array",cellDates:true});
-      const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""});
-      const cols=rows.length?Object.keys(rows[0]):[];
-      const fm=type==="checks"
-        ?{supplierName:detect(cols,"ספק","שם","supplier","name"),date:detect(cols,"תאריך","date"),amount:detect(cols,"סכום","amount","סה"),checkNumber:detect(cols,"המחאה","check","מספר","num")}
-        :{supplierName:detect(cols,"ספק","שם","supplier","name"),date:detect(cols,"תאריך","date"),amount:detect(cols,"סכום","amount","סה"),invoiceNumber:detect(cols,"חשבונית","invoice","מספר","num")};
-      setMap(fm);setPreview({type,rows,cols});setMsg("");
+  var parseFile = function parseFile(file, type) {
+    var r = new FileReader();
+    r.onload = function (e) {
+      var wb = XLSX.read(new Uint8Array(e.target.result), {
+        type: "array",
+        cellDates: true
+      });
+      var rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
+        defval: ""
+      });
+      var cols = rows.length ? Object.keys(rows[0]) : [];
+      var fm = type === "checks" ? {
+        supplierName: detect(cols, "ספק", "שם", "supplier", "name"),
+        date: detect(cols, "תאריך", "date"),
+        amount: detect(cols, "סכום", "amount", "סה"),
+        checkNumber: detect(cols, "המחאה", "check", "מספר", "num")
+      } : {
+        supplierName: detect(cols, "ספק", "שם", "supplier", "name"),
+        date: detect(cols, "תאריך", "date"),
+        amount: detect(cols, "סכום", "amount", "סה"),
+        invoiceNumber: detect(cols, "חשבונית", "invoice", "מספר", "num")
+      };
+      setMap(fm);
+      setPreview({
+        type: type,
+        rows: rows,
+        cols: cols
+      });
+      setMsg("");
     };
     r.readAsArrayBuffer(file);
   };
-
-  const doImport=()=>{
-    if(!preview) return;
-    const {type,rows}=preview;
-    const allSups=[...suppliers];
-    const getOrCreate=name=>{
-      let s=allSups.find(x=>x.name===name);
-      if(!s){s={id:uid(),name,paymentTerms:30,paymentMethod:"המחאה",notes:""};allSups.push(s);}
+  var doImport = function doImport() {
+    if (!preview) return;
+    var type = preview.type,
+      rows = preview.rows;
+    var allSups = _toConsumableArray(suppliers);
+    var getOrCreate = function getOrCreate(name) {
+      var s = allSups.find(function (x) {
+        return x.name === name;
+      });
+      if (!s) {
+        s = {
+          id: uid(),
+          name: name,
+          paymentTerms: 30,
+          paymentMethod: "המחאה",
+          notes: ""
+        };
+        allSups.push(s);
+      }
       return s;
     };
-    const parse=v=>parseFloat(String(v).replace(/[^0-9.-]/g,""))||0;
-    if(type==="checks"){
-      const items=rows.map(r=>{const name=String(r[map.supplierName]||"").trim();if(!name)return null;const sup=getOrCreate(name);const amt=parse(r[map.amount]);if(!amt)return null;return{id:uid(),supplierName:name,supplierId:sup.id,date:excelDate(r[map.date]),amount:amt,checkNumber:String(r[map.checkNumber]||"")};}).filter(Boolean);
-      setChecks(c=>[...c,...items]);setSuppliers(allSups);
-      setMsg(`✅ יובאו ${items.length} המחאות${allSups.length>suppliers.length?` | ${allSups.length-suppliers.length} ספקים חדשים`:""}`);
+    var parse = function parse(v) {
+      return parseFloat(String(v).replace(/[^0-9.-]/g, "")) || 0;
+    };
+    if (type === "checks") {
+      var items = rows.map(function (r) {
+        var name = String(r[map.supplierName] || "").trim();
+        if (!name) return null;
+        var sup = getOrCreate(name);
+        var amt = parse(r[map.amount]);
+        if (!amt) return null;
+        return {
+          id: uid(),
+          supplierName: name,
+          supplierId: sup.id,
+          date: excelDate(r[map.date]),
+          amount: amt,
+          checkNumber: String(r[map.checkNumber] || "")
+        };
+      }).filter(Boolean);
+      setChecks(function (c) {
+        return [].concat(_toConsumableArray(c), _toConsumableArray(items));
+      });
+      setSuppliers(allSups);
+      setMsg("\u2705 \u05D9\u05D5\u05D1\u05D0\u05D5 ".concat(items.length, " \u05D4\u05DE\u05D7\u05D0\u05D5\u05EA").concat(allSups.length > suppliers.length ? " | ".concat(allSups.length - suppliers.length, " \u05E1\u05E4\u05E7\u05D9\u05DD \u05D7\u05D3\u05E9\u05D9\u05DD") : ""));
     } else {
-      const items=rows.map(r=>{const name=String(r[map.supplierName]||"").trim();if(!name)return null;const sup=getOrCreate(name);const amt=parse(r[map.amount]);if(!amt)return null;return{id:uid(),supplierName:name,supplierId:sup.id,date:excelDate(r[map.date]),amount:amt,invoiceNumber:String(r[map.invoiceNumber]||"")};}).filter(Boolean);
-      setInvoices(i=>[...i,...items]);setSuppliers(allSups);
-      setMsg(`✅ יובאו ${items.length} חשבוניות${allSups.length>suppliers.length?` | ${allSups.length-suppliers.length} ספקים חדשים`:""}`);
+      var _items = rows.map(function (r) {
+        var name = String(r[map.supplierName] || "").trim();
+        if (!name) return null;
+        var sup = getOrCreate(name);
+        var amt = parse(r[map.amount]);
+        if (!amt) return null;
+        return {
+          id: uid(),
+          supplierName: name,
+          supplierId: sup.id,
+          date: excelDate(r[map.date]),
+          amount: amt,
+          invoiceNumber: String(r[map.invoiceNumber] || "")
+        };
+      }).filter(Boolean);
+      setInvoices(function (i) {
+        return [].concat(_toConsumableArray(i), _toConsumableArray(_items));
+      });
+      setSuppliers(allSups);
+      setMsg("\u2705 \u05D9\u05D5\u05D1\u05D0\u05D5 ".concat(_items.length, " \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA").concat(allSups.length > suppliers.length ? " | ".concat(allSups.length - suppliers.length, " \u05E1\u05E4\u05E7\u05D9\u05DD \u05D7\u05D3\u05E9\u05D9\u05DD") : ""));
     }
     setPreview(null);
   };
-
-  const UploadBox=({label,onFile})=><div style={{border:"2px dashed var(--bd2)",borderRadius:12,padding:"36px 24px",textAlign:"center"}}
-    onDragOver={e=>{e.preventDefault();e.currentTarget.style.borderColor="var(--gold)"}}
-    onDragLeave={e=>{e.currentTarget.style.borderColor="var(--bd2)"}}
-    onDrop={e=>{e.preventDefault();e.currentTarget.style.borderColor="var(--bd2)";const f=e.dataTransfer.files[0];if(f)onFile(f);}}>
-    <div style={{fontSize:32,marginBottom:10}}>📁</div>
-    <div style={{fontSize:15,fontWeight:600,marginBottom:6}}>{label}</div>
-    <div style={{fontSize:12,color:"var(--mu2)",marginBottom:14}}>גרור קובץ לכאן או לחץ לבחירה</div>
-    <label style={{cursor:"pointer"}}>
-      <span style={{background:"var(--s2)",border:"1px solid var(--bd2)",borderRadius:8,padding:"7px 16px",fontSize:13,fontWeight:600,color:"var(--gold)"}}>בחר קובץ</span>
-      <input type="file" accept=".xlsx,.xls,.csv" style={{display:"none"}} onChange={e=>{if(e.target.files[0])onFile(e.target.files[0]);}}/>
-    </label>
-  </div>;
-
-  const fLabels={supplierName:"שם ספק",date:"תאריך",amount:"סכום",checkNumber:"מס׳ המחאה",invoiceNumber:"מס׳ חשבונית"};
-
-  return <div>
-    <h1>יבוא נתונים מאקסל</h1>
-    <div className="sub">העלה קבצי Excel — האפליקציה מזהה עמודות אוטומטית</div>
-
-    {msg&&<div style={{background:"rgba(38,184,135,.07)",border:"1px solid rgba(38,184,135,.25)",borderRadius:10,padding:"12px 18px",marginBottom:18,color:"var(--ok)",fontSize:14}}>{msg}</div>}
-
-    {!preview&&<div className="g2" style={{marginBottom:24}}>
-      <UploadBox label="📄 ייבוא המחאות" onFile={f=>parseFile(f,"checks")}/>
-      <UploadBox label="🧾 ייבוא חשבוניות" onFile={f=>parseFile(f,"invoices")}/>
-    </div>}
-
-    {preview&&<div className="card" style={{padding:22,marginBottom:20}}>
-      <h3 style={{fontSize:15,fontWeight:700,marginBottom:4}}>{preview.type==="checks"?"תצוגה מקדימה — המחאות":"תצוגה מקדימה — חשבוניות"}</h3>
-      <div style={{fontSize:13,color:"var(--mu2)",marginBottom:18}}>{preview.rows.length} שורות</div>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))",gap:14,marginBottom:20}}>
-        {Object.entries(map).map(([field,col])=><div key={field}><label>{fLabels[field]}</label>
-          <select value={col} onChange={e=>setMap(m=>({...m,[field]:e.target.value}))}>
-            {preview.cols.map(c=><option key={c}>{c}</option>)}
-          </select>
-        </div>)}
-      </div>
-      <div style={{overflowX:"auto",marginBottom:18}}>
-        <table style={{minWidth:500}}>
-          <thead><tr><th>שם ספק</th><th>תאריך</th><th>סכום</th><th>{preview.type==="checks"?"מס׳ המחאה":"מס׳ חשבונית"}</th></tr></thead>
-          <tbody>
-            {preview.rows.slice(0,5).map((r,i)=>{
-              const name=String(r[map.supplierName]||"").trim();
-              const amt=parseFloat(String(r[map.amount]).replace(/[^0-9.-]/g,""))||0;
-              const num=String(r[preview.type==="checks"?map.checkNumber:map.invoiceNumber]||"");
-              return <tr key={i}>
-                <td>{name||<span style={{color:"var(--err)"}}>חסר</span>}</td>
-                <td style={{fontSize:12,color:"var(--mu2)"}}>{fmtDate(excelDate(r[map.date]))}</td>
-                <td className="mono" style={{color:amt?"var(--warn)":"var(--err)"}}>{amt?fmt(amt):"חסר"}</td>
-                <td style={{fontSize:12,color:"var(--mu2)"}}>{num||"—"}</td>
-              </tr>;
-            })}
-          </tbody>
-        </table>
-      </div>
-      <div style={{display:"flex",gap:8}}>
-        <button className="btn-p" onClick={doImport}>ייבא {preview.rows.length} {preview.type==="checks"?"המחאות":"חשבוניות"}</button>
-        <button className="btn-g" onClick={()=>setPreview(null)}>ביטול</button>
-      </div>
-    </div>}
-
-    <div className="g2">
-      <div className="card" style={{padding:"16px 18px"}}>
-        <div style={{fontSize:13,color:"var(--mu2)",marginBottom:8}}>📄 המחאות מיובאות</div>
-        <div className="mono" style={{fontSize:20,fontWeight:700,color:"var(--inf)"}}>{ctx.checks.length}</div>
-        <div style={{fontSize:12,color:"var(--mu2)",marginTop:4}}>סה"כ: {fmt(ctx.checks.reduce((s,c)=>s+(c.amount||0),0))}</div>
-        {ctx.checks.length>0&&<button className="btn-d" style={{marginTop:12,fontSize:12,padding:"4px 10px"}} onClick={()=>confirm("למחוק את כל ההמחאות?")&&ctx.setChecks([])}>נקה הכל</button>}
-      </div>
-      <div className="card" style={{padding:"16px 18px"}}>
-        <div style={{fontSize:13,color:"var(--mu2)",marginBottom:8}}>🧾 חשבוניות מיובאות</div>
-        <div className="mono" style={{fontSize:20,fontWeight:700,color:"var(--warn)"}}>{ctx.invoices.length}</div>
-        <div style={{fontSize:12,color:"var(--mu2)",marginTop:4}}>סה"כ: {fmt(ctx.invoices.reduce((s,i)=>s+(i.amount||0),0))}</div>
-        {ctx.invoices.length>0&&<button className="btn-d" style={{marginTop:12,fontSize:12,padding:"4px 10px"}} onClick={()=>confirm("למחוק את כל החשבוניות?")&&ctx.setInvoices([])}>נקה הכל</button>}
-      </div>
-    </div>
-  </div>;
+  var UploadBox = function UploadBox(_ref17) {
+    var label = _ref17.label,
+      onFile = _ref17.onFile;
+    return /*#__PURE__*/React.createElement("div", {
+      style: {
+        border: "2px dashed var(--bd2)",
+        borderRadius: 12,
+        padding: "36px 24px",
+        textAlign: "center"
+      },
+      onDragOver: function onDragOver(e) {
+        e.preventDefault();
+        e.currentTarget.style.borderColor = "var(--gold)";
+      },
+      onDragLeave: function onDragLeave(e) {
+        e.currentTarget.style.borderColor = "var(--bd2)";
+      },
+      onDrop: function onDrop(e) {
+        e.preventDefault();
+        e.currentTarget.style.borderColor = "var(--bd2)";
+        var f = e.dataTransfer.files[0];
+        if (f) onFile(f);
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 32,
+        marginBottom: 10
+      }
+    }, "\uD83D\uDCC1"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 15,
+        fontWeight: 600,
+        marginBottom: 6
+      }
+    }, label), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 12,
+        color: "var(--mu2)",
+        marginBottom: 14
+      }
+    }, "\u05D2\u05E8\u05D5\u05E8 \u05E7\u05D5\u05D1\u05E5 \u05DC\u05DB\u05D0\u05DF \u05D0\u05D5 \u05DC\u05D7\u05E5 \u05DC\u05D1\u05D7\u05D9\u05E8\u05D4"), /*#__PURE__*/React.createElement("label", {
+      style: {
+        cursor: "pointer"
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        background: "var(--s2)",
+        border: "1px solid var(--bd2)",
+        borderRadius: 8,
+        padding: "7px 16px",
+        fontSize: 13,
+        fontWeight: 600,
+        color: "var(--gold)"
+      }
+    }, "\u05D1\u05D7\u05E8 \u05E7\u05D5\u05D1\u05E5"), /*#__PURE__*/React.createElement("input", {
+      type: "file",
+      accept: ".xlsx,.xls,.csv",
+      style: {
+        display: "none"
+      },
+      onChange: function onChange(e) {
+        if (e.target.files[0]) onFile(e.target.files[0]);
+      }
+    })));
+  };
+  var fLabels = {
+    supplierName: "שם ספק",
+    date: "תאריך",
+    amount: "סכום",
+    checkNumber: "מס׳ המחאה",
+    invoiceNumber: "מס׳ חשבונית"
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05D9\u05D1\u05D5\u05D0 \u05E0\u05EA\u05D5\u05E0\u05D9\u05DD \u05DE\u05D0\u05E7\u05E1\u05DC"), /*#__PURE__*/React.createElement("div", {
+    className: "sub"
+  }, "\u05D4\u05E2\u05DC\u05D4 \u05E7\u05D1\u05E6\u05D9 Excel \u2014 \u05D4\u05D0\u05E4\u05DC\u05D9\u05E7\u05E6\u05D9\u05D4 \u05DE\u05D6\u05D4\u05D4 \u05E2\u05DE\u05D5\u05D3\u05D5\u05EA \u05D0\u05D5\u05D8\u05D5\u05DE\u05D8\u05D9\u05EA"), msg && /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "rgba(38,184,135,.07)",
+      border: "1px solid rgba(38,184,135,.25)",
+      borderRadius: 10,
+      padding: "12px 18px",
+      marginBottom: 18,
+      color: "var(--ok)",
+      fontSize: 14
+    }
+  }, msg), !preview && /*#__PURE__*/React.createElement("div", {
+    className: "g2",
+    style: {
+      marginBottom: 24
+    }
+  }, /*#__PURE__*/React.createElement(UploadBox, {
+    label: "\uD83D\uDCC4 \u05D9\u05D9\u05D1\u05D5\u05D0 \u05D4\u05DE\u05D7\u05D0\u05D5\u05EA",
+    onFile: function onFile(f) {
+      return parseFile(f, "checks");
+    }
+  }), /*#__PURE__*/React.createElement(UploadBox, {
+    label: "\uD83E\uDDFE \u05D9\u05D9\u05D1\u05D5\u05D0 \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA",
+    onFile: function onFile(f) {
+      return parseFile(f, "invoices");
+    }
+  })), preview && /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: 22,
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: 15,
+      fontWeight: 700,
+      marginBottom: 4
+    }
+  }, preview.type === "checks" ? "תצוגה מקדימה — המחאות" : "תצוגה מקדימה — חשבוניות"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      color: "var(--mu2)",
+      marginBottom: 18
+    }
+  }, preview.rows.length, " \u05E9\u05D5\u05E8\u05D5\u05EA"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))",
+      gap: 14,
+      marginBottom: 20
+    }
+  }, Object.entries(map).map(function (_ref18) {
+    var _ref19 = _slicedToArray(_ref18, 2),
+      field = _ref19[0],
+      col = _ref19[1];
+    return /*#__PURE__*/React.createElement("div", {
+      key: field
+    }, /*#__PURE__*/React.createElement("label", null, fLabels[field]), /*#__PURE__*/React.createElement("select", {
+      value: col,
+      onChange: function onChange(e) {
+        return setMap(function (m) {
+          return _objectSpread(_objectSpread({}, m), {}, _defineProperty({}, field, e.target.value));
+        });
+      }
+    }, preview.cols.map(function (c) {
+      return /*#__PURE__*/React.createElement("option", {
+        key: c
+      }, c);
+    })));
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      overflowX: "auto",
+      marginBottom: 18
+    }
+  }, /*#__PURE__*/React.createElement("table", {
+    style: {
+      minWidth: 500
+    }
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05E9\u05DD \u05E1\u05E4\u05E7"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05DB\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, preview.type === "checks" ? "מס׳ המחאה" : "מס׳ חשבונית"))), /*#__PURE__*/React.createElement("tbody", null, preview.rows.slice(0, 5).map(function (r, i) {
+    var name = String(r[map.supplierName] || "").trim();
+    var amt = parseFloat(String(r[map.amount]).replace(/[^0-9.-]/g, "")) || 0;
+    var num = String(r[preview.type === "checks" ? map.checkNumber : map.invoiceNumber] || "");
+    return /*#__PURE__*/React.createElement("tr", {
+      key: i
+    }, /*#__PURE__*/React.createElement("td", null, name || /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: "var(--err)"
+      }
+    }, "\u05D7\u05E1\u05E8")), /*#__PURE__*/React.createElement("td", {
+      style: {
+        fontSize: 12,
+        color: "var(--mu2)"
+      }
+    }, fmtDate(excelDate(r[map.date]))), /*#__PURE__*/React.createElement("td", {
+      className: "mono",
+      style: {
+        color: amt ? "var(--warn)" : "var(--err)"
+      }
+    }, amt ? fmt(amt) : "חסר"), /*#__PURE__*/React.createElement("td", {
+      style: {
+        fontSize: 12,
+        color: "var(--mu2)"
+      }
+    }, num || "—"));
+  })))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn-p",
+    onClick: doImport
+  }, "\u05D9\u05D9\u05D1\u05D0 ", preview.rows.length, " ", preview.type === "checks" ? "המחאות" : "חשבוניות"), /*#__PURE__*/React.createElement("button", {
+    className: "btn-g",
+    onClick: function onClick() {
+      return setPreview(null);
+    }
+  }, "\u05D1\u05D9\u05D8\u05D5\u05DC"))), /*#__PURE__*/React.createElement("div", {
+    className: "g2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: "16px 18px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      color: "var(--mu2)",
+      marginBottom: 8
+    }
+  }, "\uD83D\uDCC4 \u05D4\u05DE\u05D7\u05D0\u05D5\u05EA \u05DE\u05D9\u05D5\u05D1\u05D0\u05D5\u05EA"), /*#__PURE__*/React.createElement("div", {
+    className: "mono",
+    style: {
+      fontSize: 20,
+      fontWeight: 700,
+      color: "var(--inf)"
+    }
+  }, ctx.checks.length), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "var(--mu2)",
+      marginTop: 4
+    }
+  }, "\u05E1\u05D4\"\u05DB: ", fmt(ctx.checks.reduce(function (s, c) {
+    return s + (c.amount || 0);
+  }, 0))), ctx.checks.length > 0 && /*#__PURE__*/React.createElement("button", {
+    className: "btn-d",
+    style: {
+      marginTop: 12,
+      fontSize: 12,
+      padding: "4px 10px"
+    },
+    onClick: function onClick() {
+      return confirm("למחוק את כל ההמחאות?") && ctx.setChecks([]);
+    }
+  }, "\u05E0\u05E7\u05D4 \u05D4\u05DB\u05DC")), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: "16px 18px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      color: "var(--mu2)",
+      marginBottom: 8
+    }
+  }, "\uD83E\uDDFE \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA \u05DE\u05D9\u05D5\u05D1\u05D0\u05D5\u05EA"), /*#__PURE__*/React.createElement("div", {
+    className: "mono",
+    style: {
+      fontSize: 20,
+      fontWeight: 700,
+      color: "var(--warn)"
+    }
+  }, ctx.invoices.length), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "var(--mu2)",
+      marginTop: 4
+    }
+  }, "\u05E1\u05D4\"\u05DB: ", fmt(ctx.invoices.reduce(function (s, i) {
+    return s + (i.amount || 0);
+  }, 0))), ctx.invoices.length > 0 && /*#__PURE__*/React.createElement("button", {
+    className: "btn-d",
+    style: {
+      marginTop: 12,
+      fontSize: 12,
+      padding: "4px 10px"
+    },
+    onClick: function onClick() {
+      return confirm("למחוק את כל החשבוניות?") && ctx.setInvoices([]);
+    }
+  }, "\u05E0\u05E7\u05D4 \u05D4\u05DB\u05DC"))));
 }
 
 // ── Recurring Tab ─────────────────────────────────────────────────────────────
-function RecurringTab({ctx}){
-  const {fixedItems,setFixedItems}=ctx;
-  const blank={name:"",amount:"",type:"expense",recurrence:"monthly",dayOfMonth:"1",date:""};
-  const [form,setForm]=useState(blank);
-  const [editId,setEditId]=useState(null);
-  const up=k=>v=>setForm(f=>({...f,[k]:v}));
-
-  const submit=()=>{
-    if(!form.name.trim()||!form.amount) return;
-    const item={...form,id:editId||uid(),amount:+form.amount,dayOfMonth:+form.dayOfMonth};
-    if(editId){setFixedItems(s=>s.map(x=>x.id===editId?item:x));setEditId(null);}
-    else setFixedItems(s=>[...s,item]);
+function RecurringTab(_ref20) {
+  var ctx = _ref20.ctx;
+  var fixedItems = ctx.fixedItems,
+    setFixedItems = ctx.setFixedItems;
+  var blank = {
+    name: "",
+    amount: "",
+    type: "expense",
+    recurrence: "monthly",
+    dayOfMonth: "1",
+    date: ""
+  };
+  var _useState35 = useState(blank),
+    _useState36 = _slicedToArray(_useState35, 2),
+    form = _useState36[0],
+    setForm = _useState36[1];
+  var _useState37 = useState(null),
+    _useState38 = _slicedToArray(_useState37, 2),
+    editId = _useState38[0],
+    setEditId = _useState38[1];
+  var up = function up(k) {
+    return function (v) {
+      return setForm(function (f) {
+        return _objectSpread(_objectSpread({}, f), {}, _defineProperty({}, k, v));
+      });
+    };
+  };
+  var submit = function submit() {
+    if (!form.name.trim() || !form.amount) return;
+    var item = _objectSpread(_objectSpread({}, form), {}, {
+      id: editId || uid(),
+      amount: +form.amount,
+      dayOfMonth: +form.dayOfMonth
+    });
+    if (editId) {
+      setFixedItems(function (s) {
+        return s.map(function (x) {
+          return x.id === editId ? item : x;
+        });
+      });
+      setEditId(null);
+    } else setFixedItems(function (s) {
+      return [].concat(_toConsumableArray(s), [item]);
+    });
     setForm(blank);
   };
-
-  const expenses=fixedItems.filter(f=>f.type==="expense");
-  const incomes=fixedItems.filter(f=>f.type==="income");
-
-  return <div>
-    <h1>הכנסות והוצאות קבועות</h1>
-    <div className="sub">פריטים חוזרים חודשיים או חד-פעמיים</div>
-
-    <div className="card" style={{padding:20,marginBottom:22}}>
-      <h3 style={{fontSize:15,fontWeight:700,marginBottom:14}}>{editId?"✏ עריכה":"➕ הוסף פריט"}</h3>
-      <div style={{display:"grid",gridTemplateColumns:"2fr 1fr 1fr 1fr 1fr",gap:12,marginBottom:12}}>
-        <div><label>שם</label><input value={form.name} onChange={e=>up("name")(e.target.value)} placeholder="שם ההוצאה/הכנסה"/></div>
-        <div><label>סכום (₪)</label><input type="number" value={form.amount} onChange={e=>up("amount")(e.target.value)} placeholder="0"/></div>
-        <div><label>סוג</label><select value={form.type} onChange={e=>up("type")(e.target.value)}><option value="expense">הוצאה</option><option value="income">הכנסה</option></select></div>
-        <div><label>תדירות</label><select value={form.recurrence} onChange={e=>up("recurrence")(e.target.value)}><option value="monthly">חודשי</option><option value="once">חד-פעמי</option></select></div>
-        {form.recurrence==="monthly"
-          ?<div><label>יום בחודש</label><input type="number" min="1" max="28" value={form.dayOfMonth} onChange={e=>up("dayOfMonth")(e.target.value)}/></div>
-          :<div><label>תאריך</label><input type="date" value={form.date} onChange={e=>up("date")(e.target.value)}/></div>}
-      </div>
-      <div style={{display:"flex",gap:8}}>
-        <button className="btn-p" onClick={submit}>{editId?"עדכן":"הוסף"}</button>
-        {editId&&<button className="btn-g" onClick={()=>{setEditId(null);setForm(blank);}}>ביטול</button>}
-      </div>
-    </div>
-
-    <div className="g2" style={{marginBottom:20}}>
-      <div className="card" style={{padding:"14px 18px"}}><div style={{fontSize:11,color:"var(--mu2)",marginBottom:3}}>סה"כ הוצאות / חודש</div><div className="mono" style={{fontSize:18,fontWeight:700,color:"var(--err)"}}>{fmt(expenses.reduce((s,f)=>s+(f.amount||0),0))}</div></div>
-      <div className="card" style={{padding:"14px 18px"}}><div style={{fontSize:11,color:"var(--mu2)",marginBottom:3}}>סה"כ הכנסות / חודש</div><div className="mono" style={{fontSize:18,fontWeight:700,color:"var(--ok)"}}>{fmt(incomes.reduce((s,f)=>s+(f.amount||0),0))}</div></div>
-    </div>
-
-    {[{title:"🔴 הוצאות קבועות",items:expenses,col:"var(--err)"},{title:"🟢 הכנסות קבועות",items:incomes,col:"var(--ok)"}].map(({title,items,col})=>
-      <div key={title} className="card" style={{overflow:"hidden",marginBottom:14}}>
-        <div style={{padding:"13px 18px",borderBottom:"1px solid var(--bd)",fontWeight:700,fontSize:14}}>{title}</div>
-        <table>
-          <thead><tr><th>שם</th><th>סכום</th><th>תדירות</th><th>יום / תאריך</th><th>פעולות</th></tr></thead>
-          <tbody>
-            {items.map(fi=><tr key={fi.id}>
-              <td style={{fontWeight:600}}>{fi.name}</td>
-              <td className="mono" style={{color:col,fontWeight:700}}>{fmt(fi.amount)}</td>
-              <td style={{fontSize:12,color:"var(--mu2)"}}>{fi.recurrence==="monthly"?"חודשי":"חד-פעמי"}</td>
-              <td style={{fontSize:12,color:"var(--mu2)"}}>{fi.recurrence==="monthly"?`יום ${fi.dayOfMonth}`:fmtDate(fi.date)}</td>
-              <td><div style={{display:"flex",gap:5}}>
-                <button className="btn-g" style={{padding:"3px 9px",fontSize:12}} onClick={()=>{setForm({name:fi.name,amount:String(fi.amount),type:fi.type,recurrence:fi.recurrence,dayOfMonth:String(fi.dayOfMonth||1),date:fi.date||""});setEditId(fi.id);}}>עריכה</button>
-                <button className="btn-d" style={{padding:"3px 9px",fontSize:12}} onClick={()=>confirm("למחוק?")&&setFixedItems(s=>s.filter(x=>x.id!==fi.id))}>מחק</button>
-              </div></td>
-            </tr>)}
-            {items.length===0&&<tr><td colSpan={5} style={{textAlign:"center",color:"var(--mu2)",padding:30}}>אין פריטים</td></tr>}
-          </tbody>
-        </table>
-      </div>
-    )}
-  </div>;
+  var expenses = fixedItems.filter(function (f) {
+    return f.type === "expense";
+  });
+  var incomes = fixedItems.filter(function (f) {
+    return f.type === "income";
+  });
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05D4\u05DB\u05E0\u05E1\u05D5\u05EA \u05D5\u05D4\u05D5\u05E6\u05D0\u05D5\u05EA \u05E7\u05D1\u05D5\u05E2\u05D5\u05EA"), /*#__PURE__*/React.createElement("div", {
+    className: "sub"
+  }, "\u05E4\u05E8\u05D9\u05D8\u05D9\u05DD \u05D7\u05D5\u05D6\u05E8\u05D9\u05DD \u05D7\u05D5\u05D3\u05E9\u05D9\u05D9\u05DD \u05D0\u05D5 \u05D7\u05D3-\u05E4\u05E2\u05DE\u05D9\u05D9\u05DD"), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: 20,
+      marginBottom: 22
+    }
+  }, /*#__PURE__*/React.createElement("h3", {
+    style: {
+      fontSize: 15,
+      fontWeight: 700,
+      marginBottom: 14
+    }
+  }, editId ? "✏ עריכה" : "➕ הוסף פריט"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr",
+      gap: 12,
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05E9\u05DD"), /*#__PURE__*/React.createElement("input", {
+    value: form.name,
+    onChange: function onChange(e) {
+      return up("name")(e.target.value);
+    },
+    placeholder: "\u05E9\u05DD \u05D4\u05D4\u05D5\u05E6\u05D0\u05D4/\u05D4\u05DB\u05E0\u05E1\u05D4"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05E1\u05DB\u05D5\u05DD (\u20AA)"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: form.amount,
+    onChange: function onChange(e) {
+      return up("amount")(e.target.value);
+    },
+    placeholder: "0"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05E1\u05D5\u05D2"), /*#__PURE__*/React.createElement("select", {
+    value: form.type,
+    onChange: function onChange(e) {
+      return up("type")(e.target.value);
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "expense"
+  }, "\u05D4\u05D5\u05E6\u05D0\u05D4"), /*#__PURE__*/React.createElement("option", {
+    value: "income"
+  }, "\u05D4\u05DB\u05E0\u05E1\u05D4"))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05EA\u05D3\u05D9\u05E8\u05D5\u05EA"), /*#__PURE__*/React.createElement("select", {
+    value: form.recurrence,
+    onChange: function onChange(e) {
+      return up("recurrence")(e.target.value);
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "monthly"
+  }, "\u05D7\u05D5\u05D3\u05E9\u05D9"), /*#__PURE__*/React.createElement("option", {
+    value: "once"
+  }, "\u05D7\u05D3-\u05E4\u05E2\u05DE\u05D9"))), form.recurrence === "monthly" ? /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05D9\u05D5\u05DD \u05D1\u05D7\u05D5\u05D3\u05E9"), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    min: "1",
+    max: "28",
+    value: form.dayOfMonth,
+    onChange: function onChange(e) {
+      return up("dayOfMonth")(e.target.value);
+    }
+  })) : /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("input", {
+    type: "date",
+    value: form.date,
+    onChange: function onChange(e) {
+      return up("date")(e.target.value);
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn-p",
+    onClick: submit
+  }, editId ? "עדכן" : "הוסף"), editId && /*#__PURE__*/React.createElement("button", {
+    className: "btn-g",
+    onClick: function onClick() {
+      setEditId(null);
+      setForm(blank);
+    }
+  }, "\u05D1\u05D9\u05D8\u05D5\u05DC"))), /*#__PURE__*/React.createElement("div", {
+    className: "g2",
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: "14px 18px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "var(--mu2)",
+      marginBottom: 3
+    }
+  }, "\u05E1\u05D4\"\u05DB \u05D4\u05D5\u05E6\u05D0\u05D5\u05EA / \u05D7\u05D5\u05D3\u05E9"), /*#__PURE__*/React.createElement("div", {
+    className: "mono",
+    style: {
+      fontSize: 18,
+      fontWeight: 700,
+      color: "var(--err)"
+    }
+  }, fmt(expenses.reduce(function (s, f) {
+    return s + (f.amount || 0);
+  }, 0)))), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: "14px 18px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "var(--mu2)",
+      marginBottom: 3
+    }
+  }, "\u05E1\u05D4\"\u05DB \u05D4\u05DB\u05E0\u05E1\u05D5\u05EA / \u05D7\u05D5\u05D3\u05E9"), /*#__PURE__*/React.createElement("div", {
+    className: "mono",
+    style: {
+      fontSize: 18,
+      fontWeight: 700,
+      color: "var(--ok)"
+    }
+  }, fmt(incomes.reduce(function (s, f) {
+    return s + (f.amount || 0);
+  }, 0))))), [{
+    title: "🔴 הוצאות קבועות",
+    items: expenses,
+    col: "var(--err)"
+  }, {
+    title: "🟢 הכנסות קבועות",
+    items: incomes,
+    col: "var(--ok)"
+  }].map(function (_ref21) {
+    var title = _ref21.title,
+      items = _ref21.items,
+      col = _ref21.col;
+    return /*#__PURE__*/React.createElement("div", {
+      key: title,
+      className: "card",
+      style: {
+        overflow: "hidden",
+        marginBottom: 14
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        padding: "13px 18px",
+        borderBottom: "1px solid var(--bd)",
+        fontWeight: 700,
+        fontSize: 14
+      }
+    }, title), /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05E9\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05DB\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D3\u05D9\u05E8\u05D5\u05EA"), /*#__PURE__*/React.createElement("th", null, "\u05D9\u05D5\u05DD / \u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05E4\u05E2\u05D5\u05DC\u05D5\u05EA"))), /*#__PURE__*/React.createElement("tbody", null, items.map(function (fi) {
+      return /*#__PURE__*/React.createElement("tr", {
+        key: fi.id
+      }, /*#__PURE__*/React.createElement("td", {
+        style: {
+          fontWeight: 600
+        }
+      }, fi.name), /*#__PURE__*/React.createElement("td", {
+        className: "mono",
+        style: {
+          color: col,
+          fontWeight: 700
+        }
+      }, fmt(fi.amount)), /*#__PURE__*/React.createElement("td", {
+        style: {
+          fontSize: 12,
+          color: "var(--mu2)"
+        }
+      }, fi.recurrence === "monthly" ? "חודשי" : "חד-פעמי"), /*#__PURE__*/React.createElement("td", {
+        style: {
+          fontSize: 12,
+          color: "var(--mu2)"
+        }
+      }, fi.recurrence === "monthly" ? "\u05D9\u05D5\u05DD ".concat(fi.dayOfMonth) : fmtDate(fi.date)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("div", {
+        style: {
+          display: "flex",
+          gap: 5
+        }
+      }, /*#__PURE__*/React.createElement("button", {
+        className: "btn-g",
+        style: {
+          padding: "3px 9px",
+          fontSize: 12
+        },
+        onClick: function onClick() {
+          setForm({
+            name: fi.name,
+            amount: String(fi.amount),
+            type: fi.type,
+            recurrence: fi.recurrence,
+            dayOfMonth: String(fi.dayOfMonth || 1),
+            date: fi.date || ""
+          });
+          setEditId(fi.id);
+        }
+      }, "\u05E2\u05E8\u05D9\u05DB\u05D4"), /*#__PURE__*/React.createElement("button", {
+        className: "btn-d",
+        style: {
+          padding: "3px 9px",
+          fontSize: 12
+        },
+        onClick: function onClick() {
+          return confirm("למחוק?") && setFixedItems(function (s) {
+            return s.filter(function (x) {
+              return x.id !== fi.id;
+            });
+          });
+        }
+      }, "\u05DE\u05D7\u05E7"))));
+    }), items.length === 0 && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
+      colSpan: 5,
+      style: {
+        textAlign: "center",
+        color: "var(--mu2)",
+        padding: 30
+      }
+    }, "\u05D0\u05D9\u05DF \u05E4\u05E8\u05D9\u05D8\u05D9\u05DD")))));
+  }));
 }
 
 // ── Mount ──────────────────────────────────────────────────────────────────────
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(App, null));
+
 </script>
 </body>
 </html>
