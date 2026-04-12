@@ -52,104 +52,81 @@ h1{font-size:22px;font-weight:800;letter-spacing:-.3px}
 <body>
 <div id="root"></div>
 <script>
-
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
-function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
-function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
-function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
-function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
-function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
-function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
-var _React = React,
-  useState = _React.useState,
-  useEffect = _React.useEffect,
-  useMemo = _React.useMemo;
-var _Recharts = Recharts,
-  AreaChart = _Recharts.AreaChart,
-  Area = _Recharts.Area,
-  XAxis = _Recharts.XAxis,
-  YAxis = _Recharts.YAxis,
-  CartesianGrid = _Recharts.CartesianGrid,
-  Tooltip = _Recharts.Tooltip,
-  ResponsiveContainer = _Recharts.ResponsiveContainer,
-  ReferenceLine = _Recharts.ReferenceLine,
-  BarChart = _Recharts.BarChart,
-  Bar = _Recharts.Bar;
+const {
+  useState,
+  useEffect,
+  useMemo
+} = React;
+const {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
+  BarChart,
+  Bar
+} = Recharts;
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
-var fmt = function fmt(n) {
-  return new Intl.NumberFormat("he-IL", {
-    style: "currency",
-    currency: "ILS",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(n || 0);
-};
-var fmtDate = function fmtDate(d) {
-  return d ? new Date(d).toLocaleDateString("he-IL", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric"
-  }) : "—";
-};
-var toISO = function toISO(d) {
+const fmt = n => new Intl.NumberFormat("he-IL", {
+  style: "currency",
+  currency: "ILS",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0
+}).format(n || 0);
+const fmtDate = d => d ? new Date(d).toLocaleDateString("he-IL", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric"
+}) : "—";
+const toISO = d => {
   if (!d) return "";
-  var dt = d instanceof Date ? d : new Date(d);
+  const dt = d instanceof Date ? d : new Date(d);
   return isNaN(dt) ? "" : dt.toISOString().split("T")[0];
 };
-var addDays = function addDays(d, n) {
-  var r = new Date(d);
+const addDays = (d, n) => {
+  const r = new Date(d);
   r.setDate(r.getDate() + n);
   return r;
 };
-var eom = function eom(d) {
-  var dt = new Date(d);
+const eom = d => {
+  const dt = new Date(d);
   return new Date(dt.getFullYear(), dt.getMonth() + 1, 0);
 };
-var uid = function uid() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
-};
-var excelDate = function excelDate(v) {
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+const excelDate = v => {
   if (!v) return "";
   if (v instanceof Date) return toISO(v);
   if (typeof v === "number") return toISO(new Date(Math.round((v - 25569) * 86400000)));
   return toISO(new Date(v));
 };
-var typeLabel = function typeLabel(t) {
-  return {
-    check: "המחאה",
-    invoice: "חשבונית",
-    income: "הכנסה",
-    fixed: "הוצאה קבועה"
-  }[t] || t;
-};
+const typeLabel = t => ({
+  check: "המחאה",
+  invoice: "חשבונית",
+  income: "הכנסה",
+  fixed: "הוצאה קבועה"
+})[t] || t;
 
 // ── localStorage storage (sync) ───────────────────────────────────────────────
-var lsLoad = function lsLoad(k, fb) {
+const lsLoad = (k, fb) => {
   try {
-    var v = localStorage.getItem(k);
+    const v = localStorage.getItem(k);
     return v ? JSON.parse(v) : fb;
-  } catch (_unused) {
+  } catch {
     return fb;
   }
 };
-var lsSave = function lsSave(k, v) {
+const lsSave = (k, v) => {
   try {
     localStorage.setItem(k, JSON.stringify(v));
-  } catch (_unused2) {}
+  } catch {}
 };
 
 // ── Tab config ────────────────────────────────────────────────────────────────
-var TABS = [{
+const TABS = [{
   id: "dashboard",
   icon: "📊",
   label: "דשבורד"
@@ -181,70 +158,29 @@ var TABS = [{
 
 // ── Root ──────────────────────────────────────────────────────────────────────
 function App() {
-  var _useState = useState("dashboard"),
-    _useState2 = _slicedToArray(_useState, 2),
-    tab = _useState2[0],
-    setTab = _useState2[1];
-  var _useState3 = useState(function () {
-      return lsLoad("cf-sup", []);
-    }),
-    _useState4 = _slicedToArray(_useState3, 2),
-    suppliers = _useState4[0],
-    setSuppliers = _useState4[1];
-  var _useState5 = useState(function () {
-      return lsLoad("cf-chk", []);
-    }),
-    _useState6 = _slicedToArray(_useState5, 2),
-    checks = _useState6[0],
-    setChecks = _useState6[1];
-  var _useState7 = useState(function () {
-      return lsLoad("cf-inv", []);
-    }),
-    _useState8 = _slicedToArray(_useState7, 2),
-    invoices = _useState8[0],
-    setInvoices = _useState8[1];
-  var _useState9 = useState(function () {
-      return lsLoad("cf-fix", []);
-    }),
-    _useState0 = _slicedToArray(_useState9, 2),
-    fixedItems = _useState0[0],
-    setFixedItems = _useState0[1];
-  var _useState1 = useState(function () {
-      return lsLoad("cf-ob", 0);
-    }),
-    _useState10 = _slicedToArray(_useState1, 2),
-    openingBal = _useState10[0],
-    setOpeningBal = _useState10[1];
-  var _useState11 = useState(null),
-    _useState12 = _slicedToArray(_useState11, 2),
-    selSup = _useState12[0],
-    setSelSup = _useState12[1];
-  useEffect(function () {
-    return lsSave("cf-sup", suppliers);
-  }, [suppliers]);
-  useEffect(function () {
-    return lsSave("cf-chk", checks);
-  }, [checks]);
-  useEffect(function () {
-    return lsSave("cf-inv", invoices);
-  }, [invoices]);
-  useEffect(function () {
-    return lsSave("cf-fix", fixedItems);
-  }, [fixedItems]);
-  useEffect(function () {
-    return lsSave("cf-ob", openingBal);
-  }, [openingBal]);
-  var today = useMemo(function () {
-    var d = new Date();
+  const [tab, setTab] = useState("dashboard");
+  const [suppliers, setSuppliers] = useState(() => lsLoad("cf-sup", []));
+  const [checks, setChecks] = useState(() => lsLoad("cf-chk", []));
+  const [invoices, setInvoices] = useState(() => lsLoad("cf-inv", []));
+  const [fixedItems, setFixedItems] = useState(() => lsLoad("cf-fix", []));
+  const [openingBal, setOpeningBal] = useState(() => lsLoad("cf-ob", 0));
+  const [selSup, setSelSup] = useState(null);
+  useEffect(() => lsSave("cf-sup", suppliers), [suppliers]);
+  useEffect(() => lsSave("cf-chk", checks), [checks]);
+  useEffect(() => lsSave("cf-inv", invoices), [invoices]);
+  useEffect(() => lsSave("cf-fix", fixedItems), [fixedItems]);
+  useEffect(() => lsSave("cf-ob", openingBal), [openingBal]);
+  const today = useMemo(() => {
+    const d = new Date();
     d.setHours(0, 0, 0, 0);
     return d;
   }, []);
-  var forecast = useMemo(function () {
-    var DAYS = 120,
+  const forecast = useMemo(() => {
+    const DAYS = 120,
       events = [];
-    checks.forEach(function (c) {
+    checks.forEach(c => {
       if (!c.date) return;
-      var d = new Date(c.date);
+      const d = new Date(c.date);
       d.setHours(0, 0, 0, 0);
       if (d >= today) events.push({
         date: toISO(d),
@@ -253,13 +189,11 @@ function App() {
         label: c.supplierName || "המחאה"
       });
     });
-    invoices.forEach(function (inv) {
+    invoices.forEach(inv => {
       if (!inv.date) return;
-      var sup = suppliers.find(function (s) {
-        return s.id === inv.supplierId || s.name === inv.supplierName;
-      });
-      var terms = sup ? sup.paymentTerms || 30 : 30;
-      var pay = addDays(eom(new Date(inv.date)), terms);
+      const sup = suppliers.find(s => s.id === inv.supplierId || s.name === inv.supplierName);
+      const terms = sup ? sup.paymentTerms || 30 : 30;
+      const pay = addDays(eom(new Date(inv.date)), terms);
       if (pay >= today) events.push({
         date: toISO(pay),
         amount: -Math.abs(inv.amount || 0),
@@ -267,10 +201,10 @@ function App() {
         label: inv.supplierName || "חשבונית"
       });
     });
-    var _loop = function _loop() {
-      var d = addDays(today, i);
-      fixedItems.forEach(function (fi) {
-        var sign = fi.type === "income" ? 1 : -1;
+    for (let i = 0; i < DAYS; i++) {
+      const d = addDays(today, i);
+      fixedItems.forEach(fi => {
+        const sign = fi.type === "income" ? 1 : -1;
         if (fi.recurrence === "monthly" && d.getDate() === (fi.dayOfMonth || 1)) events.push({
           date: toISO(d),
           amount: sign * Math.abs(fi.amount || 0),
@@ -283,23 +217,18 @@ function App() {
           label: fi.name
         });
       });
-    };
-    for (var i = 0; i < DAYS; i++) {
-      _loop();
     }
-    events.sort(function (a, b) {
-      return a.date.localeCompare(b.date);
-    });
-    var byDate = {};
-    events.forEach(function (e) {
+    events.sort((a, b) => a.date.localeCompare(b.date));
+    const byDate = {};
+    events.forEach(e => {
       (byDate[e.date] = byDate[e.date] || []).push(e);
     });
-    var bal = openingBal;
-    var chartData = [];
-    for (var _i = 0; _i < DAYS; _i++) {
-      var d = addDays(today, _i),
+    let bal = openingBal;
+    const chartData = [];
+    for (let i = 0; i < DAYS; i++) {
+      const d = addDays(today, i),
         key = toISO(d);
-      (byDate[key] || []).forEach(function (e) {
+      (byDate[key] || []).forEach(e => {
         bal += e.amount;
       });
       chartData.push({
@@ -311,53 +240,41 @@ function App() {
         })
       });
     }
-    var negDays = chartData.filter(function (c) {
-      return c.balance < 0;
-    }).map(function (c) {
-      return c.date;
-    });
-    var minBal = chartData.length ? Math.min.apply(Math, _toConsumableArray(chartData.map(function (c) {
-      return c.balance;
-    }))) : 0;
+    const negDays = chartData.filter(c => c.balance < 0).map(c => c.date);
+    const minBal = chartData.length ? Math.min(...chartData.map(c => c.balance)) : 0;
     return {
-      events: events,
-      byDate: byDate,
-      chartData: chartData,
-      negDays: negDays,
-      minBal: minBal
+      events,
+      byDate,
+      chartData,
+      negDays,
+      minBal
     };
   }, [checks, invoices, suppliers, fixedItems, openingBal, today]);
-  var kpis = useMemo(function () {
-    return {
-      ob: openingBal,
-      totalChecks: checks.reduce(function (s, c) {
-        return s + (c.amount || 0);
-      }, 0),
-      totalInvoices: invoices.reduce(function (s, i) {
-        return s + (i.amount || 0);
-      }, 0),
-      supCount: suppliers.length,
-      minForecast: forecast.minBal,
-      negDays: forecast.negDays.length
-    };
-  }, [checks, invoices, suppliers, openingBal, forecast]);
-  var ctx = {
-    suppliers: suppliers,
-    setSuppliers: setSuppliers,
-    checks: checks,
-    setChecks: setChecks,
-    invoices: invoices,
-    setInvoices: setInvoices,
-    fixedItems: fixedItems,
-    setFixedItems: setFixedItems,
-    openingBal: openingBal,
-    setOpeningBal: setOpeningBal,
-    forecast: forecast,
-    kpis: kpis,
-    selSup: selSup,
-    setSelSup: setSelSup,
-    setTab: setTab,
-    today: today
+  const kpis = useMemo(() => ({
+    ob: openingBal,
+    totalChecks: checks.reduce((s, c) => s + (c.amount || 0), 0),
+    totalInvoices: invoices.reduce((s, i) => s + (i.amount || 0), 0),
+    supCount: suppliers.length,
+    minForecast: forecast.minBal,
+    negDays: forecast.negDays.length
+  }), [checks, invoices, suppliers, openingBal, forecast]);
+  const ctx = {
+    suppliers,
+    setSuppliers,
+    checks,
+    setChecks,
+    invoices,
+    setInvoices,
+    fixedItems,
+    setFixedItems,
+    openingBal,
+    setOpeningBal,
+    forecast,
+    kpis,
+    selSup,
+    setSelSup,
+    setTab,
+    today
   };
   return /*#__PURE__*/React.createElement("div", {
     style: {
@@ -402,13 +319,11 @@ function App() {
       flexDirection: "column",
       gap: 2
     }
-  }, TABS.map(function (t) {
-    var act = tab === t.id;
+  }, TABS.map(t => {
+    const act = tab === t.id;
     return /*#__PURE__*/React.createElement("button", {
       key: t.id,
-      onClick: function onClick() {
-        return setTab(t.id);
-      },
+      onClick: () => setTab(t.id),
       style: {
         background: act ? "var(--glow)" : "transparent",
         color: act ? "var(--gold)" : "var(--mu2)",
@@ -494,10 +409,11 @@ function App() {
 }
 
 // ── Shared ────────────────────────────────────────────────────────────────────
-function Modal(_ref) {
-  var title = _ref.title,
-    onClose = _ref.onClose,
-    children = _ref.children;
+function Modal({
+  title,
+  onClose,
+  children
+}) {
   return /*#__PURE__*/React.createElement("div", {
     style: {
       position: "fixed",
@@ -508,9 +424,7 @@ function Modal(_ref) {
       justifyContent: "center",
       zIndex: 999
     },
-    onClick: function onClick(e) {
-      return e.target === e.currentTarget && onClose();
-    }
+    onClick: e => e.target === e.currentTarget && onClose()
   }, /*#__PURE__*/React.createElement("div", {
     className: "card",
     style: {
@@ -539,13 +453,14 @@ function Modal(_ref) {
     onClick: onClose
   }, "\u2715")), children));
 }
-function KpiCard(_ref2) {
-  var icon = _ref2.icon,
-    label = _ref2.label,
-    value = _ref2.value,
-    color = _ref2.color,
-    onClick = _ref2.onClick,
-    note = _ref2.note;
+function KpiCard({
+  icon,
+  label,
+  value,
+  color,
+  onClick,
+  note
+}) {
   return /*#__PURE__*/React.createElement("div", {
     className: "card",
     onClick: onClick,
@@ -554,12 +469,8 @@ function KpiCard(_ref2) {
       cursor: onClick ? "pointer" : "default",
       transition: "border-color .2s"
     },
-    onMouseEnter: function onMouseEnter(e) {
-      return onClick && (e.currentTarget.style.borderColor = "var(--gold)");
-    },
-    onMouseLeave: function onMouseLeave(e) {
-      return e.currentTarget.style.borderColor = "var(--bd)";
-    }
+    onMouseEnter: e => onClick && (e.currentTarget.style.borderColor = "var(--gold)"),
+    onMouseLeave: e => e.currentTarget.style.borderColor = "var(--bd)"
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 24,
@@ -586,12 +497,12 @@ function KpiCard(_ref2) {
     }
   }, note));
 }
-function ChartTip(_ref3) {
-  var _payload$;
-  var active = _ref3.active,
-    payload = _ref3.payload;
-  if (!active || !(payload !== null && payload !== void 0 && payload.length)) return null;
-  var v = payload[0].value;
+function ChartTip({
+  active,
+  payload
+}) {
+  if (!active || !payload?.length) return null;
+  const v = payload[0].value;
   return /*#__PURE__*/React.createElement("div", {
     style: {
       background: "var(--s2)",
@@ -605,7 +516,7 @@ function ChartTip(_ref3) {
       color: "var(--mu2)",
       marginBottom: 3
     }
-  }, (_payload$ = payload[0]) === null || _payload$ === void 0 || (_payload$ = _payload$.payload) === null || _payload$ === void 0 ? void 0 : _payload$.label), /*#__PURE__*/React.createElement("div", {
+  }, payload[0]?.payload?.label), /*#__PURE__*/React.createElement("div", {
     className: "mono",
     style: {
       fontSize: 15,
@@ -616,47 +527,34 @@ function ChartTip(_ref3) {
 }
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
-function Dashboard(_ref4) {
-  var ctx = _ref4.ctx;
-  var kpis = ctx.kpis,
-    forecast = ctx.forecast,
-    openingBal = ctx.openingBal,
-    setOpeningBal = ctx.setOpeningBal,
-    checks = ctx.checks,
-    invoices = ctx.invoices;
-  var _useState13 = useState(false),
-    _useState14 = _slicedToArray(_useState13, 2),
-    editBal = _useState14[0],
-    setEditBal = _useState14[1];
-  var _useState15 = useState(openingBal),
-    _useState16 = _slicedToArray(_useState15, 2),
-    balVal = _useState16[0],
-    setBalVal = _useState16[1];
-  var monthlyBars = useMemo(function () {
-    var now = new Date();
+function Dashboard({
+  ctx
+}) {
+  const {
+    kpis,
+    forecast,
+    openingBal,
+    setOpeningBal,
+    checks,
+    invoices
+  } = ctx;
+  const [editBal, setEditBal] = useState(false);
+  const [balVal, setBalVal] = useState(openingBal);
+  const monthlyBars = useMemo(() => {
+    const now = new Date();
     return Array.from({
       length: 6
-    }, function (_, i) {
-      var d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
-      var key = "".concat(d.getFullYear(), "-").concat(String(d.getMonth() + 1).padStart(2, "0"));
-      var label = d.toLocaleDateString("he-IL", {
+    }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const label = d.toLocaleDateString("he-IL", {
         month: "short",
         year: "2-digit"
       });
       return {
-        label: label,
-        inv: invoices.filter(function (x) {
-          var _x$date;
-          return (_x$date = x.date) === null || _x$date === void 0 ? void 0 : _x$date.startsWith(key);
-        }).reduce(function (s, x) {
-          return s + (x.amount || 0);
-        }, 0),
-        chk: checks.filter(function (x) {
-          var _x$date2;
-          return (_x$date2 = x.date) === null || _x$date2 === void 0 ? void 0 : _x$date2.startsWith(key);
-        }).reduce(function (s, x) {
-          return s + (x.amount || 0);
-        }, 0)
+        label,
+        inv: invoices.filter(x => x.date?.startsWith(key)).reduce((s, x) => s + (x.amount || 0), 0),
+        chk: checks.filter(x => x.date?.startsWith(key)).reduce((s, x) => s + (x.amount || 0), 0)
       };
     });
   }, [invoices, checks]);
@@ -672,7 +570,7 @@ function Dashboard(_ref4) {
     label: "\u05D9\u05EA\u05E8\u05D4 \u05E0\u05D5\u05DB\u05D7\u05D9\u05EA",
     value: fmt(kpis.ob),
     color: kpis.ob >= 0 ? "var(--ok)" : "var(--err)",
-    onClick: function onClick() {
+    onClick: () => {
       setBalVal(kpis.ob);
       setEditBal(true);
     },
@@ -704,15 +602,11 @@ function Dashboard(_ref4) {
     color: "var(--mu2)"
   })), editBal && /*#__PURE__*/React.createElement(Modal, {
     title: "\u05E2\u05D3\u05DB\u05D5\u05DF \u05D9\u05EA\u05E8\u05EA \u05D7\u05E9\u05D1\u05D5\u05DF \u05D1\u05E0\u05E7",
-    onClose: function onClose() {
-      return setEditBal(false);
-    }
+    onClose: () => setEditBal(false)
   }, /*#__PURE__*/React.createElement("label", null, "\u05D9\u05EA\u05E8\u05D4 \u05E0\u05D5\u05DB\u05D7\u05D9\u05EA (\u20AA)"), /*#__PURE__*/React.createElement("input", {
     type: "number",
     value: balVal,
-    onChange: function onChange(e) {
-      return setBalVal(+e.target.value);
-    },
+    onChange: e => setBalVal(+e.target.value),
     style: {
       marginBottom: 16
     },
@@ -724,15 +618,13 @@ function Dashboard(_ref4) {
     }
   }, /*#__PURE__*/React.createElement("button", {
     className: "btn-p",
-    onClick: function onClick() {
+    onClick: () => {
       setOpeningBal(+balVal);
       setEditBal(false);
     }
   }, "\u05E9\u05DE\u05D5\u05E8"), /*#__PURE__*/React.createElement("button", {
     className: "btn-g",
-    onClick: function onClick() {
-      return setEditBal(false);
-    }
+    onClick: () => setEditBal(false)
   }, "\u05D1\u05D9\u05D8\u05D5\u05DC"))), /*#__PURE__*/React.createElement("div", {
     className: "card",
     style: {
@@ -797,9 +689,7 @@ function Dashboard(_ref4) {
     },
     tickLine: false,
     axisLine: false,
-    tickFormatter: function tickFormatter(v) {
-      return "\u20AA".concat((Math.abs(v) / 1000).toFixed(0), "K");
-    },
+    tickFormatter: v => `₪${(Math.abs(v) / 1000).toFixed(0)}K`,
     width: 52
   }), /*#__PURE__*/React.createElement(Tooltip, {
     content: /*#__PURE__*/React.createElement(ChartTip, null)
@@ -819,9 +709,7 @@ function Dashboard(_ref4) {
       r: 4,
       fill: "#d4a853"
     }
-  })))), monthlyBars.some(function (m) {
-    return m.inv > 0 || m.chk > 0;
-  }) && /*#__PURE__*/React.createElement("div", {
+  })))), monthlyBars.some(m => m.inv > 0 || m.chk > 0) && /*#__PURE__*/React.createElement("div", {
     className: "card",
     style: {
       padding: "22px 24px",
@@ -862,14 +750,10 @@ function Dashboard(_ref4) {
     },
     tickLine: false,
     axisLine: false,
-    tickFormatter: function tickFormatter(v) {
-      return "\u20AA".concat((v / 1000).toFixed(0), "K");
-    },
+    tickFormatter: v => `₪${(v / 1000).toFixed(0)}K`,
     width: 52
   }), /*#__PURE__*/React.createElement(Tooltip, {
-    formatter: function formatter(v, n) {
-      return [fmt(v), n === "inv" ? "חשבוניות" : "המחאות"];
-    },
+    formatter: (v, n) => [fmt(v), n === "inv" ? "חשבוניות" : "המחאות"],
     contentStyle: {
       background: "var(--s2)",
       border: "1px solid var(--bd)",
@@ -892,28 +776,23 @@ function Dashboard(_ref4) {
       justifyContent: "center",
       marginTop: 10
     }
-  }, [["#d4a030", "חשבוניות"], ["#4d96e8", "המחאות"]].map(function (_ref5) {
-    var _ref6 = _slicedToArray(_ref5, 2),
-      c = _ref6[0],
-      l = _ref6[1];
-    return /*#__PURE__*/React.createElement("div", {
-      key: l,
-      style: {
-        display: "flex",
-        alignItems: "center",
-        gap: 6,
-        fontSize: 12,
-        color: "var(--mu2)"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        width: 10,
-        height: 10,
-        borderRadius: 2,
-        background: c
-      }
-    }), l);
-  }))), forecast.negDays.length > 0 && /*#__PURE__*/React.createElement("div", {
+  }, [["#d4a030", "חשבוניות"], ["#4d96e8", "המחאות"]].map(([c, l]) => /*#__PURE__*/React.createElement("div", {
+    key: l,
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 6,
+      fontSize: 12,
+      color: "var(--mu2)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 10,
+      height: 10,
+      borderRadius: 2,
+      background: c
+    }
+  }), l)))), forecast.negDays.length > 0 && /*#__PURE__*/React.createElement("div", {
     style: {
       background: "rgba(224,84,84,.04)",
       border: "1px solid rgba(224,84,84,.18)",
@@ -933,18 +812,16 @@ function Dashboard(_ref4) {
       flexWrap: "wrap",
       gap: 7
     }
-  }, forecast.negDays.slice(0, 18).map(function (d) {
-    return /*#__PURE__*/React.createElement("span", {
-      key: d,
-      style: {
-        background: "rgba(224,84,84,.1)",
-        color: "var(--err)",
-        padding: "3px 10px",
-        borderRadius: 999,
-        fontSize: 12
-      }
-    }, fmtDate(d));
-  }), forecast.negDays.length > 18 && /*#__PURE__*/React.createElement("span", {
+  }, forecast.negDays.slice(0, 18).map(d => /*#__PURE__*/React.createElement("span", {
+    key: d,
+    style: {
+      background: "rgba(224,84,84,.1)",
+      color: "var(--err)",
+      padding: "3px 10px",
+      borderRadius: 999,
+      fontSize: 12
+    }
+  }, fmtDate(d))), forecast.negDays.length > 18 && /*#__PURE__*/React.createElement("span", {
     style: {
       color: "var(--mu2)",
       fontSize: 12,
@@ -954,30 +831,26 @@ function Dashboard(_ref4) {
 }
 
 // ── Forecast Tab ──────────────────────────────────────────────────────────────
-function ForecastTab(_ref7) {
-  var ctx = _ref7.ctx;
-  var forecast = ctx.forecast,
-    openingBal = ctx.openingBal;
-  var _useState17 = useState("table"),
-    _useState18 = _slicedToArray(_useState17, 2),
-    mode = _useState18[0],
-    setMode = _useState18[1];
-  var _useState19 = useState("all"),
-    _useState20 = _slicedToArray(_useState19, 2),
-    filter = _useState20[0],
-    setFilter = _useState20[1];
-  var rows = useMemo(function () {
-    var bal = openingBal;
-    return forecast.events.map(function (e) {
+function ForecastTab({
+  ctx
+}) {
+  const {
+    forecast,
+    openingBal
+  } = ctx;
+  const [mode, setMode] = useState("table");
+  const [filter, setFilter] = useState("all");
+  const rows = useMemo(() => {
+    let bal = openingBal;
+    return forecast.events.map(e => {
       bal += e.amount;
-      return _objectSpread(_objectSpread({}, e), {}, {
-        bal: bal
-      });
+      return {
+        ...e,
+        bal
+      };
     });
   }, [forecast.events, openingBal]);
-  var filtered = filter === "all" ? rows : rows.filter(function (r) {
-    return r.type === filter;
-  });
+  const filtered = filter === "all" ? rows : rows.filter(r => r.type === filter);
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
@@ -994,14 +867,10 @@ function ForecastTab(_ref7) {
     }
   }, /*#__PURE__*/React.createElement("button", {
     className: mode === "table" ? "btn-p" : "btn-g",
-    onClick: function onClick() {
-      return setMode("table");
-    }
+    onClick: () => setMode("table")
   }, "\u05D8\u05D1\u05DC\u05D4"), /*#__PURE__*/React.createElement("button", {
     className: mode === "chart" ? "btn-p" : "btn-g",
-    onClick: function onClick() {
-      return setMode("chart");
-    }
+    onClick: () => setMode("chart")
   }, "\u05D2\u05E8\u05E3"))), mode === "chart" && /*#__PURE__*/React.createElement("div", {
     className: "card",
     style: {
@@ -1051,9 +920,7 @@ function ForecastTab(_ref7) {
     },
     tickLine: false,
     axisLine: false,
-    tickFormatter: function tickFormatter(v) {
-      return "\u20AA".concat((Math.abs(v) / 1000).toFixed(0), "K");
-    },
+    tickFormatter: v => `₪${(Math.abs(v) / 1000).toFixed(0)}K`,
     width: 58
   }), /*#__PURE__*/React.createElement(Tooltip, {
     content: /*#__PURE__*/React.createElement(ChartTip, null)
@@ -1080,22 +947,15 @@ function ForecastTab(_ref7) {
       marginBottom: 14,
       flexWrap: "wrap"
     }
-  }, [["all", "הכל"], ["check", "המחאות"], ["invoice", "חשבוניות"], ["income", "הכנסות"], ["fixed", "קבועות"]].map(function (_ref8) {
-    var _ref9 = _slicedToArray(_ref8, 2),
-      v = _ref9[0],
-      l = _ref9[1];
-    return /*#__PURE__*/React.createElement("button", {
-      key: v,
-      onClick: function onClick() {
-        return setFilter(v);
-      },
-      className: filter === v ? "btn-p" : "btn-g",
-      style: {
-        padding: "5px 12px",
-        fontSize: 13
-      }
-    }, l);
-  })), /*#__PURE__*/React.createElement("div", {
+  }, [["all", "הכל"], ["check", "המחאות"], ["invoice", "חשבוניות"], ["income", "הכנסות"], ["fixed", "קבועות"]].map(([v, l]) => /*#__PURE__*/React.createElement("button", {
+    key: v,
+    onClick: () => setFilter(v),
+    className: filter === v ? "btn-p" : "btn-g",
+    style: {
+      padding: "5px 12px",
+      fontSize: 13
+    }
+  }, l))), /*#__PURE__*/React.createElement("div", {
     className: "card",
     style: {
       overflow: "hidden"
@@ -1112,39 +972,37 @@ function ForecastTab(_ref7) {
       color: "var(--gold)",
       fontWeight: 700
     }
-  }, fmt(openingBal))), filtered.map(function (r, i) {
-    return /*#__PURE__*/React.createElement("tr", {
-      key: i
-    }, /*#__PURE__*/React.createElement("td", {
-      style: {
-        color: "var(--mu2)",
-        fontSize: 12,
-        whiteSpace: "nowrap"
-      }
-    }, fmtDate(r.date)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("span", {
-      className: "tag t-".concat(r.type)
-    }, typeLabel(r.type))), /*#__PURE__*/React.createElement("td", {
-      style: {
-        maxWidth: 200,
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap"
-      }
-    }, r.label), /*#__PURE__*/React.createElement("td", {
-      className: "mono",
-      style: {
-        color: r.amount < 0 ? "var(--err)" : "var(--ok)",
-        fontWeight: 600,
-        whiteSpace: "nowrap"
-      }
-    }, r.amount < 0 ? "−" : "+", fmt(Math.abs(r.amount))), /*#__PURE__*/React.createElement("td", {
-      className: "mono",
-      style: {
-        fontWeight: 700,
-        color: r.bal < 0 ? "var(--err)" : "var(--tx)"
-      }
-    }, fmt(r.bal)));
-  }), filtered.length === 0 && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
+  }, fmt(openingBal))), filtered.map((r, i) => /*#__PURE__*/React.createElement("tr", {
+    key: i
+  }, /*#__PURE__*/React.createElement("td", {
+    style: {
+      color: "var(--mu2)",
+      fontSize: 12,
+      whiteSpace: "nowrap"
+    }
+  }, fmtDate(r.date)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("span", {
+    className: `tag t-${r.type}`
+  }, typeLabel(r.type))), /*#__PURE__*/React.createElement("td", {
+    style: {
+      maxWidth: 200,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap"
+    }
+  }, r.label), /*#__PURE__*/React.createElement("td", {
+    className: "mono",
+    style: {
+      color: r.amount < 0 ? "var(--err)" : "var(--ok)",
+      fontWeight: 600,
+      whiteSpace: "nowrap"
+    }
+  }, r.amount < 0 ? "−" : "+", fmt(Math.abs(r.amount))), /*#__PURE__*/React.createElement("td", {
+    className: "mono",
+    style: {
+      fontWeight: 700,
+      color: r.bal < 0 ? "var(--err)" : "var(--tx)"
+    }
+  }, fmt(r.bal)))), filtered.length === 0 && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
     colSpan: 5,
     style: {
       textAlign: "center",
@@ -1155,15 +1013,18 @@ function ForecastTab(_ref7) {
 }
 
 // ── Suppliers Tab ─────────────────────────────────────────────────────────────
-function SuppliersTab(_ref0) {
-  var ctx = _ref0.ctx;
-  var suppliers = ctx.suppliers,
-    setSuppliers = ctx.setSuppliers,
-    checks = ctx.checks,
-    invoices = ctx.invoices,
-    setSelSup = ctx.setSelSup,
-    setTab = ctx.setTab;
-  var blank = {
+function SuppliersTab({
+  ctx
+}) {
+  const {
+    suppliers,
+    setSuppliers,
+    checks,
+    invoices,
+    setSelSup,
+    setTab
+  } = ctx;
+  const blank = {
     name: "",
     paymentTerms: "30",
     paymentMethod: "המחאה",
@@ -1171,64 +1032,39 @@ function SuppliersTab(_ref0) {
     email: "",
     notes: ""
   };
-  var _useState21 = useState(blank),
-    _useState22 = _slicedToArray(_useState21, 2),
-    form = _useState22[0],
-    setForm = _useState22[1];
-  var _useState23 = useState(null),
-    _useState24 = _slicedToArray(_useState23, 2),
-    editId = _useState24[0],
-    setEditId = _useState24[1];
-  var _useState25 = useState(""),
-    _useState26 = _slicedToArray(_useState25, 2),
-    search = _useState26[0],
-    setSearch = _useState26[1];
-  var up = function up(k) {
-    return function (v) {
-      return setForm(function (f) {
-        return _objectSpread(_objectSpread({}, f), {}, _defineProperty({}, k, v));
-      });
-    };
-  };
-  var submit = function submit() {
+  const [form, setForm] = useState(blank);
+  const [editId, setEditId] = useState(null);
+  const [search, setSearch] = useState("");
+  const up = k => v => setForm(f => ({
+    ...f,
+    [k]: v
+  }));
+  const submit = () => {
     if (!form.name.trim()) return;
     if (editId) {
-      setSuppliers(function (s) {
-        return s.map(function (x) {
-          return x.id === editId ? _objectSpread(_objectSpread(_objectSpread({}, x), form), {}, {
-            paymentTerms: +form.paymentTerms
-          }) : x;
-        });
-      });
-      setEditId(null);
-    } else setSuppliers(function (s) {
-      return [].concat(_toConsumableArray(s), [_objectSpread(_objectSpread({}, form), {}, {
-        id: uid(),
+      setSuppliers(s => s.map(x => x.id === editId ? {
+        ...x,
+        ...form,
         paymentTerms: +form.paymentTerms
-      })]);
-    });
+      } : x));
+      setEditId(null);
+    } else setSuppliers(s => [...s, {
+      ...form,
+      id: uid(),
+      paymentTerms: +form.paymentTerms
+    }]);
     setForm(blank);
   };
-  var stats = function stats(sup) {
-    var tInv = invoices.filter(function (i) {
-      return i.supplierId === sup.id || i.supplierName === sup.name;
-    }).reduce(function (s, i) {
-      return s + (i.amount || 0);
-    }, 0);
-    var tChk = checks.filter(function (c) {
-      return c.supplierId === sup.id || c.supplierName === sup.name;
-    }).reduce(function (s, c) {
-      return s + (c.amount || 0);
-    }, 0);
+  const stats = sup => {
+    const tInv = invoices.filter(i => i.supplierId === sup.id || i.supplierName === sup.name).reduce((s, i) => s + (i.amount || 0), 0);
+    const tChk = checks.filter(c => c.supplierId === sup.id || c.supplierName === sup.name).reduce((s, c) => s + (c.amount || 0), 0);
     return {
-      tInv: tInv,
-      tChk: tChk,
+      tInv,
+      tChk,
       bal: tInv - tChk
     };
   };
-  var list = suppliers.filter(function (s) {
-    return !search || s.name.includes(search);
-  });
+  const list = suppliers.filter(s => !search || s.name.includes(search));
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05E0\u05D9\u05D4\u05D5\u05DC \u05E1\u05E4\u05E7\u05D9\u05DD"), /*#__PURE__*/React.createElement("div", {
     className: "sub"
   }, "\u05D4\u05D2\u05D3\u05E8 \u05E1\u05E4\u05E7\u05D9\u05DD \u05D5\u05EA\u05E0\u05D0\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD \u05DC\u05D7\u05D9\u05E9\u05D5\u05D1 \u05EA\u05D7\u05D6\u05D9\u05EA \u05DE\u05D3\u05D5\u05D9\u05E7"), /*#__PURE__*/React.createElement("div", {
@@ -1252,36 +1088,24 @@ function SuppliersTab(_ref0) {
     }
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05E9\u05DD \u05E1\u05E4\u05E7 *"), /*#__PURE__*/React.createElement("input", {
     value: form.name,
-    onChange: function onChange(e) {
-      return up("name")(e.target.value);
-    },
+    onChange: e => up("name")(e.target.value),
     placeholder: "\u05E9\u05DD \u05D4\u05E1\u05E4\u05E7"
   })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05EA\u05E0\u05D0\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD (\u05D9\u05DE\u05D9\u05DD)"), /*#__PURE__*/React.createElement("input", {
     type: "number",
     value: form.paymentTerms,
-    onChange: function onChange(e) {
-      return up("paymentTerms")(e.target.value);
-    }
+    onChange: e => up("paymentTerms")(e.target.value)
   })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05D0\u05DE\u05E6\u05E2\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD"), /*#__PURE__*/React.createElement("select", {
     value: form.paymentMethod,
-    onChange: function onChange(e) {
-      return up("paymentMethod")(e.target.value);
-    }
-  }, ["המחאה", "העברה בנקאית", "אשראי", "מזומן", "אחר"].map(function (m) {
-    return /*#__PURE__*/React.createElement("option", {
-      key: m
-    }, m);
-  }))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05D8\u05DC\u05E4\u05D5\u05DF"), /*#__PURE__*/React.createElement("input", {
+    onChange: e => up("paymentMethod")(e.target.value)
+  }, ["המחאה", "העברה בנקאית", "אשראי", "מזומן", "אחר"].map(m => /*#__PURE__*/React.createElement("option", {
+    key: m
+  }, m)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05D8\u05DC\u05E4\u05D5\u05DF"), /*#__PURE__*/React.createElement("input", {
     value: form.phone || "",
-    onChange: function onChange(e) {
-      return up("phone")(e.target.value);
-    },
+    onChange: e => up("phone")(e.target.value),
     placeholder: "050-0000000"
   })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05D0\u05D9\u05DE\u05D9\u05D9\u05DC"), /*#__PURE__*/React.createElement("input", {
     value: form.email || "",
-    onChange: function onChange(e) {
-      return up("email")(e.target.value);
-    },
+    onChange: e => up("email")(e.target.value),
     placeholder: "supplier@..."
   }))), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1289,9 +1113,7 @@ function SuppliersTab(_ref0) {
     }
   }, /*#__PURE__*/React.createElement("label", null, "\u05D4\u05E2\u05E8\u05D5\u05EA"), /*#__PURE__*/React.createElement("input", {
     value: form.notes || "",
-    onChange: function onChange(e) {
-      return up("notes")(e.target.value);
-    }
+    onChange: e => up("notes")(e.target.value)
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
@@ -1302,15 +1124,13 @@ function SuppliersTab(_ref0) {
     onClick: submit
   }, editId ? "עדכן" : "הוסף ספק"), editId && /*#__PURE__*/React.createElement("button", {
     className: "btn-g",
-    onClick: function onClick() {
+    onClick: () => {
       setEditId(null);
       setForm(blank);
     }
   }, "\u05D1\u05D9\u05D8\u05D5\u05DC"))), /*#__PURE__*/React.createElement("input", {
     value: search,
-    onChange: function onChange(e) {
-      return setSearch(e.target.value);
-    },
+    onChange: e => setSearch(e.target.value),
     placeholder: "\uD83D\uDD0D \u05D7\u05D9\u05E4\u05D5\u05E9\u2026",
     style: {
       maxWidth: 280,
@@ -1321,8 +1141,8 @@ function SuppliersTab(_ref0) {
     style: {
       overflow: "hidden"
     }
-  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05E9\u05DD \u05E1\u05E4\u05E7"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05E0\u05D0\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05D0\u05DE\u05E6\u05E2\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA"), /*#__PURE__*/React.createElement("th", null, "\u05E9\u05D5\u05DC\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05D9\u05EA\u05E8\u05D4"), /*#__PURE__*/React.createElement("th", null, "\u05E4\u05E2\u05D5\u05DC\u05D5\u05EA"))), /*#__PURE__*/React.createElement("tbody", null, list.map(function (sup) {
-    var st = stats(sup);
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05E9\u05DD \u05E1\u05E4\u05E7"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05E0\u05D0\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05D0\u05DE\u05E6\u05E2\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA"), /*#__PURE__*/React.createElement("th", null, "\u05E9\u05D5\u05DC\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05D9\u05EA\u05E8\u05D4"), /*#__PURE__*/React.createElement("th", null, "\u05E4\u05E2\u05D5\u05DC\u05D5\u05EA"))), /*#__PURE__*/React.createElement("tbody", null, list.map(sup => {
+    const st = stats(sup);
     return /*#__PURE__*/React.createElement("tr", {
       key: sup.id
     }, /*#__PURE__*/React.createElement("td", {
@@ -1374,7 +1194,7 @@ function SuppliersTab(_ref0) {
         padding: "3px 9px",
         fontSize: 12
       },
-      onClick: function onClick() {
+      onClick: () => {
         setSelSup(sup.id);
         setTab("ledger");
       }
@@ -1384,7 +1204,7 @@ function SuppliersTab(_ref0) {
         padding: "3px 9px",
         fontSize: 12
       },
-      onClick: function onClick() {
+      onClick: () => {
         setForm({
           name: sup.name,
           paymentTerms: String(sup.paymentTerms || 30),
@@ -1401,13 +1221,7 @@ function SuppliersTab(_ref0) {
         padding: "3px 9px",
         fontSize: 12
       },
-      onClick: function onClick() {
-        return confirm("למחוק ספק זה?") && setSuppliers(function (s) {
-          return s.filter(function (x) {
-            return x.id !== sup.id;
-          });
-        });
-      }
+      onClick: () => confirm("למחוק ספק זה?") && setSuppliers(s => s.filter(x => x.id !== sup.id))
     }, "\u05DE\u05D7\u05E7"))));
   }), list.length === 0 && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
     colSpan: 7,
@@ -1420,41 +1234,26 @@ function SuppliersTab(_ref0) {
 }
 
 // ── Ledger Tab ────────────────────────────────────────────────────────────────
-function LedgerTab(_ref1) {
-  var _suppliers$;
-  var ctx = _ref1.ctx;
-  var suppliers = ctx.suppliers,
-    checks = ctx.checks,
-    invoices = ctx.invoices,
-    selSup = ctx.selSup,
-    setSelSup = ctx.setSelSup,
-    today = ctx.today;
-  var _useState27 = useState(selSup || ((_suppliers$ = suppliers[0]) === null || _suppliers$ === void 0 ? void 0 : _suppliers$.id) || ""),
-    _useState28 = _slicedToArray(_useState27, 2),
-    sid = _useState28[0],
-    setSid = _useState28[1];
-  useEffect(function () {
+function LedgerTab({
+  ctx
+}) {
+  const {
+    suppliers,
+    checks,
+    invoices,
+    selSup,
+    setSelSup,
+    today
+  } = ctx;
+  const [sid, setSid] = useState(selSup || suppliers[0]?.id || "");
+  useEffect(() => {
     if (selSup) setSid(selSup);
   }, [selSup]);
-  var sup = suppliers.find(function (s) {
-    return s.id === sid;
-  });
-  var sInv = sup ? _toConsumableArray(invoices.filter(function (i) {
-    return i.supplierId === sup.id || i.supplierName === sup.name;
-  })).sort(function (a, b) {
-    return (a.date || "").localeCompare(b.date || "");
-  }) : [];
-  var sChk = sup ? _toConsumableArray(checks.filter(function (c) {
-    return c.supplierId === sup.id || c.supplierName === sup.name;
-  })).sort(function (a, b) {
-    return (a.date || "").localeCompare(b.date || "");
-  }) : [];
-  var tInv = sInv.reduce(function (s, i) {
-    return s + (i.amount || 0);
-  }, 0);
-  var tChk = sChk.reduce(function (s, c) {
-    return s + (c.amount || 0);
-  }, 0);
+  const sup = suppliers.find(s => s.id === sid);
+  const sInv = sup ? [...invoices.filter(i => i.supplierId === sup.id || i.supplierName === sup.name)].sort((a, b) => (a.date || "").localeCompare(b.date || "")) : [];
+  const sChk = sup ? [...checks.filter(c => c.supplierId === sup.id || c.supplierName === sup.name)].sort((a, b) => (a.date || "").localeCompare(b.date || "")) : [];
+  const tInv = sInv.reduce((s, i) => s + (i.amount || 0), 0);
+  const tChk = sChk.reduce((s, c) => s + (c.amount || 0), 0);
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05DB\u05E8\u05D8\u05E1\u05EA \u05E1\u05E4\u05E7"), /*#__PURE__*/React.createElement("div", {
     className: "sub"
   }, "\u05DB\u05DC \u05D4\u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA \u05D5\u05D4\u05D4\u05DE\u05D7\u05D0\u05D5\u05EA \u05DC\u05E4\u05D9 \u05E1\u05E4\u05E7"), /*#__PURE__*/React.createElement("div", {
@@ -1467,7 +1266,7 @@ function LedgerTab(_ref1) {
     }
   }, /*#__PURE__*/React.createElement("select", {
     value: sid,
-    onChange: function onChange(e) {
+    onChange: e => {
       setSid(e.target.value);
       setSelSup(e.target.value);
     },
@@ -1476,12 +1275,10 @@ function LedgerTab(_ref1) {
     }
   }, /*#__PURE__*/React.createElement("option", {
     value: ""
-  }, "\u2014 \u05D1\u05D7\u05E8 \u05E1\u05E4\u05E7 \u2014"), suppliers.map(function (s) {
-    return /*#__PURE__*/React.createElement("option", {
-      key: s.id,
-      value: s.id
-    }, s.name);
-  })), sup && /*#__PURE__*/React.createElement("div", {
+  }, "\u2014 \u05D1\u05D7\u05E8 \u05E1\u05E4\u05E7 \u2014"), suppliers.map(s => /*#__PURE__*/React.createElement("option", {
+    key: s.id,
+    value: s.id
+  }, s.name))), sup && /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 24,
@@ -1501,29 +1298,27 @@ function LedgerTab(_ref1) {
     c: tInv - tChk > 0 ? "var(--err)" : "var(--ok)"
   }, {
     l: "תנאי תשלום",
-    v: "\u05E9\u05D5\u05D8\u05E3+".concat(sup.paymentTerms || 30),
+    v: `שוטף+${sup.paymentTerms || 30}`,
     c: "var(--mu2)"
-  }].map(function (k, i) {
-    return /*#__PURE__*/React.createElement("div", {
-      key: i,
-      style: {
-        textAlign: "center"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 11,
-        color: "var(--mu2)",
-        marginBottom: 2
-      }
-    }, k.l), /*#__PURE__*/React.createElement("div", {
-      className: "mono",
-      style: {
-        fontSize: 14,
-        fontWeight: 700,
-        color: k.c
-      }
-    }, k.v));
-  }))), sup ? /*#__PURE__*/React.createElement("div", {
+  }].map((k, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "var(--mu2)",
+      marginBottom: 2
+    }
+  }, k.l), /*#__PURE__*/React.createElement("div", {
+    className: "mono",
+    style: {
+      fontSize: 14,
+      fontWeight: 700,
+      color: k.c
+    }
+  }, k.v))))), sup ? /*#__PURE__*/React.createElement("div", {
     className: "g2"
   }, /*#__PURE__*/React.createElement("div", {
     className: "card",
@@ -1548,9 +1343,9 @@ function LedgerTab(_ref1) {
       color: "var(--warn)",
       fontWeight: 700
     }
-  }, fmt(tInv))), /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05DE\u05E1\u05F3 \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05EA"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05DB\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05E9\u05DC\u05D5\u05DD \u05E6\u05E4\u05D5\u05D9"))), /*#__PURE__*/React.createElement("tbody", null, sInv.map(function (inv) {
-    var pay = addDays(eom(new Date(inv.date)), sup.paymentTerms || 30);
-    var late = pay < today;
+  }, fmt(tInv))), /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05DE\u05E1\u05F3 \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05EA"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05DB\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05E9\u05DC\u05D5\u05DD \u05E6\u05E4\u05D5\u05D9"))), /*#__PURE__*/React.createElement("tbody", null, sInv.map(inv => {
+    const pay = addDays(eom(new Date(inv.date)), sup.paymentTerms || 30);
+    const late = pay < today;
     return /*#__PURE__*/React.createElement("tr", {
       key: inv.id
     }, /*#__PURE__*/React.createElement("td", {
@@ -1606,27 +1401,25 @@ function LedgerTab(_ref1) {
       color: "var(--ok)",
       fontWeight: 700
     }
-  }, fmt(tChk))), /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05DE\u05E1\u05F3 \u05D4\u05DE\u05D7\u05D0\u05D4"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05DB\u05D5\u05DD"))), /*#__PURE__*/React.createElement("tbody", null, sChk.map(function (c) {
-    return /*#__PURE__*/React.createElement("tr", {
-      key: c.id
-    }, /*#__PURE__*/React.createElement("td", {
-      style: {
-        fontSize: 12,
-        color: "var(--mu2)",
-        whiteSpace: "nowrap"
-      }
-    }, fmtDate(c.date)), /*#__PURE__*/React.createElement("td", {
-      style: {
-        fontSize: 12
-      }
-    }, c.checkNumber || "—"), /*#__PURE__*/React.createElement("td", {
-      className: "mono",
-      style: {
-        color: "var(--ok)",
-        fontWeight: 700
-      }
-    }, fmt(c.amount)));
-  }), !sChk.length && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
+  }, fmt(tChk))), /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05DE\u05E1\u05F3 \u05D4\u05DE\u05D7\u05D0\u05D4"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05DB\u05D5\u05DD"))), /*#__PURE__*/React.createElement("tbody", null, sChk.map(c => /*#__PURE__*/React.createElement("tr", {
+    key: c.id
+  }, /*#__PURE__*/React.createElement("td", {
+    style: {
+      fontSize: 12,
+      color: "var(--mu2)",
+      whiteSpace: "nowrap"
+    }
+  }, fmtDate(c.date)), /*#__PURE__*/React.createElement("td", {
+    style: {
+      fontSize: 12
+    }
+  }, c.checkNumber || "—"), /*#__PURE__*/React.createElement("td", {
+    className: "mono",
+    style: {
+      color: "var(--ok)",
+      fontWeight: 700
+    }
+  }, fmt(c.amount)))), !sChk.length && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
     colSpan: 3,
     style: {
       textAlign: "center",
@@ -1644,68 +1437,57 @@ function LedgerTab(_ref1) {
 }
 
 // ── Aging Tab ─────────────────────────────────────────────────────────────────
-function AgingTab(_ref10) {
-  var ctx = _ref10.ctx;
-  var invoices = ctx.invoices,
-    checks = ctx.checks,
-    suppliers = ctx.suppliers,
-    today = ctx.today;
-  var rows = useMemo(function () {
-    return suppliers.map(function (sup) {
-      var sInv = invoices.filter(function (i) {
-        return i.supplierId === sup.id || i.supplierName === sup.name;
-      });
-      var pool = checks.filter(function (c) {
-        return c.supplierId === sup.id || c.supplierName === sup.name;
-      }).reduce(function (s, c) {
-        return s + (c.amount || 0);
-      }, 0);
-      var bkts = {
-        "0-30": 0,
-        "31-60": 0,
-        "61-90": 0,
-        "90+": 0
-      };
-      _toConsumableArray(sInv).sort(function (a, b) {
-        return (a.date || "").localeCompare(b.date || "");
-      }).forEach(function (inv) {
-        var age = Math.floor((today - new Date(inv.date)) / 86400000);
-        var amt = inv.amount || 0,
-          cov = Math.min(pool, amt);
-        pool -= cov;
-        var open = amt - cov;
-        if (open <= 0) return;
-        if (age <= 30) bkts["0-30"] += open;else if (age <= 60) bkts["31-60"] += open;else if (age <= 90) bkts["61-90"] += open;else bkts["90+"] += open;
-      });
-      var total = Object.values(bkts).reduce(function (s, v) {
-        return s + v;
-      }, 0);
-      return {
-        sup: sup,
-        bkts: bkts,
-        total: total
-      };
-    }).filter(function (r) {
-      return r.total > 0;
+function AgingTab({
+  ctx
+}) {
+  const {
+    invoices,
+    checks,
+    suppliers,
+    today
+  } = ctx;
+  const rows = useMemo(() => suppliers.map(sup => {
+    const sInv = invoices.filter(i => i.supplierId === sup.id || i.supplierName === sup.name);
+    let pool = checks.filter(c => c.supplierId === sup.id || c.supplierName === sup.name).reduce((s, c) => s + (c.amount || 0), 0);
+    const bkts = {
+      "0-30": 0,
+      "31-60": 0,
+      "61-90": 0,
+      "90+": 0
+    };
+    [...sInv].sort((a, b) => (a.date || "").localeCompare(b.date || "")).forEach(inv => {
+      const age = Math.floor((today - new Date(inv.date)) / 86400000);
+      const amt = inv.amount || 0,
+        cov = Math.min(pool, amt);
+      pool -= cov;
+      const open = amt - cov;
+      if (open <= 0) return;
+      if (age <= 30) bkts["0-30"] += open;else if (age <= 60) bkts["31-60"] += open;else if (age <= 90) bkts["61-90"] += open;else bkts["90+"] += open;
     });
-  }, [invoices, checks, suppliers, today]);
-  var totals = useMemo(function () {
-    var t = {
+    const total = Object.values(bkts).reduce((s, v) => s + v, 0);
+    return {
+      sup,
+      bkts,
+      total
+    };
+  }).filter(r => r.total > 0), [invoices, checks, suppliers, today]);
+  const totals = useMemo(() => {
+    const t = {
       "0-30": 0,
       "31-60": 0,
       "61-90": 0,
       "90+": 0,
       all: 0
     };
-    rows.forEach(function (r) {
-      Object.keys(r.bkts).forEach(function (k) {
+    rows.forEach(r => {
+      Object.keys(r.bkts).forEach(k => {
         t[k] += r.bkts[k];
       });
       t.all += r.total;
     });
     return t;
   }, [rows]);
-  var bc = {
+  const bc = {
     "0-30": "var(--ok)",
     "31-60": "var(--warn)",
     "61-90": "var(--err)",
@@ -1718,31 +1500,26 @@ function AgingTab(_ref10) {
     style: {
       marginBottom: 20
     }
-  }, [["0-30", "עד 30 יום"], ["31-60", "31–60 יום"], ["61-90", "61–90 יום"], ["90+", "מעל 90 יום"]].map(function (_ref11) {
-    var _ref12 = _slicedToArray(_ref11, 2),
-      k = _ref12[0],
-      l = _ref12[1];
-    return /*#__PURE__*/React.createElement("div", {
-      key: k,
-      className: "card",
-      style: {
-        padding: "16px 18px"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 11,
-        color: "var(--mu2)",
-        marginBottom: 6
-      }
-    }, l), /*#__PURE__*/React.createElement("div", {
-      className: "mono",
-      style: {
-        fontSize: 16,
-        fontWeight: 700,
-        color: bc[k]
-      }
-    }, fmt(totals[k])));
-  })), rows.length > 0 ? /*#__PURE__*/React.createElement("div", {
+  }, [["0-30", "עד 30 יום"], ["31-60", "31–60 יום"], ["61-90", "61–90 יום"], ["90+", "מעל 90 יום"]].map(([k, l]) => /*#__PURE__*/React.createElement("div", {
+    key: k,
+    className: "card",
+    style: {
+      padding: "16px 18px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "var(--mu2)",
+      marginBottom: 6
+    }
+  }, l), /*#__PURE__*/React.createElement("div", {
+    className: "mono",
+    style: {
+      fontSize: 16,
+      fontWeight: 700,
+      color: bc[k]
+    }
+  }, fmt(totals[k]))))), rows.length > 0 ? /*#__PURE__*/React.createElement("div", {
     className: "card",
     style: {
       overflow: "hidden"
@@ -1763,36 +1540,30 @@ function AgingTab(_ref10) {
     style: {
       color: bc["90+"]
     }
-  }, "90+"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05D4\"\u05DB \u05E4\u05EA\u05D5\u05D7"))), /*#__PURE__*/React.createElement("tbody", null, rows.map(function (_ref13) {
-    var sup = _ref13.sup,
-      bkts = _ref13.bkts,
-      total = _ref13.total;
-    return /*#__PURE__*/React.createElement("tr", {
-      key: sup.id
-    }, /*#__PURE__*/React.createElement("td", {
-      style: {
-        fontWeight: 700
-      }
-    }, sup.name), Object.entries(bkts).map(function (_ref14) {
-      var _ref15 = _slicedToArray(_ref14, 2),
-        k = _ref15[0],
-        v = _ref15[1];
-      return /*#__PURE__*/React.createElement("td", {
-        key: k,
-        className: "mono",
-        style: {
-          color: v > 0 ? bc[k] : "var(--mu)",
-          fontWeight: v > 0 ? 700 : 400
-        }
-      }, v > 0 ? fmt(v) : "—");
-    }), /*#__PURE__*/React.createElement("td", {
-      className: "mono",
-      style: {
-        fontWeight: 800,
-        color: "var(--err)"
-      }
-    }, fmt(total)));
-  }), /*#__PURE__*/React.createElement("tr", {
+  }, "90+"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05D4\"\u05DB \u05E4\u05EA\u05D5\u05D7"))), /*#__PURE__*/React.createElement("tbody", null, rows.map(({
+    sup,
+    bkts,
+    total
+  }) => /*#__PURE__*/React.createElement("tr", {
+    key: sup.id
+  }, /*#__PURE__*/React.createElement("td", {
+    style: {
+      fontWeight: 700
+    }
+  }, sup.name), Object.entries(bkts).map(([k, v]) => /*#__PURE__*/React.createElement("td", {
+    key: k,
+    className: "mono",
+    style: {
+      color: v > 0 ? bc[k] : "var(--mu)",
+      fontWeight: v > 0 ? 700 : 400
+    }
+  }, v > 0 ? fmt(v) : "—")), /*#__PURE__*/React.createElement("td", {
+    className: "mono",
+    style: {
+      fontWeight: 800,
+      color: "var(--err)"
+    }
+  }, fmt(total)))), /*#__PURE__*/React.createElement("tr", {
     style: {
       borderTop: "2px solid var(--bd)"
     }
@@ -1801,16 +1572,14 @@ function AgingTab(_ref10) {
       fontWeight: 700,
       color: "var(--mu2)"
     }
-  }, "\u05E1\u05D4\"\u05DB"), ["0-30", "31-60", "61-90", "90+"].map(function (k) {
-    return /*#__PURE__*/React.createElement("td", {
-      key: k,
-      className: "mono",
-      style: {
-        fontWeight: 700,
-        color: bc[k]
-      }
-    }, fmt(totals[k]));
-  }), /*#__PURE__*/React.createElement("td", {
+  }, "\u05E1\u05D4\"\u05DB"), ["0-30", "31-60", "61-90", "90+"].map(k => /*#__PURE__*/React.createElement("td", {
+    key: k,
+    className: "mono",
+    style: {
+      fontWeight: 700,
+      color: bc[k]
+    }
+  }, fmt(totals[k]))), /*#__PURE__*/React.createElement("td", {
     className: "mono",
     style: {
       fontWeight: 800,
@@ -1828,58 +1597,39 @@ function AgingTab(_ref10) {
 }
 
 // ── Import Tab ────────────────────────────────────────────────────────────────
-function ImportTab(_ref16) {
-  var ctx = _ref16.ctx;
-  var suppliers = ctx.suppliers,
-    setSuppliers = ctx.setSuppliers,
-    checks = ctx.checks,
-    setChecks = ctx.setChecks,
-    invoices = ctx.invoices,
-    setInvoices = ctx.setInvoices;
-  var _useState29 = useState(null),
-    _useState30 = _slicedToArray(_useState29, 2),
-    preview = _useState30[0],
-    setPreview = _useState30[1];
-  var _useState31 = useState({}),
-    _useState32 = _slicedToArray(_useState31, 2),
-    map = _useState32[0],
-    setMap = _useState32[1];
-  var _useState33 = useState(""),
-    _useState34 = _slicedToArray(_useState33, 2),
-    msg = _useState34[0],
-    setMsg = _useState34[1];
-  var detect = function detect(cols) {
-    for (var _len = arguments.length, cands = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      cands[_key - 1] = arguments[_key];
-    }
-    var _loop2 = function _loop2() {
-        var c = _cands[_i2];
-        var f = cols.find(function (col) {
-          return col.toLowerCase().includes(c);
-        });
-        if (f) return {
-          v: f
-        };
-      },
-      _ret;
-    for (var _i2 = 0, _cands = cands; _i2 < _cands.length; _i2++) {
-      _ret = _loop2();
-      if (_ret) return _ret.v;
+function ImportTab({
+  ctx
+}) {
+  const {
+    suppliers,
+    setSuppliers,
+    checks,
+    setChecks,
+    invoices,
+    setInvoices
+  } = ctx;
+  const [preview, setPreview] = useState(null);
+  const [map, setMap] = useState({});
+  const [msg, setMsg] = useState("");
+  const detect = (cols, ...cands) => {
+    for (const c of cands) {
+      const f = cols.find(col => col.toLowerCase().includes(c));
+      if (f) return f;
     }
     return cols[0] || "";
   };
-  var parseFile = function parseFile(file, type) {
-    var r = new FileReader();
-    r.onload = function (e) {
-      var wb = XLSX.read(new Uint8Array(e.target.result), {
+  const parseFile = (file, type) => {
+    const r = new FileReader();
+    r.onload = e => {
+      const wb = XLSX.read(new Uint8Array(e.target.result), {
         type: "array",
         cellDates: true
       });
-      var rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
         defval: ""
       });
-      var cols = rows.length ? Object.keys(rows[0]) : [];
-      var fm = type === "checks" ? {
+      const cols = rows.length ? Object.keys(rows[0]) : [];
+      const fm = type === "checks" ? {
         supplierName: detect(cols, "ספק", "שם", "supplier", "name"),
         date: detect(cols, "תאריך", "date"),
         amount: detect(cols, "סכום", "amount", "סה"),
@@ -1892,27 +1642,27 @@ function ImportTab(_ref16) {
       };
       setMap(fm);
       setPreview({
-        type: type,
-        rows: rows,
-        cols: cols
+        type,
+        rows,
+        cols
       });
       setMsg("");
     };
     r.readAsArrayBuffer(file);
   };
-  var doImport = function doImport() {
+  const doImport = () => {
     if (!preview) return;
-    var type = preview.type,
-      rows = preview.rows;
-    var allSups = _toConsumableArray(suppliers);
-    var getOrCreate = function getOrCreate(name) {
-      var s = allSups.find(function (x) {
-        return x.name === name;
-      });
+    const {
+      type,
+      rows
+    } = preview;
+    const allSups = [...suppliers];
+    const getOrCreate = name => {
+      let s = allSups.find(x => x.name === name);
       if (!s) {
         s = {
           id: uid(),
-          name: name,
+          name,
           paymentTerms: 30,
           paymentMethod: "המחאה",
           notes: ""
@@ -1921,15 +1671,13 @@ function ImportTab(_ref16) {
       }
       return s;
     };
-    var parse = function parse(v) {
-      return parseFloat(String(v).replace(/[^0-9.-]/g, "")) || 0;
-    };
+    const parse = v => parseFloat(String(v).replace(/[^0-9.-]/g, "")) || 0;
     if (type === "checks") {
-      var items = rows.map(function (r) {
-        var name = String(r[map.supplierName] || "").trim();
+      const items = rows.map(r => {
+        const name = String(r[map.supplierName] || "").trim();
         if (!name) return null;
-        var sup = getOrCreate(name);
-        var amt = parse(r[map.amount]);
+        const sup = getOrCreate(name);
+        const amt = parse(r[map.amount]);
         if (!amt) return null;
         return {
           id: uid(),
@@ -1940,17 +1688,15 @@ function ImportTab(_ref16) {
           checkNumber: String(r[map.checkNumber] || "")
         };
       }).filter(Boolean);
-      setChecks(function (c) {
-        return [].concat(_toConsumableArray(c), _toConsumableArray(items));
-      });
+      setChecks(c => [...c, ...items]);
       setSuppliers(allSups);
-      setMsg("\u2705 \u05D9\u05D5\u05D1\u05D0\u05D5 ".concat(items.length, " \u05D4\u05DE\u05D7\u05D0\u05D5\u05EA").concat(allSups.length > suppliers.length ? " | ".concat(allSups.length - suppliers.length, " \u05E1\u05E4\u05E7\u05D9\u05DD \u05D7\u05D3\u05E9\u05D9\u05DD") : ""));
+      setMsg(`✅ יובאו ${items.length} המחאות${allSups.length > suppliers.length ? ` | ${allSups.length - suppliers.length} ספקים חדשים` : ""}`);
     } else {
-      var _items = rows.map(function (r) {
-        var name = String(r[map.supplierName] || "").trim();
+      const items = rows.map(r => {
+        const name = String(r[map.supplierName] || "").trim();
         if (!name) return null;
-        var sup = getOrCreate(name);
-        var amt = parse(r[map.amount]);
+        const sup = getOrCreate(name);
+        const amt = parse(r[map.amount]);
         if (!amt) return null;
         return {
           id: uid(),
@@ -1961,80 +1707,77 @@ function ImportTab(_ref16) {
           invoiceNumber: String(r[map.invoiceNumber] || "")
         };
       }).filter(Boolean);
-      setInvoices(function (i) {
-        return [].concat(_toConsumableArray(i), _toConsumableArray(_items));
-      });
+      setInvoices(i => [...i, ...items]);
       setSuppliers(allSups);
-      setMsg("\u2705 \u05D9\u05D5\u05D1\u05D0\u05D5 ".concat(_items.length, " \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA").concat(allSups.length > suppliers.length ? " | ".concat(allSups.length - suppliers.length, " \u05E1\u05E4\u05E7\u05D9\u05DD \u05D7\u05D3\u05E9\u05D9\u05DD") : ""));
+      setMsg(`✅ יובאו ${items.length} חשבוניות${allSups.length > suppliers.length ? ` | ${allSups.length - suppliers.length} ספקים חדשים` : ""}`);
     }
     setPreview(null);
   };
-  var UploadBox = function UploadBox(_ref17) {
-    var label = _ref17.label,
-      onFile = _ref17.onFile;
-    return /*#__PURE__*/React.createElement("div", {
-      style: {
-        border: "2px dashed var(--bd2)",
-        borderRadius: 12,
-        padding: "36px 24px",
-        textAlign: "center"
-      },
-      onDragOver: function onDragOver(e) {
-        e.preventDefault();
-        e.currentTarget.style.borderColor = "var(--gold)";
-      },
-      onDragLeave: function onDragLeave(e) {
-        e.currentTarget.style.borderColor = "var(--bd2)";
-      },
-      onDrop: function onDrop(e) {
-        e.preventDefault();
-        e.currentTarget.style.borderColor = "var(--bd2)";
-        var f = e.dataTransfer.files[0];
-        if (f) onFile(f);
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 32,
-        marginBottom: 10
-      }
-    }, "\uD83D\uDCC1"), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 15,
-        fontWeight: 600,
-        marginBottom: 6
-      }
-    }, label), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 12,
-        color: "var(--mu2)",
-        marginBottom: 14
-      }
-    }, "\u05D2\u05E8\u05D5\u05E8 \u05E7\u05D5\u05D1\u05E5 \u05DC\u05DB\u05D0\u05DF \u05D0\u05D5 \u05DC\u05D7\u05E5 \u05DC\u05D1\u05D7\u05D9\u05E8\u05D4"), /*#__PURE__*/React.createElement("label", {
-      style: {
-        cursor: "pointer"
-      }
-    }, /*#__PURE__*/React.createElement("span", {
-      style: {
-        background: "var(--s2)",
-        border: "1px solid var(--bd2)",
-        borderRadius: 8,
-        padding: "7px 16px",
-        fontSize: 13,
-        fontWeight: 600,
-        color: "var(--gold)"
-      }
-    }, "\u05D1\u05D7\u05E8 \u05E7\u05D5\u05D1\u05E5"), /*#__PURE__*/React.createElement("input", {
-      type: "file",
-      accept: ".xlsx,.xls,.csv",
-      style: {
-        display: "none"
-      },
-      onChange: function onChange(e) {
-        if (e.target.files[0]) onFile(e.target.files[0]);
-      }
-    })));
-  };
-  var fLabels = {
+  const UploadBox = ({
+    label,
+    onFile
+  }) => /*#__PURE__*/React.createElement("div", {
+    style: {
+      border: "2px dashed var(--bd2)",
+      borderRadius: 12,
+      padding: "36px 24px",
+      textAlign: "center"
+    },
+    onDragOver: e => {
+      e.preventDefault();
+      e.currentTarget.style.borderColor = "var(--gold)";
+    },
+    onDragLeave: e => {
+      e.currentTarget.style.borderColor = "var(--bd2)";
+    },
+    onDrop: e => {
+      e.preventDefault();
+      e.currentTarget.style.borderColor = "var(--bd2)";
+      const f = e.dataTransfer.files[0];
+      if (f) onFile(f);
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 32,
+      marginBottom: 10
+    }
+  }, "\uD83D\uDCC1"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 15,
+      fontWeight: 600,
+      marginBottom: 6
+    }
+  }, label), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "var(--mu2)",
+      marginBottom: 14
+    }
+  }, "\u05D2\u05E8\u05D5\u05E8 \u05E7\u05D5\u05D1\u05E5 \u05DC\u05DB\u05D0\u05DF \u05D0\u05D5 \u05DC\u05D7\u05E5 \u05DC\u05D1\u05D7\u05D9\u05E8\u05D4"), /*#__PURE__*/React.createElement("label", {
+    style: {
+      cursor: "pointer"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      background: "var(--s2)",
+      border: "1px solid var(--bd2)",
+      borderRadius: 8,
+      padding: "7px 16px",
+      fontSize: 13,
+      fontWeight: 600,
+      color: "var(--gold)"
+    }
+  }, "\u05D1\u05D7\u05E8 \u05E7\u05D5\u05D1\u05E5"), /*#__PURE__*/React.createElement("input", {
+    type: "file",
+    accept: ".xlsx,.xls,.csv",
+    style: {
+      display: "none"
+    },
+    onChange: e => {
+      if (e.target.files[0]) onFile(e.target.files[0]);
+    }
+  })));
+  const fLabels = {
     supplierName: "שם ספק",
     date: "תאריך",
     amount: "סכום",
@@ -2060,14 +1803,10 @@ function ImportTab(_ref16) {
     }
   }, /*#__PURE__*/React.createElement(UploadBox, {
     label: "\uD83D\uDCC4 \u05D9\u05D9\u05D1\u05D5\u05D0 \u05D4\u05DE\u05D7\u05D0\u05D5\u05EA",
-    onFile: function onFile(f) {
-      return parseFile(f, "checks");
-    }
+    onFile: f => parseFile(f, "checks")
   }), /*#__PURE__*/React.createElement(UploadBox, {
     label: "\uD83E\uDDFE \u05D9\u05D9\u05D1\u05D5\u05D0 \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA",
-    onFile: function onFile(f) {
-      return parseFile(f, "invoices");
-    }
+    onFile: f => parseFile(f, "invoices")
   })), preview && /*#__PURE__*/React.createElement("div", {
     className: "card",
     style: {
@@ -2093,25 +1832,17 @@ function ImportTab(_ref16) {
       gap: 14,
       marginBottom: 20
     }
-  }, Object.entries(map).map(function (_ref18) {
-    var _ref19 = _slicedToArray(_ref18, 2),
-      field = _ref19[0],
-      col = _ref19[1];
-    return /*#__PURE__*/React.createElement("div", {
-      key: field
-    }, /*#__PURE__*/React.createElement("label", null, fLabels[field]), /*#__PURE__*/React.createElement("select", {
-      value: col,
-      onChange: function onChange(e) {
-        return setMap(function (m) {
-          return _objectSpread(_objectSpread({}, m), {}, _defineProperty({}, field, e.target.value));
-        });
-      }
-    }, preview.cols.map(function (c) {
-      return /*#__PURE__*/React.createElement("option", {
-        key: c
-      }, c);
-    })));
-  })), /*#__PURE__*/React.createElement("div", {
+  }, Object.entries(map).map(([field, col]) => /*#__PURE__*/React.createElement("div", {
+    key: field
+  }, /*#__PURE__*/React.createElement("label", null, fLabels[field]), /*#__PURE__*/React.createElement("select", {
+    value: col,
+    onChange: e => setMap(m => ({
+      ...m,
+      [field]: e.target.value
+    }))
+  }, preview.cols.map(c => /*#__PURE__*/React.createElement("option", {
+    key: c
+  }, c)))))), /*#__PURE__*/React.createElement("div", {
     style: {
       overflowX: "auto",
       marginBottom: 18
@@ -2120,10 +1851,10 @@ function ImportTab(_ref16) {
     style: {
       minWidth: 500
     }
-  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05E9\u05DD \u05E1\u05E4\u05E7"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05DB\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, preview.type === "checks" ? "מס׳ המחאה" : "מס׳ חשבונית"))), /*#__PURE__*/React.createElement("tbody", null, preview.rows.slice(0, 5).map(function (r, i) {
-    var name = String(r[map.supplierName] || "").trim();
-    var amt = parseFloat(String(r[map.amount]).replace(/[^0-9.-]/g, "")) || 0;
-    var num = String(r[preview.type === "checks" ? map.checkNumber : map.invoiceNumber] || "");
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05E9\u05DD \u05E1\u05E4\u05E7"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05DB\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, preview.type === "checks" ? "מס׳ המחאה" : "מס׳ חשבונית"))), /*#__PURE__*/React.createElement("tbody", null, preview.rows.slice(0, 5).map((r, i) => {
+    const name = String(r[map.supplierName] || "").trim();
+    const amt = parseFloat(String(r[map.amount]).replace(/[^0-9.-]/g, "")) || 0;
+    const num = String(r[preview.type === "checks" ? map.checkNumber : map.invoiceNumber] || "");
     return /*#__PURE__*/React.createElement("tr", {
       key: i
     }, /*#__PURE__*/React.createElement("td", null, name || /*#__PURE__*/React.createElement("span", {
@@ -2156,9 +1887,7 @@ function ImportTab(_ref16) {
     onClick: doImport
   }, "\u05D9\u05D9\u05D1\u05D0 ", preview.rows.length, " ", preview.type === "checks" ? "המחאות" : "חשבוניות"), /*#__PURE__*/React.createElement("button", {
     className: "btn-g",
-    onClick: function onClick() {
-      return setPreview(null);
-    }
+    onClick: () => setPreview(null)
   }, "\u05D1\u05D9\u05D8\u05D5\u05DC"))), /*#__PURE__*/React.createElement("div", {
     className: "g2"
   }, /*#__PURE__*/React.createElement("div", {
@@ -2185,18 +1914,14 @@ function ImportTab(_ref16) {
       color: "var(--mu2)",
       marginTop: 4
     }
-  }, "\u05E1\u05D4\"\u05DB: ", fmt(ctx.checks.reduce(function (s, c) {
-    return s + (c.amount || 0);
-  }, 0))), ctx.checks.length > 0 && /*#__PURE__*/React.createElement("button", {
+  }, "\u05E1\u05D4\"\u05DB: ", fmt(ctx.checks.reduce((s, c) => s + (c.amount || 0), 0))), ctx.checks.length > 0 && /*#__PURE__*/React.createElement("button", {
     className: "btn-d",
     style: {
       marginTop: 12,
       fontSize: 12,
       padding: "4px 10px"
     },
-    onClick: function onClick() {
-      return confirm("למחוק את כל ההמחאות?") && ctx.setChecks([]);
-    }
+    onClick: () => confirm("למחוק את כל ההמחאות?") && ctx.setChecks([])
   }, "\u05E0\u05E7\u05D4 \u05D4\u05DB\u05DC")), /*#__PURE__*/React.createElement("div", {
     className: "card",
     style: {
@@ -2221,27 +1946,26 @@ function ImportTab(_ref16) {
       color: "var(--mu2)",
       marginTop: 4
     }
-  }, "\u05E1\u05D4\"\u05DB: ", fmt(ctx.invoices.reduce(function (s, i) {
-    return s + (i.amount || 0);
-  }, 0))), ctx.invoices.length > 0 && /*#__PURE__*/React.createElement("button", {
+  }, "\u05E1\u05D4\"\u05DB: ", fmt(ctx.invoices.reduce((s, i) => s + (i.amount || 0), 0))), ctx.invoices.length > 0 && /*#__PURE__*/React.createElement("button", {
     className: "btn-d",
     style: {
       marginTop: 12,
       fontSize: 12,
       padding: "4px 10px"
     },
-    onClick: function onClick() {
-      return confirm("למחוק את כל החשבוניות?") && ctx.setInvoices([]);
-    }
+    onClick: () => confirm("למחוק את כל החשבוניות?") && ctx.setInvoices([])
   }, "\u05E0\u05E7\u05D4 \u05D4\u05DB\u05DC"))));
 }
 
 // ── Recurring Tab ─────────────────────────────────────────────────────────────
-function RecurringTab(_ref20) {
-  var ctx = _ref20.ctx;
-  var fixedItems = ctx.fixedItems,
-    setFixedItems = ctx.setFixedItems;
-  var blank = {
+function RecurringTab({
+  ctx
+}) {
+  const {
+    fixedItems,
+    setFixedItems
+  } = ctx;
+  const blank = {
     name: "",
     amount: "",
     type: "expense",
@@ -2249,46 +1973,28 @@ function RecurringTab(_ref20) {
     dayOfMonth: "1",
     date: ""
   };
-  var _useState35 = useState(blank),
-    _useState36 = _slicedToArray(_useState35, 2),
-    form = _useState36[0],
-    setForm = _useState36[1];
-  var _useState37 = useState(null),
-    _useState38 = _slicedToArray(_useState37, 2),
-    editId = _useState38[0],
-    setEditId = _useState38[1];
-  var up = function up(k) {
-    return function (v) {
-      return setForm(function (f) {
-        return _objectSpread(_objectSpread({}, f), {}, _defineProperty({}, k, v));
-      });
-    };
-  };
-  var submit = function submit() {
+  const [form, setForm] = useState(blank);
+  const [editId, setEditId] = useState(null);
+  const up = k => v => setForm(f => ({
+    ...f,
+    [k]: v
+  }));
+  const submit = () => {
     if (!form.name.trim() || !form.amount) return;
-    var item = _objectSpread(_objectSpread({}, form), {}, {
+    const item = {
+      ...form,
       id: editId || uid(),
       amount: +form.amount,
       dayOfMonth: +form.dayOfMonth
-    });
+    };
     if (editId) {
-      setFixedItems(function (s) {
-        return s.map(function (x) {
-          return x.id === editId ? item : x;
-        });
-      });
+      setFixedItems(s => s.map(x => x.id === editId ? item : x));
       setEditId(null);
-    } else setFixedItems(function (s) {
-      return [].concat(_toConsumableArray(s), [item]);
-    });
+    } else setFixedItems(s => [...s, item]);
     setForm(blank);
   };
-  var expenses = fixedItems.filter(function (f) {
-    return f.type === "expense";
-  });
-  var incomes = fixedItems.filter(function (f) {
-    return f.type === "income";
-  });
+  const expenses = fixedItems.filter(f => f.type === "expense");
+  const incomes = fixedItems.filter(f => f.type === "income");
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05D4\u05DB\u05E0\u05E1\u05D5\u05EA \u05D5\u05D4\u05D5\u05E6\u05D0\u05D5\u05EA \u05E7\u05D1\u05D5\u05E2\u05D5\u05EA"), /*#__PURE__*/React.createElement("div", {
     className: "sub"
   }, "\u05E4\u05E8\u05D9\u05D8\u05D9\u05DD \u05D7\u05D5\u05D6\u05E8\u05D9\u05DD \u05D7\u05D5\u05D3\u05E9\u05D9\u05D9\u05DD \u05D0\u05D5 \u05D7\u05D3-\u05E4\u05E2\u05DE\u05D9\u05D9\u05DD"), /*#__PURE__*/React.createElement("div", {
@@ -2312,31 +2018,23 @@ function RecurringTab(_ref20) {
     }
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05E9\u05DD"), /*#__PURE__*/React.createElement("input", {
     value: form.name,
-    onChange: function onChange(e) {
-      return up("name")(e.target.value);
-    },
+    onChange: e => up("name")(e.target.value),
     placeholder: "\u05E9\u05DD \u05D4\u05D4\u05D5\u05E6\u05D0\u05D4/\u05D4\u05DB\u05E0\u05E1\u05D4"
   })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05E1\u05DB\u05D5\u05DD (\u20AA)"), /*#__PURE__*/React.createElement("input", {
     type: "number",
     value: form.amount,
-    onChange: function onChange(e) {
-      return up("amount")(e.target.value);
-    },
+    onChange: e => up("amount")(e.target.value),
     placeholder: "0"
   })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05E1\u05D5\u05D2"), /*#__PURE__*/React.createElement("select", {
     value: form.type,
-    onChange: function onChange(e) {
-      return up("type")(e.target.value);
-    }
+    onChange: e => up("type")(e.target.value)
   }, /*#__PURE__*/React.createElement("option", {
     value: "expense"
   }, "\u05D4\u05D5\u05E6\u05D0\u05D4"), /*#__PURE__*/React.createElement("option", {
     value: "income"
   }, "\u05D4\u05DB\u05E0\u05E1\u05D4"))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05EA\u05D3\u05D9\u05E8\u05D5\u05EA"), /*#__PURE__*/React.createElement("select", {
     value: form.recurrence,
-    onChange: function onChange(e) {
-      return up("recurrence")(e.target.value);
-    }
+    onChange: e => up("recurrence")(e.target.value)
   }, /*#__PURE__*/React.createElement("option", {
     value: "monthly"
   }, "\u05D7\u05D5\u05D3\u05E9\u05D9"), /*#__PURE__*/React.createElement("option", {
@@ -2346,15 +2044,11 @@ function RecurringTab(_ref20) {
     min: "1",
     max: "28",
     value: form.dayOfMonth,
-    onChange: function onChange(e) {
-      return up("dayOfMonth")(e.target.value);
-    }
+    onChange: e => up("dayOfMonth")(e.target.value)
   })) : /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("input", {
     type: "date",
     value: form.date,
-    onChange: function onChange(e) {
-      return up("date")(e.target.value);
-    }
+    onChange: e => up("date")(e.target.value)
   }))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
@@ -2365,7 +2059,7 @@ function RecurringTab(_ref20) {
     onClick: submit
   }, editId ? "עדכן" : "הוסף"), editId && /*#__PURE__*/React.createElement("button", {
     className: "btn-g",
-    onClick: function onClick() {
+    onClick: () => {
       setEditId(null);
       setForm(blank);
     }
@@ -2392,9 +2086,7 @@ function RecurringTab(_ref20) {
       fontWeight: 700,
       color: "var(--err)"
     }
-  }, fmt(expenses.reduce(function (s, f) {
-    return s + (f.amount || 0);
-  }, 0)))), /*#__PURE__*/React.createElement("div", {
+  }, fmt(expenses.reduce((s, f) => s + (f.amount || 0), 0)))), /*#__PURE__*/React.createElement("div", {
     className: "card",
     style: {
       padding: "14px 18px"
@@ -2412,9 +2104,7 @@ function RecurringTab(_ref20) {
       fontWeight: 700,
       color: "var(--ok)"
     }
-  }, fmt(incomes.reduce(function (s, f) {
-    return s + (f.amount || 0);
-  }, 0))))), [{
+  }, fmt(incomes.reduce((s, f) => s + (f.amount || 0), 0))))), [{
     title: "🔴 הוצאות קבועות",
     items: expenses,
     col: "var(--err)"
@@ -2422,99 +2112,88 @@ function RecurringTab(_ref20) {
     title: "🟢 הכנסות קבועות",
     items: incomes,
     col: "var(--ok)"
-  }].map(function (_ref21) {
-    var title = _ref21.title,
-      items = _ref21.items,
-      col = _ref21.col;
-    return /*#__PURE__*/React.createElement("div", {
-      key: title,
-      className: "card",
-      style: {
-        overflow: "hidden",
-        marginBottom: 14
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        padding: "13px 18px",
-        borderBottom: "1px solid var(--bd)",
-        fontWeight: 700,
-        fontSize: 14
-      }
-    }, title), /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05E9\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05DB\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D3\u05D9\u05E8\u05D5\u05EA"), /*#__PURE__*/React.createElement("th", null, "\u05D9\u05D5\u05DD / \u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05E4\u05E2\u05D5\u05DC\u05D5\u05EA"))), /*#__PURE__*/React.createElement("tbody", null, items.map(function (fi) {
-      return /*#__PURE__*/React.createElement("tr", {
-        key: fi.id
-      }, /*#__PURE__*/React.createElement("td", {
-        style: {
-          fontWeight: 600
-        }
-      }, fi.name), /*#__PURE__*/React.createElement("td", {
-        className: "mono",
-        style: {
-          color: col,
-          fontWeight: 700
-        }
-      }, fmt(fi.amount)), /*#__PURE__*/React.createElement("td", {
-        style: {
-          fontSize: 12,
-          color: "var(--mu2)"
-        }
-      }, fi.recurrence === "monthly" ? "חודשי" : "חד-פעמי"), /*#__PURE__*/React.createElement("td", {
-        style: {
-          fontSize: 12,
-          color: "var(--mu2)"
-        }
-      }, fi.recurrence === "monthly" ? "\u05D9\u05D5\u05DD ".concat(fi.dayOfMonth) : fmtDate(fi.date)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("div", {
-        style: {
-          display: "flex",
-          gap: 5
-        }
-      }, /*#__PURE__*/React.createElement("button", {
-        className: "btn-g",
-        style: {
-          padding: "3px 9px",
-          fontSize: 12
-        },
-        onClick: function onClick() {
-          setForm({
-            name: fi.name,
-            amount: String(fi.amount),
-            type: fi.type,
-            recurrence: fi.recurrence,
-            dayOfMonth: String(fi.dayOfMonth || 1),
-            date: fi.date || ""
-          });
-          setEditId(fi.id);
-        }
-      }, "\u05E2\u05E8\u05D9\u05DB\u05D4"), /*#__PURE__*/React.createElement("button", {
-        className: "btn-d",
-        style: {
-          padding: "3px 9px",
-          fontSize: 12
-        },
-        onClick: function onClick() {
-          return confirm("למחוק?") && setFixedItems(function (s) {
-            return s.filter(function (x) {
-              return x.id !== fi.id;
-            });
-          });
-        }
-      }, "\u05DE\u05D7\u05E7"))));
-    }), items.length === 0 && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
-      colSpan: 5,
-      style: {
-        textAlign: "center",
-        color: "var(--mu2)",
-        padding: 30
-      }
-    }, "\u05D0\u05D9\u05DF \u05E4\u05E8\u05D9\u05D8\u05D9\u05DD")))));
-  }));
+  }].map(({
+    title,
+    items,
+    col
+  }) => /*#__PURE__*/React.createElement("div", {
+    key: title,
+    className: "card",
+    style: {
+      overflow: "hidden",
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "13px 18px",
+      borderBottom: "1px solid var(--bd)",
+      fontWeight: 700,
+      fontSize: 14
+    }
+  }, title), /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05E9\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05DB\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D3\u05D9\u05E8\u05D5\u05EA"), /*#__PURE__*/React.createElement("th", null, "\u05D9\u05D5\u05DD / \u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05E4\u05E2\u05D5\u05DC\u05D5\u05EA"))), /*#__PURE__*/React.createElement("tbody", null, items.map(fi => /*#__PURE__*/React.createElement("tr", {
+    key: fi.id
+  }, /*#__PURE__*/React.createElement("td", {
+    style: {
+      fontWeight: 600
+    }
+  }, fi.name), /*#__PURE__*/React.createElement("td", {
+    className: "mono",
+    style: {
+      color: col,
+      fontWeight: 700
+    }
+  }, fmt(fi.amount)), /*#__PURE__*/React.createElement("td", {
+    style: {
+      fontSize: 12,
+      color: "var(--mu2)"
+    }
+  }, fi.recurrence === "monthly" ? "חודשי" : "חד-פעמי"), /*#__PURE__*/React.createElement("td", {
+    style: {
+      fontSize: 12,
+      color: "var(--mu2)"
+    }
+  }, fi.recurrence === "monthly" ? `יום ${fi.dayOfMonth}` : fmtDate(fi.date)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 5
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn-g",
+    style: {
+      padding: "3px 9px",
+      fontSize: 12
+    },
+    onClick: () => {
+      setForm({
+        name: fi.name,
+        amount: String(fi.amount),
+        type: fi.type,
+        recurrence: fi.recurrence,
+        dayOfMonth: String(fi.dayOfMonth || 1),
+        date: fi.date || ""
+      });
+      setEditId(fi.id);
+    }
+  }, "\u05E2\u05E8\u05D9\u05DB\u05D4"), /*#__PURE__*/React.createElement("button", {
+    className: "btn-d",
+    style: {
+      padding: "3px 9px",
+      fontSize: 12
+    },
+    onClick: () => confirm("למחוק?") && setFixedItems(s => s.filter(x => x.id !== fi.id))
+  }, "\u05DE\u05D7\u05E7"))))), items.length === 0 && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
+    colSpan: 5,
+    style: {
+      textAlign: "center",
+      color: "var(--mu2)",
+      padding: 30
+    }
+  }, "\u05D0\u05D9\u05DF \u05E4\u05E8\u05D9\u05D8\u05D9\u05DD")))))));
 }
 
 // ── Mount ──────────────────────────────────────────────────────────────────────
-ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(App, null));
-ReactDOM.createRoot(document.getElementById("root")).render(
-  React.createElement(App, null)
-);
+ReactDOM.createRoot(document.getElementById("root")).render( /*#__PURE__*/React.createElement(App, null));
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App, null));
 
 </script>
 </body>
