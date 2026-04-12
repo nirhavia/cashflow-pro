@@ -1,4 +1,57 @@
-��`�!�ia�iejx<script>
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CashFlow Pro</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.10.3/Recharts.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080d14;--s1:#0f1622;--s2:#141e2e;--bd:#1e2d42;--bd2:#263650;
+  --gold:#d4a853;--gold2:#e8c077;--glow:rgba(212,168,83,.15);
+  --tx:#c8ddf0;--mu:#4e6a8a;--mu2:#6b87a8;
+  --ok:#26b887;--err:#e05454;--warn:#d4a030;--inf:#4d96e8;--r:10px;
+}
+html,body{height:100%;background:var(--bg)}
+body{font-family:'Heebo',sans-serif;direction:rtl;color:var(--tx)}
+.mono{font-family:'JetBrains Mono',monospace}
+input,select,textarea{background:var(--s1);color:var(--tx);border:1px solid var(--bd);border-radius:var(--r);padding:8px 12px;font-family:'Heebo',sans-serif;font-size:14px;width:100%;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--glow)}
+button{cursor:pointer;border:none;border-radius:var(--r);padding:8px 16px;font-family:'Heebo',sans-serif;font-size:14px;font-weight:600;transition:all .15s;white-space:nowrap}
+.btn-p{background:var(--gold);color:#080d14}.btn-p:hover{background:var(--gold2);transform:translateY(-1px)}.btn-p:disabled{opacity:.45;cursor:default;transform:none}
+.btn-g{background:transparent;color:var(--tx);border:1px solid var(--bd)}.btn-g:hover{border-color:var(--gold);color:var(--gold)}
+.btn-d{background:transparent;color:var(--err);border:1px solid rgba(224,84,84,.3)}.btn-d:hover{background:var(--err);color:#fff}
+table{width:100%;border-collapse:collapse}
+th{text-align:right;padding:9px 14px;color:var(--mu2);font-size:11px;font-weight:600;letter-spacing:.6px;border-bottom:1px solid var(--bd);white-space:nowrap}
+td{padding:9px 14px;font-size:13.5px;border-bottom:1px solid rgba(30,45,66,.7);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(212,168,83,.025)}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:14px}
+.tag{display:inline-flex;align-items:center;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700}
+.t-check{background:rgba(77,150,232,.15);color:var(--inf)}
+.t-invoice{background:rgba(212,160,48,.15);color:var(--warn)}
+.t-income{background:rgba(38,184,135,.15);color:var(--ok)}
+.t-fixed{background:rgba(224,84,84,.15);color:var(--err)}
+label{font-size:12px;color:var(--mu2);display:block;margin-bottom:5px;font-weight:500}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+h1{font-size:22px;font-weight:800;letter-spacing:-.3px}
+.sub{color:var(--mu2);font-size:13px;margin:3px 0 22px}
+#root{height:100%}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
 const {
   useState,
   useEffect,
@@ -2141,14 +2194,15 @@ function RecurringTab({
 // ── Mount ──────────────────────────────────────────────────────────────────────
 ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(App, null));
 
-// ── Mount ──
 try {
   ReactDOM.createRoot(document.getElementById('root'))
     .render(React.createElement(App, null));
 } catch(e) {
   document.getElementById('root').innerHTML =
-    '<div style="color:#e05454;padding:40px;font-family:monospace;font-size:14px;background:#0c1018">' +
-    '<b>JS Error:</b><br>' + e.message + '<br><pre>' + e.stack + '</pre></div>';
+    '<div style="color:#e05454;padding:40px;font-family:monospace;background:#0c1018;min-height:100vh">' +
+    '<b>Error:</b><br>' + e.message + '</div>';
 }
 
-</script>����m�
+</script>
+</body>
+</html>
