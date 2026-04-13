@@ -4,10 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>CashFlow Pro</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.10.3/Recharts.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -15,2194 +13,999 @@
   --bg:#080d14;--s1:#0f1622;--s2:#141e2e;--bd:#1e2d42;--bd2:#263650;
   --gold:#d4a853;--gold2:#e8c077;--glow:rgba(212,168,83,.15);
   --tx:#c8ddf0;--mu:#4e6a8a;--mu2:#6b87a8;
-  --ok:#26b887;--err:#e05454;--warn:#d4a030;--inf:#4d96e8;--r:10px;
+  --ok:#26b887;--err:#e05454;--warn:#d4a030;--inf:#4d96e8;
 }
-html,body{height:100%;background:var(--bg)}
-body{font-family:'Heebo',sans-serif;direction:rtl;color:var(--tx)}
+html,body{height:100%;background:var(--bg);overflow:hidden}
+body{font-family:'Heebo',sans-serif;direction:rtl;color:var(--tx);font-size:14px}
 .mono{font-family:'JetBrains Mono',monospace}
-input,select,textarea{background:var(--s1);color:var(--tx);border:1px solid var(--bd);border-radius:var(--r);padding:8px 12px;font-family:'Heebo',sans-serif;font-size:14px;width:100%;outline:none;transition:border-color .2s,box-shadow .2s}
-input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--glow)}
-button{cursor:pointer;border:none;border-radius:var(--r);padding:8px 16px;font-family:'Heebo',sans-serif;font-size:14px;font-weight:600;transition:all .15s;white-space:nowrap}
-.btn-p{background:var(--gold);color:#080d14}.btn-p:hover{background:var(--gold2);transform:translateY(-1px)}.btn-p:disabled{opacity:.45;cursor:default;transform:none}
-.btn-g{background:transparent;color:var(--tx);border:1px solid var(--bd)}.btn-g:hover{border-color:var(--gold);color:var(--gold)}
-.btn-d{background:transparent;color:var(--err);border:1px solid rgba(224,84,84,.3)}.btn-d:hover{background:var(--err);color:#fff}
+input,select,textarea{background:var(--s1);color:var(--tx);border:1px solid var(--bd);border-radius:9px;padding:8px 12px;font-family:'Heebo',sans-serif;font-size:14px;width:100%;outline:none;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--gold)}
+button{cursor:pointer;border:none;border-radius:9px;padding:7px 15px;font-family:'Heebo',sans-serif;font-size:13px;font-weight:600;transition:all .15s}
+.bp{background:var(--gold);color:#080d14}.bp:hover{background:var(--gold2)}
+.bg{background:transparent;color:var(--tx);border:1px solid var(--bd)}.bg:hover{border-color:var(--gold);color:var(--gold)}
+.bd{background:transparent;color:var(--err);border:1px solid rgba(224,84,84,.3)}.bd:hover{background:var(--err);color:#fff}
 table{width:100%;border-collapse:collapse}
-th{text-align:right;padding:9px 14px;color:var(--mu2);font-size:11px;font-weight:600;letter-spacing:.6px;border-bottom:1px solid var(--bd);white-space:nowrap}
-td{padding:9px 14px;font-size:13.5px;border-bottom:1px solid rgba(30,45,66,.7);vertical-align:middle}
+th{text-align:right;padding:8px 13px;color:var(--mu2);font-size:11px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid var(--bd);white-space:nowrap}
+td{padding:8px 13px;border-bottom:1px solid rgba(30,45,66,.6);vertical-align:middle}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(212,168,83,.025)}
-.card{background:var(--s1);border:1px solid var(--bd);border-radius:14px}
-.tag{display:inline-flex;align-items:center;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700}
+tr:hover td{background:rgba(212,168,83,.03)}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:13px}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
 .t-check{background:rgba(77,150,232,.15);color:var(--inf)}
 .t-invoice{background:rgba(212,160,48,.15);color:var(--warn)}
 .t-income{background:rgba(38,184,135,.15);color:var(--ok)}
 .t-fixed{background:rgba(224,84,84,.15);color:var(--err)}
-label{font-size:12px;color:var(--mu2);display:block;margin-bottom:5px;font-weight:500}
+label{font-size:12px;color:var(--mu2);display:block;margin-bottom:4px;font-weight:500}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-h1{font-size:22px;font-weight:800;letter-spacing:-.3px}
-.sub{color:var(--mu2);font-size:13px;margin:3px 0 22px}
-#root{height:100%}
+/* Layout */
+#app{display:flex;height:100vh}
+#sidebar{width:215px;background:#05090f;border-left:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0}
+#sidebar-logo{padding:18px 15px 15px;border-bottom:1px solid var(--bd)}
+#sidebar-logo .sub{font-size:9px;color:var(--mu);letter-spacing:3px;margin-bottom:3px}
+#sidebar-logo .name{font-size:18px;font-weight:900;color:var(--gold)}
+#sidebar-nav{flex:1;padding:8px 6px;display:flex;flex-direction:column;gap:2px}
+.nav-btn{background:transparent;color:var(--mu2);border:none;border-radius:8px;padding:8px 11px;text-align:right;font-size:13px;font-weight:400;display:flex;align-items:center;gap:8px;cursor:pointer;border-right:2px solid transparent;transition:all .15s;width:100%}
+.nav-btn.active{background:var(--glow);color:var(--gold);font-weight:700;border-right-color:var(--gold)}
+.nav-btn:hover:not(.active){color:var(--tx)}
+#sidebar-footer{padding:10px 10px 14px;display:flex;flex-direction:column;gap:7px}
+.alert-box{padding:8px 11px;background:rgba(224,84,84,.07);border:1px solid rgba(224,84,84,.2);border-radius:8px;font-size:11px;color:var(--err);font-weight:700}
+.balance-box{padding:8px 11px;background:var(--glow);border:1px solid rgba(212,168,83,.15);border-radius:8px}
+.balance-box .lbl{font-size:10px;color:var(--mu);margin-bottom:2px}
+.balance-box .val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700}
+#main{flex:1;overflow:auto;padding:24px 28px}
+/* Pages */
+.page{display:none}
+.page.active{display:block}
+h1{font-size:21px;font-weight:800;margin-bottom:3px}
+.sub-title{color:var(--mu2);font-size:13px;margin-bottom:20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.kpi{padding:16px 18px}
+.kpi .icon{font-size:22px;margin-bottom:8px}
+.kpi .val{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;margin-bottom:4px}
+.kpi .lbl{font-size:12px;color:var(--mu2)}
+.kpi .note{font-size:10px;color:rgba(212,168,83,.4);margin-top:3px}
+.kpi:hover{border-color:var(--gold)}
+/* Modal */
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:999;align-items:center;justify-content:center}
+#modal-overlay.open{display:flex}
+#modal-box{background:var(--s1);border:1px solid var(--bd);border-radius:14px;width:440px;padding:26px;box-shadow:0 24px 64px rgba(0,0,0,.6);max-height:90vh;overflow:auto}
+#modal-title{font-size:15px;font-weight:700;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center}
+/* Chart containers */
+.chart-wrap{position:relative;height:230px}
+.chart-wrap-lg{position:relative;height:320px}
+/* Drag-drop */
+.drop-zone{border:2px dashed var(--bd2);border-radius:11px;padding:32px 20px;text-align:center;transition:border-color .2s;cursor:pointer}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--gold)}
+.drop-zone .dz-icon{font-size:30px;margin-bottom:8px}
+.drop-zone .dz-title{font-size:14px;font-weight:600;margin-bottom:5px}
+.drop-zone .dz-sub{font-size:12px;color:var(--mu2);margin-bottom:12px}
+/* Misc */
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spacer{height:16px}
+.section-title{font-size:14px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--bd)}
+.empty{text-align:center;color:var(--mu2);padding:48px;font-size:14px}
+.success-msg{background:rgba(38,184,135,.07);border:1px solid rgba(38,184,135,.25);border-radius:9px;padding:11px 16px;color:var(--ok);font-size:13px;margin-bottom:14px}
 </style>
 </head>
 <body>
-<div id="root"></div>
+<div id="app">
+  <!-- Sidebar -->
+  <nav id="sidebar">
+    <div id="sidebar-logo">
+      <div class="sub">ניהול תזרים מזומנים</div>
+      <div class="name">CashFlow Pro</div>
+    </div>
+    <div id="sidebar-nav"></div>
+    <div id="sidebar-footer">
+      <div id="alert-area"></div>
+      <div class="balance-box">
+        <div class="lbl">יתרה נוכחית</div>
+        <div class="val mono" id="sidebar-balance"></div>
+      </div>
+    </div>
+  </nav>
+  <!-- Main -->
+  <main id="main">
+    <div id="page-dashboard" class="page"></div>
+    <div id="page-forecast"  class="page"></div>
+    <div id="page-suppliers" class="page"></div>
+    <div id="page-ledger"    class="page"></div>
+    <div id="page-aging"     class="page"></div>
+    <div id="page-import"    class="page"></div>
+    <div id="page-recurring" class="page"></div>
+  </main>
+</div>
+<!-- Modal -->
+<div id="modal-overlay">
+  <div id="modal-box">
+    <div id="modal-title"><span id="modal-title-text"></span><button class="bg" style="padding:3px 9px;font-size:15px" onclick="closeModal()">✕</button></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
 <script>
-const {
-  useState,
-  useEffect,
-  useMemo
-} = React;
-const {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  ReferenceLine,
-  BarChart,
-  Bar
-} = Recharts;
+// ═══════════════════════════════════════════════════════════════
+// STATE & STORAGE
+// ═══════════════════════════════════════════════════════════════
+const S = {
+  suppliers:    JSON.parse(localStorage.getItem('cf-sup')  || '[]'),
+  checks:       JSON.parse(localStorage.getItem('cf-chk')  || '[]'),
+  invoices:     JSON.parse(localStorage.getItem('cf-inv')  || '[]'),
+  fixedItems:   JSON.parse(localStorage.getItem('cf-fix')  || '[]'),
+  openingBal:   parseFloat(localStorage.getItem('cf-ob')   || '0'),
+  activeTab:    'dashboard',
+};
+const save = () => {
+  localStorage.setItem('cf-sup', JSON.stringify(S.suppliers));
+  localStorage.setItem('cf-chk', JSON.stringify(S.checks));
+  localStorage.setItem('cf-inv', JSON.stringify(S.invoices));
+  localStorage.setItem('cf-fix', JSON.stringify(S.fixedItems));
+  localStorage.setItem('cf-ob',  S.openingBal);
+};
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,5);
 
-// ── Utilities ─────────────────────────────────────────────────────────────────
-const fmt = n => new Intl.NumberFormat("he-IL", {
-  style: "currency",
-  currency: "ILS",
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 0
-}).format(n || 0);
-const fmtDate = d => d ? new Date(d).toLocaleDateString("he-IL", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric"
-}) : "—";
-const toISO = d => {
-  if (!d) return "";
-  const dt = d instanceof Date ? d : new Date(d);
-  return isNaN(dt) ? "" : dt.toISOString().split("T")[0];
-};
-const addDays = (d, n) => {
-  const r = new Date(d);
-  r.setDate(r.getDate() + n);
-  return r;
-};
-const eom = d => {
-  const dt = new Date(d);
-  return new Date(dt.getFullYear(), dt.getMonth() + 1, 0);
-};
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
-const excelDate = v => {
-  if (!v) return "";
-  if (v instanceof Date) return toISO(v);
-  if (typeof v === "number") return toISO(new Date(Math.round((v - 25569) * 86400000)));
-  return toISO(new Date(v));
-};
-const typeLabel = t => ({
-  check: "המחאה",
-  invoice: "חשבונית",
-  income: "הכנסה",
-  fixed: "הוצאה קבועה"
-})[t] || t;
-
-// ── localStorage storage (sync) ───────────────────────────────────────────────
-const lsLoad = (k, fb) => {
-  try {
-    const v = localStorage.getItem(k);
-    return v ? JSON.parse(v) : fb;
-  } catch {
-    return fb;
+// ═══════════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════════
+const fmt = n => new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS',minimumFractionDigits:0,maximumFractionDigits:0}).format(n||0);
+const fmtD = d => d ? new Date(d).toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
+const toISO = d => { if(!d) return ''; const dt = d instanceof Date ? d : new Date(d); return isNaN(dt)?'':dt.toISOString().split('T')[0]; };
+const addDays = (d,n) => { const r=new Date(d); r.setDate(r.getDate()+n); return r; };
+const eom = d => { const dt=new Date(d); return new Date(dt.getFullYear(),dt.getMonth()+1,0); };
+const xlDate = v => { if(!v) return ''; if(v instanceof Date) return toISO(v); if(typeof v==='number') return toISO(new Date(Math.round((v-25569)*86400000))); return toISO(new Date(v)); };
+const typeLabel = t => ({check:'המחאה',invoice:'חשבונית',income:'הכנסה',fixed:'הוצאה קבועה'}[t]||t);
+const h = (tag, attrs={}, ...children) => {
+  const el = document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs)){
+    if(k==='class') el.className=v;
+    else if(k.startsWith('on')) el.addEventListener(k.slice(2),v);
+    else el.setAttribute(k,v);
   }
+  children.flat().forEach(c => { if(c==null) return; el.append(typeof c==='string'||typeof c==='number' ? document.createTextNode(String(c)) : c); });
+  return el;
 };
-const lsSave = (k, v) => {
-  try {
-    localStorage.setItem(k, JSON.stringify(v));
-  } catch {}
-};
+const el = id => document.getElementById(id);
 
-// ── Tab config ────────────────────────────────────────────────────────────────
-const TABS = [{
-  id: "dashboard",
-  icon: "📊",
-  label: "דשבורד"
-}, {
-  id: "forecast",
-  icon: "📅",
-  label: "תזרים עתידי"
-}, {
-  id: "suppliers",
-  icon: "🏢",
-  label: "ספקים"
-}, {
-  id: "ledger",
-  icon: "📒",
-  label: "כרטסת ספק"
-}, {
-  id: "aging",
-  icon: "⏱",
-  label: "גיול חשבוניות"
-}, {
-  id: "import",
-  icon: "📥",
-  label: "יבוא נתונים"
-}, {
-  id: "recurring",
-  icon: "🔄",
-  label: "קבועות"
-}];
+// ═══════════════════════════════════════════════════════════════
+// FORECAST ENGINE
+// ═══════════════════════════════════════════════════════════════
+function buildForecast() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const DAYS = 120;
+  const events = [];
 
-// ── Root ──────────────────────────────────────────────────────────────────────
-function App() {
-  const [tab, setTab] = useState("dashboard");
-  const [suppliers, setSuppliers] = useState(() => lsLoad("cf-sup", []));
-  const [checks, setChecks] = useState(() => lsLoad("cf-chk", []));
-  const [invoices, setInvoices] = useState(() => lsLoad("cf-inv", []));
-  const [fixedItems, setFixedItems] = useState(() => lsLoad("cf-fix", []));
-  const [openingBal, setOpeningBal] = useState(() => lsLoad("cf-ob", 0));
-  const [selSup, setSelSup] = useState(null);
-  useEffect(() => lsSave("cf-sup", suppliers), [suppliers]);
-  useEffect(() => lsSave("cf-chk", checks), [checks]);
-  useEffect(() => lsSave("cf-inv", invoices), [invoices]);
-  useEffect(() => lsSave("cf-fix", fixedItems), [fixedItems]);
-  useEffect(() => lsSave("cf-ob", openingBal), [openingBal]);
-  const today = useMemo(() => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }, []);
-  const forecast = useMemo(() => {
-    const DAYS = 120,
-      events = [];
-    checks.forEach(c => {
-      if (!c.date) return;
-      const d = new Date(c.date);
-      d.setHours(0, 0, 0, 0);
-      if (d >= today) events.push({
-        date: toISO(d),
-        amount: -Math.abs(c.amount || 0),
-        type: "check",
-        label: c.supplierName || "המחאה"
-      });
+  S.checks.forEach(c => {
+    if(!c.date) return;
+    const d = new Date(c.date); d.setHours(0,0,0,0);
+    if(d >= today) events.push({date:toISO(d), amount:-Math.abs(c.amount||0), type:'check', label:c.supplierName||'המחאה'});
+  });
+
+  S.invoices.forEach(inv => {
+    if(!inv.date) return;
+    const sup = S.suppliers.find(s=>s.id===inv.supplierId||s.name===inv.supplierName);
+    const terms = sup?(sup.paymentTerms||30):30;
+    const pay = addDays(eom(new Date(inv.date)), terms);
+    if(pay >= today) events.push({date:toISO(pay), amount:-Math.abs(inv.amount||0), type:'invoice', label:inv.supplierName||'חשבונית'});
+  });
+
+  for(let i=0;i<DAYS;i++){
+    const d = addDays(today,i);
+    S.fixedItems.forEach(fi=>{
+      const sign = fi.type==='income' ? 1 : -1;
+      if(fi.recurrence==='monthly' && d.getDate()===(fi.dayOfMonth||1))
+        events.push({date:toISO(d), amount:sign*Math.abs(fi.amount||0), type:fi.type==='income'?'income':'fixed', label:fi.name});
+      else if(fi.recurrence==='once' && toISO(d)===fi.date)
+        events.push({date:toISO(d), amount:sign*Math.abs(fi.amount||0), type:fi.type==='income'?'income':'fixed', label:fi.name});
     });
-    invoices.forEach(inv => {
-      if (!inv.date) return;
-      const sup = suppliers.find(s => s.id === inv.supplierId || s.name === inv.supplierName);
-      const terms = sup ? sup.paymentTerms || 30 : 30;
-      const pay = addDays(eom(new Date(inv.date)), terms);
-      if (pay >= today) events.push({
-        date: toISO(pay),
-        amount: -Math.abs(inv.amount || 0),
-        type: "invoice",
-        label: inv.supplierName || "חשבונית"
-      });
-    });
-    for (let i = 0; i < DAYS; i++) {
-      const d = addDays(today, i);
-      fixedItems.forEach(fi => {
-        const sign = fi.type === "income" ? 1 : -1;
-        if (fi.recurrence === "monthly" && d.getDate() === (fi.dayOfMonth || 1)) events.push({
-          date: toISO(d),
-          amount: sign * Math.abs(fi.amount || 0),
-          type: fi.type === "income" ? "income" : "fixed",
-          label: fi.name
-        });else if (fi.recurrence === "once" && toISO(d) === fi.date) events.push({
-          date: toISO(d),
-          amount: sign * Math.abs(fi.amount || 0),
-          type: fi.type === "income" ? "income" : "fixed",
-          label: fi.name
-        });
-      });
-    }
-    events.sort((a, b) => a.date.localeCompare(b.date));
-    const byDate = {};
-    events.forEach(e => {
-      (byDate[e.date] = byDate[e.date] || []).push(e);
-    });
-    let bal = openingBal;
-    const chartData = [];
-    for (let i = 0; i < DAYS; i++) {
-      const d = addDays(today, i),
-        key = toISO(d);
-      (byDate[key] || []).forEach(e => {
-        bal += e.amount;
-      });
-      chartData.push({
-        date: key,
-        balance: Math.round(bal),
-        label: d.toLocaleDateString("he-IL", {
-          day: "numeric",
-          month: "short"
-        })
-      });
-    }
-    const negDays = chartData.filter(c => c.balance < 0).map(c => c.date);
-    const minBal = chartData.length ? Math.min(...chartData.map(c => c.balance)) : 0;
-    return {
-      events,
-      byDate,
-      chartData,
-      negDays,
-      minBal
-    };
-  }, [checks, invoices, suppliers, fixedItems, openingBal, today]);
-  const kpis = useMemo(() => ({
-    ob: openingBal,
-    totalChecks: checks.reduce((s, c) => s + (c.amount || 0), 0),
-    totalInvoices: invoices.reduce((s, i) => s + (i.amount || 0), 0),
-    supCount: suppliers.length,
-    minForecast: forecast.minBal,
-    negDays: forecast.negDays.length
-  }), [checks, invoices, suppliers, openingBal, forecast]);
-  const ctx = {
-    suppliers,
-    setSuppliers,
-    checks,
-    setChecks,
-    invoices,
-    setInvoices,
-    fixedItems,
-    setFixedItems,
-    openingBal,
-    setOpeningBal,
-    forecast,
-    kpis,
-    selSup,
-    setSelSup,
-    setTab,
-    today
-  };
-  return /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      height: "100vh",
-      overflow: "hidden"
-    }
-  }, /*#__PURE__*/React.createElement("nav", {
-    style: {
-      width: 220,
-      background: "#05090f",
-      borderLeft: "1px solid var(--bd)",
-      display: "flex",
-      flexDirection: "column",
-      flexShrink: 0,
-      overflow: "auto"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: "20px 16px 16px",
-      borderBottom: "1px solid var(--bd)"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 9,
-      color: "var(--mu)",
-      letterSpacing: 3,
-      marginBottom: 4
-    }
-  }, "\u05E0\u05D9\u05D4\u05D5\u05DC \u05EA\u05D6\u05E8\u05D9\u05DD \u05DE\u05D6\u05D5\u05DE\u05E0\u05D9\u05DD"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 19,
-      fontWeight: 900,
-      color: "var(--gold)",
-      letterSpacing: -.5
-    }
-  }, "CashFlow Pro")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      flex: 1,
-      padding: "10px 8px",
-      display: "flex",
-      flexDirection: "column",
-      gap: 2
-    }
-  }, TABS.map(t => {
-    const act = tab === t.id;
-    return /*#__PURE__*/React.createElement("button", {
-      key: t.id,
-      onClick: () => setTab(t.id),
-      style: {
-        background: act ? "var(--glow)" : "transparent",
-        color: act ? "var(--gold)" : "var(--mu2)",
-        border: "none",
-        borderRadius: 9,
-        padding: "9px 12px",
-        textAlign: "right",
-        fontSize: 13.5,
-        fontWeight: act ? 700 : 400,
-        display: "flex",
-        alignItems: "center",
-        gap: 9,
-        cursor: "pointer",
-        borderRight: act ? "2px solid var(--gold)" : "2px solid transparent",
-        transition: "all .15s"
+  }
+
+  events.sort((a,b)=>a.date.localeCompare(b.date));
+
+  let bal = S.openingBal;
+  const chartData = [];
+  for(let i=0;i<DAYS;i++){
+    const d = addDays(today,i);
+    const key = toISO(d);
+    events.filter(e=>e.date===key).forEach(e=>{ bal+=e.amount; });
+    chartData.push({date:key, balance:Math.round(bal), label:d.toLocaleDateString('he-IL',{day:'numeric',month:'short'})});
+  }
+
+  const negDays = chartData.filter(c=>c.balance<0).map(c=>c.date);
+  const minBal = chartData.length ? Math.min(...chartData.map(c=>c.balance)) : 0;
+  return {events, chartData, negDays, minBal};
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SIDEBAR & NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+const TABS = [
+  {id:'dashboard',icon:'📊',label:'דשבורד'},
+  {id:'forecast', icon:'📅',label:'תזרים עתידי'},
+  {id:'suppliers',icon:'🏢',label:'ספקים'},
+  {id:'ledger',   icon:'📒',label:'כרטסת ספק'},
+  {id:'aging',    icon:'⏱', label:'גיול חשבוניות'},
+  {id:'import',   icon:'📥',label:'יבוא נתונים'},
+  {id:'recurring',icon:'🔄',label:'קבועות'},
+];
+
+function renderSidebar() {
+  const nav = el('sidebar-nav');
+  nav.innerHTML = '';
+  TABS.forEach(t => {
+    const btn = h('button', {class:'nav-btn'+(S.activeTab===t.id?' active':''), onclick:()=>navigate(t.id)});
+    btn.innerHTML = `<span style="font-size:15px">${t.icon}</span>${t.label}`;
+    nav.appendChild(btn);
+  });
+  const fc = buildForecast();
+  const alertArea = el('alert-area');
+  alertArea.innerHTML = '';
+  if(fc.negDays.length>0){
+    alertArea.innerHTML = `<div class="alert-box">⚠ ${fc.negDays.length} ימי חוסר צפויים</div>`;
+  }
+  const balEl = el('sidebar-balance');
+  balEl.textContent = fmt(S.openingBal);
+  balEl.style.color = S.openingBal >= 0 ? 'var(--ok)' : 'var(--err)';
+}
+
+function navigate(tabId) {
+  S.activeTab = tabId;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  el('page-'+tabId).classList.add('active');
+  renderSidebar();
+  renders[tabId]();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════════
+function openModal(title, bodyHTML) {
+  el('modal-title-text').textContent = title;
+  el('modal-body').innerHTML = bodyHTML;
+  el('modal-overlay').classList.add('open');
+}
+function closeModal() { el('modal-overlay').classList.remove('open'); }
+el('modal-overlay').addEventListener('click', e => { if(e.target===el('modal-overlay')) closeModal(); });
+
+// ═══════════════════════════════════════════════════════════════
+// CHART INSTANCES
+// ═══════════════════════════════════════════════════════════════
+const charts = {};
+function destroyChart(id) { if(charts[id]){charts[id].destroy();delete charts[id];} }
+
+// ═══════════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+function renderDashboard() {
+  const pg = el('page-dashboard');
+  const fc = buildForecast();
+  const totalChk = S.checks.reduce((s,c)=>s+(c.amount||0),0);
+  const totalInv = S.invoices.reduce((s,i)=>s+(i.amount||0),0);
+
+  pg.innerHTML = `
+    <h1>דשבורד</h1><div class="sub-title">סקירה כללית ותחזית תזרים</div>
+    <div class="g3" style="margin-bottom:18px">
+      <div class="card kpi" id="kpi-bal" style="cursor:pointer" title="לחץ לעדכון">
+        <div class="icon">💰</div>
+        <div class="val" style="color:${S.openingBal>=0?'var(--ok)':'var(--err)'}">${fmt(S.openingBal)}</div>
+        <div class="lbl">יתרה נוכחית</div><div class="note">לחץ לעדכון</div>
+      </div>
+      <div class="card kpi"><div class="icon">🧾</div><div class="val" style="color:var(--warn)">${fmt(totalInv)}</div><div class="lbl">סה"כ חשבוניות</div></div>
+      <div class="card kpi"><div class="icon">📄</div><div class="val" style="color:var(--inf)">${fmt(totalChk)}</div><div class="lbl">סה"כ המחאות</div></div>
+      <div class="card kpi"><div class="icon">⏳</div><div class="val" style="color:var(--err)">${fmt(Math.max(0,totalInv-totalChk))}</div><div class="lbl">יתרה לתשלום</div></div>
+      <div class="card kpi"><div class="icon">${fc.minBal<0?'⚠':'✅'}</div><div class="val" style="color:${fc.minBal<0?'var(--err)':'var(--ok)'}">${fmt(fc.minBal)}</div><div class="lbl">מינימום תחזית 120 יום</div></div>
+      <div class="card kpi"><div class="icon">🏢</div><div class="val" style="color:var(--mu2)">${S.suppliers.length}</div><div class="lbl">ספקים פעילים</div></div>
+    </div>
+    <div class="card" style="padding:20px 22px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <span style="font-size:14px;font-weight:700">תחזית תזרים — 120 ימים קדימה</span>
+        ${fc.negDays.length>0?`<span class="tag t-fixed">⚠ ${fc.negDays.length} ימי חוסר</span>`:''}
+      </div>
+      <div class="chart-wrap"><canvas id="chart-forecast-dash"></canvas></div>
+    </div>
+    ${buildMonthlyBarHTML()}
+    ${fc.negDays.length>0?`
+    <div style="background:rgba(224,84,84,.04);border:1px solid rgba(224,84,84,.18);border-radius:11px;padding:18px">
+      <div style="color:var(--err);font-size:13px;font-weight:700;margin-bottom:10px">⚠ ימים עם יתרה שלילית</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">${fc.negDays.slice(0,18).map(d=>`<span style="background:rgba(224,84,84,.1);color:var(--err);padding:2px 9px;border-radius:999px;font-size:12px">${fmtD(d)}</span>`).join('')}${fc.negDays.length>18?`<span style="color:var(--mu2);font-size:12px">+${fc.negDays.length-18} נוספים</span>`:''}</div>
+    </div>`:''}
+  `;
+
+  el('kpi-bal').addEventListener('click', () => {
+    openModal('עדכון יתרת בנק', `
+      <label>יתרה נוכחית (₪)</label>
+      <input type="number" id="bal-input" value="${S.openingBal}" style="margin-bottom:14px">
+      <div style="display:flex;gap:8px">
+        <button class="bp" onclick="S.openingBal=parseFloat(document.getElementById('bal-input').value)||0;save();closeModal();navigate('dashboard')">שמור</button>
+        <button class="bg" onclick="closeModal()">ביטול</button>
+      </div>
+    `);
+  });
+
+  destroyChart('forecast-dash');
+  const ctx = el('chart-forecast-dash').getContext('2d');
+  const every = Math.ceil(fc.chartData.length/12);
+  charts['forecast-dash'] = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels: fc.chartData.map((d,i)=>i%every===0?d.label:''),
+      datasets:[{
+        data: fc.chartData.map(d=>d.balance),
+        borderColor:'#d4a853',borderWidth:2,pointRadius:0,
+        fill:true,backgroundColor:'rgba(212,168,83,.12)',tension:.4
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.raw)}}},
+      scales:{
+        x:{grid:{color:'#172030'},ticks:{color:'#4e6a8a',font:{size:10}}},
+        y:{grid:{color:'#172030'},ticks:{color:'#4e6a8a',font:{size:10},callback:v=>`₪${(Math.abs(v)/1000).toFixed(0)}K`}}
       }
-    }, /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 16
+    }
+  });
+
+  // monthly bars
+  renderMonthlyBar();
+}
+
+function buildMonthlyBarHTML() {
+  const now = new Date();
+  const hasData = S.invoices.length>0||S.checks.length>0;
+  if(!hasData) return '';
+  return `
+    <div class="card" style="padding:20px 22px;margin-bottom:16px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:16px">חשבוניות מול תשלומים — 6 חודשים אחרונים</div>
+      <div style="height:170px"><canvas id="chart-monthly"></canvas></div>
+      <div style="display:flex;gap:16px;justify-content:center;margin-top:10px">
+        <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--mu2)"><div style="width:10px;height:10px;border-radius:2px;background:#d4a030"></div>חשבוניות</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--mu2)"><div style="width:10px;height:10px;border-radius:2px;background:#4d96e8"></div>המחאות</div>
+      </div>
+    </div>`;
+}
+
+function renderMonthlyBar() {
+  if(!el('chart-monthly')) return;
+  const now = new Date();
+  const months = Array.from({length:6},(_,i)=>{
+    const d = new Date(now.getFullYear(),now.getMonth()-5+i,1);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    return {key, label:d.toLocaleDateString('he-IL',{month:'short',year:'2-digit'})};
+  });
+  destroyChart('monthly');
+  const ctx = el('chart-monthly').getContext('2d');
+  charts['monthly'] = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels:months.map(m=>m.label),
+      datasets:[
+        {label:'חשבוניות',data:months.map(m=>S.invoices.filter(x=>x.date?.startsWith(m.key)).reduce((s,x)=>s+(x.amount||0),0)),backgroundColor:'rgba(212,160,48,.85)',borderRadius:3},
+        {label:'המחאות', data:months.map(m=>S.checks.filter(x=>x.date?.startsWith(m.key)).reduce((s,x)=>s+(x.amount||0),0)), backgroundColor:'rgba(77,150,232,.85)',borderRadius:3}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.raw)}`}}},
+      scales:{
+        x:{grid:{color:'#172030'},ticks:{color:'#4e6a8a',font:{size:11}}},
+        y:{grid:{color:'#172030'},ticks:{color:'#4e6a8a',font:{size:10},callback:v=>`₪${(v/1000).toFixed(0)}K`}}
       }
-    }, t.icon), t.label);
-  })), /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: "10px 12px 16px",
-      display: "flex",
-      flexDirection: "column",
-      gap: 8
     }
-  }, kpis.negDays > 0 && /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: "9px 12px",
-      background: "rgba(224,84,84,.07)",
-      border: "1px solid rgba(224,84,84,.2)",
-      borderRadius: 9
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: "var(--err)",
-      fontWeight: 700
-    }
-  }, "\u26A0 ", kpis.negDays, " \u05D9\u05DE\u05D9 \u05D7\u05D5\u05E1\u05E8 \u05E6\u05E4\u05D5\u05D9\u05D9\u05DD")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: "9px 12px",
-      background: "var(--glow)",
-      border: "1px solid rgba(212,168,83,.15)",
-      borderRadius: 9
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 10,
-      color: "var(--mu)",
-      marginBottom: 3
-    }
-  }, "\u05D9\u05EA\u05E8\u05D4 \u05E0\u05D5\u05DB\u05D7\u05D9\u05EA"), /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 14,
-      fontWeight: 700,
-      color: openingBal >= 0 ? "var(--ok)" : "var(--err)"
-    }
-  }, fmt(openingBal))))), /*#__PURE__*/React.createElement("main", {
-    style: {
-      flex: 1,
-      overflow: "auto",
-      padding: "26px 32px"
-    }
-  }, tab === "dashboard" && /*#__PURE__*/React.createElement(Dashboard, {
-    ctx: ctx
-  }), tab === "forecast" && /*#__PURE__*/React.createElement(ForecastTab, {
-    ctx: ctx
-  }), tab === "suppliers" && /*#__PURE__*/React.createElement(SuppliersTab, {
-    ctx: ctx
-  }), tab === "ledger" && /*#__PURE__*/React.createElement(LedgerTab, {
-    ctx: ctx
-  }), tab === "aging" && /*#__PURE__*/React.createElement(AgingTab, {
-    ctx: ctx
-  }), tab === "import" && /*#__PURE__*/React.createElement(ImportTab, {
-    ctx: ctx
-  }), tab === "recurring" && /*#__PURE__*/React.createElement(RecurringTab, {
-    ctx: ctx
-  })));
+  });
 }
 
-// ── Shared ────────────────────────────────────────────────────────────────────
-function Modal({
-  title,
-  onClose,
-  children
-}) {
-  return /*#__PURE__*/React.createElement("div", {
-    style: {
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0,0,0,.65)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 999
-    },
-    onClick: e => e.target === e.currentTarget && onClose()
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    style: {
-      width: 440,
-      padding: 28,
-      boxShadow: "0 24px 64px rgba(0,0,0,.6)"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 20
-    }
-  }, /*#__PURE__*/React.createElement("h3", {
-    style: {
-      fontSize: 16,
-      fontWeight: 700
-    }
-  }, title), /*#__PURE__*/React.createElement("button", {
-    className: "btn-g",
-    style: {
-      padding: "4px 10px",
-      fontSize: 16
-    },
-    onClick: onClose
-  }, "\u2715")), children));
-}
-function KpiCard({
-  icon,
-  label,
-  value,
-  color,
-  onClick,
-  note
-}) {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    onClick: onClick,
-    style: {
-      padding: "18px 20px",
-      cursor: onClick ? "pointer" : "default",
-      transition: "border-color .2s"
-    },
-    onMouseEnter: e => onClick && (e.currentTarget.style.borderColor = "var(--gold)"),
-    onMouseLeave: e => e.currentTarget.style.borderColor = "var(--bd)"
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 24,
-      marginBottom: 10
-    }
-  }, icon), /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 18,
-      fontWeight: 700,
-      color: color || "var(--tx)"
-    }
-  }, value), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 12,
-      color: "var(--mu2)",
-      marginTop: 5
-    }
-  }, label), note && /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 10,
-      color: "rgba(212,168,83,.4)",
-      marginTop: 4
-    }
-  }, note));
-}
-function ChartTip({
-  active,
-  payload
-}) {
-  if (!active || !payload?.length) return null;
-  const v = payload[0].value;
-  return /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "var(--s2)",
-      border: "1px solid var(--bd)",
-      borderRadius: 9,
-      padding: "10px 14px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: "var(--mu2)",
-      marginBottom: 3
-    }
-  }, payload[0]?.payload?.label), /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 15,
-      fontWeight: 700,
-      color: v >= 0 ? "var(--ok)" : "var(--err)"
-    }
-  }, fmt(v)));
-}
+// ═══════════════════════════════════════════════════════════════
+// FORECAST TAB
+// ═══════════════════════════════════════════════════════════════
+let fcMode = 'table', fcFilter = 'all';
+function renderForecast() {
+  const pg = el('page-forecast');
+  const fc = buildForecast();
+  let bal = S.openingBal;
+  const rows = fc.events.map(e=>{bal+=e.amount;return{...e,bal};});
+  const filtered = fcFilter==='all'?rows:rows.filter(r=>r.type===fcFilter);
 
-// ── Dashboard ─────────────────────────────────────────────────────────────────
-function Dashboard({
-  ctx
-}) {
-  const {
-    kpis,
-    forecast,
-    openingBal,
-    setOpeningBal,
-    checks,
-    invoices
-  } = ctx;
-  const [editBal, setEditBal] = useState(false);
-  const [balVal, setBalVal] = useState(openingBal);
-  const monthlyBars = useMemo(() => {
-    const now = new Date();
-    return Array.from({
-      length: 6
-    }, (_, i) => {
-      const d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-      const label = d.toLocaleDateString("he-IL", {
-        month: "short",
-        year: "2-digit"
-      });
-      return {
-        label,
-        inv: invoices.filter(x => x.date?.startsWith(key)).reduce((s, x) => s + (x.amount || 0), 0),
-        chk: checks.filter(x => x.date?.startsWith(key)).reduce((s, x) => s + (x.amount || 0), 0)
-      };
+  pg.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+      <div><h1>תזרים עתידי</h1><div class="sub-title">תחזית 120 יום קדימה</div></div>
+      <div style="display:flex;gap:7px">
+        <button class="${fcMode==='table'?'bp':'bg'}" onclick="fcMode='table';renderForecast()">טבלה</button>
+        <button class="${fcMode==='chart'?'bp':'bg'}" onclick="fcMode='chart';renderForecast()">גרף</button>
+      </div>
+    </div>
+    ${fcMode==='chart'?`<div class="card" style="padding:20px 22px"><div class="chart-wrap-lg"><canvas id="chart-forecast-lg"></canvas></div></div>`:`
+    <div style="display:flex;gap:7px;margin-bottom:13px;flex-wrap:wrap">
+      ${[['all','הכל'],['check','המחאות'],['invoice','חשבוניות'],['income','הכנסות'],['fixed','קבועות']].map(([v,l])=>`<button class="${fcFilter===v?'bp':'bg'}" style="padding:4px 11px;font-size:12px" onclick="fcFilter='${v}';renderForecast()">${l}</button>`).join('')}
+    </div>
+    <div class="card" style="overflow:hidden">
+      <table>
+        <thead><tr><th>תאריך</th><th>סוג</th><th>תיאור</th><th>שינוי</th><th>יתרה מצטברת</th></tr></thead>
+        <tbody>
+          <tr><td colspan="4" style="color:var(--mu2);font-size:12px">יתרת פתיחה</td><td class="mono" style="color:var(--gold);font-weight:700">${fmt(S.openingBal)}</td></tr>
+          ${filtered.map(r=>`<tr>
+            <td style="color:var(--mu2);font-size:12px;white-space:nowrap">${fmtD(r.date)}</td>
+            <td><span class="tag t-${r.type}">${typeLabel(r.type)}</span></td>
+            <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.label}</td>
+            <td class="mono" style="color:${r.amount<0?'var(--err)':'var(--ok)'};font-weight:600;white-space:nowrap">${r.amount<0?'−':'+'}${fmt(Math.abs(r.amount))}</td>
+            <td class="mono" style="font-weight:700;color:${r.bal<0?'var(--err)':'var(--tx)'}">${fmt(r.bal)}</td>
+          </tr>`).join('')}
+          ${filtered.length===0?'<tr><td colspan="5" class="empty">אין נתונים עתידיים</td></tr>':''}
+        </tbody>
+      </table>
+    </div>`}
+  `;
+
+  if(fcMode==='chart'){
+    destroyChart('forecast-lg');
+    const ctx = el('chart-forecast-lg').getContext('2d');
+    const every = Math.ceil(fc.chartData.length/15);
+    charts['forecast-lg'] = new Chart(ctx,{
+      type:'line',
+      data:{
+        labels:fc.chartData.map((d,i)=>i%every===0?d.label:''),
+        datasets:[{data:fc.chartData.map(d=>d.balance),borderColor:'#d4a853',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(212,168,83,.12)',tension:.4}]
+      },
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.raw)}}},scales:{x:{grid:{color:'#172030'},ticks:{color:'#4e6a8a',font:{size:10}}},y:{grid:{color:'#172030'},ticks:{color:'#4e6a8a',font:{size:10},callback:v=>`₪${(Math.abs(v)/1000).toFixed(0)}K`}}}}
     });
-  }, [invoices, checks]);
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05D3\u05E9\u05D1\u05D5\u05E8\u05D3"), /*#__PURE__*/React.createElement("div", {
-    className: "sub"
-  }, "\u05E1\u05E7\u05D9\u05E8\u05D4 \u05DB\u05DC\u05DC\u05D9\u05EA \u05D5\u05EA\u05D7\u05D6\u05D9\u05EA \u05EA\u05D6\u05E8\u05D9\u05DD"), /*#__PURE__*/React.createElement("div", {
-    className: "g3",
-    style: {
-      marginBottom: 20
-    }
-  }, /*#__PURE__*/React.createElement(KpiCard, {
-    icon: "\uD83D\uDCB0",
-    label: "\u05D9\u05EA\u05E8\u05D4 \u05E0\u05D5\u05DB\u05D7\u05D9\u05EA",
-    value: fmt(kpis.ob),
-    color: kpis.ob >= 0 ? "var(--ok)" : "var(--err)",
-    onClick: () => {
-      setBalVal(kpis.ob);
-      setEditBal(true);
-    },
-    note: "\u05DC\u05D7\u05E5 \u05DC\u05E2\u05D3\u05DB\u05D5\u05DF"
-  }), /*#__PURE__*/React.createElement(KpiCard, {
-    icon: "\uD83E\uDDFE",
-    label: "\u05E1\u05D4\u05F4\u05DB \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA",
-    value: fmt(kpis.totalInvoices),
-    color: "var(--warn)"
-  }), /*#__PURE__*/React.createElement(KpiCard, {
-    icon: "\uD83D\uDCC4",
-    label: "\u05E1\u05D4\u05F4\u05DB \u05D4\u05DE\u05D7\u05D0\u05D5\u05EA",
-    value: fmt(kpis.totalChecks),
-    color: "var(--inf)"
-  }), /*#__PURE__*/React.createElement(KpiCard, {
-    icon: "\u23F3",
-    label: "\u05D9\u05EA\u05E8\u05D4 \u05DC\u05EA\u05E9\u05DC\u05D5\u05DD",
-    value: fmt(Math.max(0, kpis.totalInvoices - kpis.totalChecks)),
-    color: "var(--err)"
-  }), /*#__PURE__*/React.createElement(KpiCard, {
-    icon: kpis.minForecast < 0 ? "⚠" : "✅",
-    label: "\u05DE\u05D9\u05E0\u05D9\u05DE\u05D5\u05DD \u05EA\u05D7\u05D6\u05D9\u05EA 120\u05D9\u05F3",
-    value: fmt(kpis.minForecast),
-    color: kpis.minForecast < 0 ? "var(--err)" : "var(--ok)"
-  }), /*#__PURE__*/React.createElement(KpiCard, {
-    icon: "\uD83C\uDFE2",
-    label: "\u05E1\u05E4\u05E7\u05D9\u05DD \u05E4\u05E2\u05D9\u05DC\u05D9\u05DD",
-    value: kpis.supCount,
-    color: "var(--mu2)"
-  })), editBal && /*#__PURE__*/React.createElement(Modal, {
-    title: "\u05E2\u05D3\u05DB\u05D5\u05DF \u05D9\u05EA\u05E8\u05EA \u05D7\u05E9\u05D1\u05D5\u05DF \u05D1\u05E0\u05E7",
-    onClose: () => setEditBal(false)
-  }, /*#__PURE__*/React.createElement("label", null, "\u05D9\u05EA\u05E8\u05D4 \u05E0\u05D5\u05DB\u05D7\u05D9\u05EA (\u20AA)"), /*#__PURE__*/React.createElement("input", {
-    type: "number",
-    value: balVal,
-    onChange: e => setBalVal(+e.target.value),
-    style: {
-      marginBottom: 16
-    },
-    autoFocus: true
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 8
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "btn-p",
-    onClick: () => {
-      setOpeningBal(+balVal);
-      setEditBal(false);
-    }
-  }, "\u05E9\u05DE\u05D5\u05E8"), /*#__PURE__*/React.createElement("button", {
-    className: "btn-g",
-    onClick: () => setEditBal(false)
-  }, "\u05D1\u05D9\u05D8\u05D5\u05DC"))), /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    style: {
-      padding: "22px 24px",
-      marginBottom: 18
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 18
-    }
-  }, /*#__PURE__*/React.createElement("h2", {
-    style: {
-      fontSize: 15,
-      fontWeight: 700
-    }
-  }, "\u05EA\u05D7\u05D6\u05D9\u05EA \u05EA\u05D6\u05E8\u05D9\u05DD \u2014 120 \u05D9\u05DE\u05D9\u05DD \u05E7\u05D3\u05D9\u05DE\u05D4"), forecast.negDays.length > 0 && /*#__PURE__*/React.createElement("span", {
-    className: "tag t-fixed"
-  }, "\u26A0 ", forecast.negDays.length, " \u05D9\u05DE\u05D9 \u05D7\u05D5\u05E1\u05E8")), /*#__PURE__*/React.createElement(ResponsiveContainer, {
-    width: "100%",
-    height: 230
-  }, /*#__PURE__*/React.createElement(AreaChart, {
-    data: forecast.chartData,
-    margin: {
-      top: 5,
-      right: 5,
-      bottom: 0,
-      left: 5
-    }
-  }, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("linearGradient", {
-    id: "gp",
-    x1: "0",
-    y1: "0",
-    x2: "0",
-    y2: "1"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "5%",
-    stopColor: "#d4a853",
-    stopOpacity: 0.25
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "95%",
-    stopColor: "#d4a853",
-    stopOpacity: 0
-  }))), /*#__PURE__*/React.createElement(CartesianGrid, {
-    strokeDasharray: "3 3",
-    stroke: "#172030"
-  }), /*#__PURE__*/React.createElement(XAxis, {
-    dataKey: "label",
-    tick: {
-      fill: "#4e6a8a",
-      fontSize: 10
-    },
-    tickLine: false,
-    axisLine: false,
-    interval: 14
-  }), /*#__PURE__*/React.createElement(YAxis, {
-    tick: {
-      fill: "#4e6a8a",
-      fontSize: 10
-    },
-    tickLine: false,
-    axisLine: false,
-    tickFormatter: v => `₪${(Math.abs(v) / 1000).toFixed(0)}K`,
-    width: 52
-  }), /*#__PURE__*/React.createElement(Tooltip, {
-    content: /*#__PURE__*/React.createElement(ChartTip, null)
-  }), /*#__PURE__*/React.createElement(ReferenceLine, {
-    y: 0,
-    stroke: "#e05454",
-    strokeDasharray: "4 4",
-    strokeOpacity: 0.5
-  }), /*#__PURE__*/React.createElement(Area, {
-    type: "monotone",
-    dataKey: "balance",
-    stroke: "#d4a853",
-    strokeWidth: 2,
-    fill: "url(#gp)",
-    dot: false,
-    activeDot: {
-      r: 4,
-      fill: "#d4a853"
-    }
-  })))), monthlyBars.some(m => m.inv > 0 || m.chk > 0) && /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    style: {
-      padding: "22px 24px",
-      marginBottom: 18
-    }
-  }, /*#__PURE__*/React.createElement("h2", {
-    style: {
-      fontSize: 15,
-      fontWeight: 700,
-      marginBottom: 18
-    }
-  }, "\u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA \u05DE\u05D5\u05DC \u05EA\u05E9\u05DC\u05D5\u05DE\u05D9\u05DD \u2014 6 \u05D7\u05D5\u05D3\u05E9\u05D9\u05DD \u05D0\u05D7\u05E8\u05D5\u05E0\u05D9\u05DD"), /*#__PURE__*/React.createElement(ResponsiveContainer, {
-    width: "100%",
-    height: 180
-  }, /*#__PURE__*/React.createElement(BarChart, {
-    data: monthlyBars,
-    margin: {
-      top: 5,
-      right: 5,
-      bottom: 0,
-      left: 5
-    }
-  }, /*#__PURE__*/React.createElement(CartesianGrid, {
-    strokeDasharray: "3 3",
-    stroke: "#172030"
-  }), /*#__PURE__*/React.createElement(XAxis, {
-    dataKey: "label",
-    tick: {
-      fill: "#4e6a8a",
-      fontSize: 11
-    },
-    tickLine: false,
-    axisLine: false
-  }), /*#__PURE__*/React.createElement(YAxis, {
-    tick: {
-      fill: "#4e6a8a",
-      fontSize: 10
-    },
-    tickLine: false,
-    axisLine: false,
-    tickFormatter: v => `₪${(v / 1000).toFixed(0)}K`,
-    width: 52
-  }), /*#__PURE__*/React.createElement(Tooltip, {
-    formatter: (v, n) => [fmt(v), n === "inv" ? "חשבוניות" : "המחאות"],
-    contentStyle: {
-      background: "var(--s2)",
-      border: "1px solid var(--bd)",
-      borderRadius: 8
-    }
-  }), /*#__PURE__*/React.createElement(Bar, {
-    dataKey: "inv",
-    fill: "#d4a030",
-    opacity: 0.85,
-    radius: [3, 3, 0, 0]
-  }), /*#__PURE__*/React.createElement(Bar, {
-    dataKey: "chk",
-    fill: "#4d96e8",
-    opacity: 0.85,
-    radius: [3, 3, 0, 0]
-  }))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 18,
-      justifyContent: "center",
-      marginTop: 10
-    }
-  }, [["#d4a030", "חשבוניות"], ["#4d96e8", "המחאות"]].map(([c, l]) => /*#__PURE__*/React.createElement("div", {
-    key: l,
-    style: {
-      display: "flex",
-      alignItems: "center",
-      gap: 6,
-      fontSize: 12,
-      color: "var(--mu2)"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: 10,
-      height: 10,
-      borderRadius: 2,
-      background: c
-    }
-  }), l)))), forecast.negDays.length > 0 && /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "rgba(224,84,84,.04)",
-      border: "1px solid rgba(224,84,84,.18)",
-      borderRadius: 12,
-      padding: 20
-    }
-  }, /*#__PURE__*/React.createElement("h3", {
-    style: {
-      color: "var(--err)",
-      fontSize: 14,
-      marginBottom: 12,
-      fontWeight: 700
-    }
-  }, "\u26A0 \u05D9\u05DE\u05D9\u05DD \u05E2\u05DD \u05D9\u05EA\u05E8\u05D4 \u05E9\u05DC\u05D9\u05DC\u05D9\u05EA"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      flexWrap: "wrap",
-      gap: 7
-    }
-  }, forecast.negDays.slice(0, 18).map(d => /*#__PURE__*/React.createElement("span", {
-    key: d,
-    style: {
-      background: "rgba(224,84,84,.1)",
-      color: "var(--err)",
-      padding: "3px 10px",
-      borderRadius: 999,
-      fontSize: 12
-    }
-  }, fmtDate(d))), forecast.negDays.length > 18 && /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: "var(--mu2)",
-      fontSize: 12,
-      alignSelf: "center"
-    }
-  }, "+", forecast.negDays.length - 18, " \u05E0\u05D5\u05E1\u05E4\u05D9\u05DD"))));
+  }
 }
 
-// ── Forecast Tab ──────────────────────────────────────────────────────────────
-function ForecastTab({
-  ctx
-}) {
-  const {
-    forecast,
-    openingBal
-  } = ctx;
-  const [mode, setMode] = useState("table");
-  const [filter, setFilter] = useState("all");
-  const rows = useMemo(() => {
-    let bal = openingBal;
-    return forecast.events.map(e => {
-      bal += e.amount;
-      return {
-        ...e,
-        bal
-      };
-    });
-  }, [forecast.events, openingBal]);
-  const filtered = filter === "all" ? rows : rows.filter(r => r.type === filter);
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "flex-start",
-      marginBottom: 22
-    }
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05EA\u05D6\u05E8\u05D9\u05DD \u05E2\u05EA\u05D9\u05D3\u05D9"), /*#__PURE__*/React.createElement("div", {
-    className: "sub"
-  }, "\u05EA\u05D7\u05D6\u05D9\u05EA 120 \u05D9\u05D5\u05DD \u05E7\u05D3\u05D9\u05DE\u05D4")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 8
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    className: mode === "table" ? "btn-p" : "btn-g",
-    onClick: () => setMode("table")
-  }, "\u05D8\u05D1\u05DC\u05D4"), /*#__PURE__*/React.createElement("button", {
-    className: mode === "chart" ? "btn-p" : "btn-g",
-    onClick: () => setMode("chart")
-  }, "\u05D2\u05E8\u05E3"))), mode === "chart" && /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    style: {
-      padding: "22px 24px"
-    }
-  }, /*#__PURE__*/React.createElement(ResponsiveContainer, {
-    width: "100%",
-    height: 360
-  }, /*#__PURE__*/React.createElement(AreaChart, {
-    data: forecast.chartData,
-    margin: {
-      top: 5,
-      right: 5,
-      bottom: 0,
-      left: 5
-    }
-  }, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("linearGradient", {
-    id: "fg2",
-    x1: "0",
-    y1: "0",
-    x2: "0",
-    y2: "1"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "5%",
-    stopColor: "#d4a853",
-    stopOpacity: 0.25
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "95%",
-    stopColor: "#d4a853",
-    stopOpacity: 0
-  }))), /*#__PURE__*/React.createElement(CartesianGrid, {
-    strokeDasharray: "3 3",
-    stroke: "#172030"
-  }), /*#__PURE__*/React.createElement(XAxis, {
-    dataKey: "label",
-    tick: {
-      fill: "#4e6a8a",
-      fontSize: 10
-    },
-    tickLine: false,
-    axisLine: false,
-    interval: 7
-  }), /*#__PURE__*/React.createElement(YAxis, {
-    tick: {
-      fill: "#4e6a8a",
-      fontSize: 10
-    },
-    tickLine: false,
-    axisLine: false,
-    tickFormatter: v => `₪${(Math.abs(v) / 1000).toFixed(0)}K`,
-    width: 58
-  }), /*#__PURE__*/React.createElement(Tooltip, {
-    content: /*#__PURE__*/React.createElement(ChartTip, null)
-  }), /*#__PURE__*/React.createElement(ReferenceLine, {
-    y: 0,
-    stroke: "#e05454",
-    strokeDasharray: "4 4",
-    strokeOpacity: 0.6
-  }), /*#__PURE__*/React.createElement(Area, {
-    type: "monotone",
-    dataKey: "balance",
-    stroke: "#d4a853",
-    strokeWidth: 2,
-    fill: "url(#fg2)",
-    dot: false,
-    activeDot: {
-      r: 4,
-      fill: "#d4a853"
-    }
-  })))), mode === "table" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 8,
-      marginBottom: 14,
-      flexWrap: "wrap"
-    }
-  }, [["all", "הכל"], ["check", "המחאות"], ["invoice", "חשבוניות"], ["income", "הכנסות"], ["fixed", "קבועות"]].map(([v, l]) => /*#__PURE__*/React.createElement("button", {
-    key: v,
-    onClick: () => setFilter(v),
-    className: filter === v ? "btn-p" : "btn-g",
-    style: {
-      padding: "5px 12px",
-      fontSize: 13
-    }
-  }, l))), /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    style: {
-      overflow: "hidden"
-    }
-  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05D5\u05D2"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D9\u05D0\u05D5\u05E8"), /*#__PURE__*/React.createElement("th", null, "\u05E9\u05D9\u05E0\u05D5\u05D9"), /*#__PURE__*/React.createElement("th", null, "\u05D9\u05EA\u05E8\u05D4 \u05DE\u05E6\u05D8\u05D1\u05E8\u05EA"))), /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
-    colSpan: 4,
-    style: {
-      color: "var(--mu2)",
-      fontSize: 12
-    }
-  }, "\u05D9\u05EA\u05E8\u05EA \u05E4\u05EA\u05D9\u05D7\u05D4"), /*#__PURE__*/React.createElement("td", {
-    className: "mono",
-    style: {
-      color: "var(--gold)",
-      fontWeight: 700
-    }
-  }, fmt(openingBal))), filtered.map((r, i) => /*#__PURE__*/React.createElement("tr", {
-    key: i
-  }, /*#__PURE__*/React.createElement("td", {
-    style: {
-      color: "var(--mu2)",
-      fontSize: 12,
-      whiteSpace: "nowrap"
-    }
-  }, fmtDate(r.date)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("span", {
-    className: `tag t-${r.type}`
-  }, typeLabel(r.type))), /*#__PURE__*/React.createElement("td", {
-    style: {
-      maxWidth: 200,
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      whiteSpace: "nowrap"
-    }
-  }, r.label), /*#__PURE__*/React.createElement("td", {
-    className: "mono",
-    style: {
-      color: r.amount < 0 ? "var(--err)" : "var(--ok)",
-      fontWeight: 600,
-      whiteSpace: "nowrap"
-    }
-  }, r.amount < 0 ? "−" : "+", fmt(Math.abs(r.amount))), /*#__PURE__*/React.createElement("td", {
-    className: "mono",
-    style: {
-      fontWeight: 700,
-      color: r.bal < 0 ? "var(--err)" : "var(--tx)"
-    }
-  }, fmt(r.bal)))), filtered.length === 0 && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
-    colSpan: 5,
-    style: {
-      textAlign: "center",
-      color: "var(--mu2)",
-      padding: 50
-    }
-  }, "\u05D0\u05D9\u05DF \u05E0\u05EA\u05D5\u05E0\u05D9\u05DD. \u05D9\u05D9\u05D1\u05D0 \u05E7\u05D1\u05E6\u05D9\u05DD \u05DB\u05D3\u05D9 \u05DC\u05E8\u05D0\u05D5\u05EA \u05EA\u05D7\u05D6\u05D9\u05EA.")))))));
-}
-
-// ── Suppliers Tab ─────────────────────────────────────────────────────────────
-function SuppliersTab({
-  ctx
-}) {
-  const {
-    suppliers,
-    setSuppliers,
-    checks,
-    invoices,
-    setSelSup,
-    setTab
-  } = ctx;
-  const blank = {
-    name: "",
-    paymentTerms: "30",
-    paymentMethod: "המחאה",
-    phone: "",
-    email: "",
-    notes: ""
-  };
-  const [form, setForm] = useState(blank);
-  const [editId, setEditId] = useState(null);
-  const [search, setSearch] = useState("");
-  const up = k => v => setForm(f => ({
-    ...f,
-    [k]: v
-  }));
-  const submit = () => {
-    if (!form.name.trim()) return;
-    if (editId) {
-      setSuppliers(s => s.map(x => x.id === editId ? {
-        ...x,
-        ...form,
-        paymentTerms: +form.paymentTerms
-      } : x));
-      setEditId(null);
-    } else setSuppliers(s => [...s, {
-      ...form,
-      id: uid(),
-      paymentTerms: +form.paymentTerms
-    }]);
-    setForm(blank);
-  };
+// ═══════════════════════════════════════════════════════════════
+// SUPPLIERS
+// ═══════════════════════════════════════════════════════════════
+let supSearch='', supEditId=null;
+function renderSuppliers(){
+  const pg = el('page-suppliers');
+  const list = S.suppliers.filter(s=>!supSearch||s.name.includes(supSearch));
   const stats = sup => {
-    const tInv = invoices.filter(i => i.supplierId === sup.id || i.supplierName === sup.name).reduce((s, i) => s + (i.amount || 0), 0);
-    const tChk = checks.filter(c => c.supplierId === sup.id || c.supplierName === sup.name).reduce((s, c) => s + (c.amount || 0), 0);
-    return {
-      tInv,
-      tChk,
-      bal: tInv - tChk
-    };
+    const tInv=S.invoices.filter(i=>i.supplierId===sup.id||i.supplierName===sup.name).reduce((s,i)=>s+(i.amount||0),0);
+    const tChk=S.checks.filter(c=>c.supplierId===sup.id||c.supplierName===sup.name).reduce((s,c)=>s+(c.amount||0),0);
+    return{tInv,tChk,bal:tInv-tChk};
   };
-  const list = suppliers.filter(s => !search || s.name.includes(search));
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05E0\u05D9\u05D4\u05D5\u05DC \u05E1\u05E4\u05E7\u05D9\u05DD"), /*#__PURE__*/React.createElement("div", {
-    className: "sub"
-  }, "\u05D4\u05D2\u05D3\u05E8 \u05E1\u05E4\u05E7\u05D9\u05DD \u05D5\u05EA\u05E0\u05D0\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD \u05DC\u05D7\u05D9\u05E9\u05D5\u05D1 \u05EA\u05D7\u05D6\u05D9\u05EA \u05DE\u05D3\u05D5\u05D9\u05E7"), /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    style: {
-      padding: 20,
-      marginBottom: 20
+  pg.innerHTML = `
+    <h1>ניהול ספקים</h1><div class="sub-title">הגדר ספקים ותנאי תשלום</div>
+    <div class="card" style="padding:18px;margin-bottom:18px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:13px" id="sup-form-title">${supEditId?'✏ עריכת ספק':'➕ הוסף ספק'}</div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:11px;margin-bottom:11px">
+        <div><label>שם ספק *</label><input id="sf-name" placeholder="שם הספק"></div>
+        <div><label>תנאי תשלום</label><select id="sf-terms">
+          <option value="30">שוטף + 30</option>
+          <option value="60">שוטף + 60</option>
+          <option value="90">שוטף + 90</option>
+          <option value="120">שוטף + 120</option>
+          <option value="150">שוטף + 150</option>
+        </select></div>
+        <div><label>אמצעי תשלום</label><select id="sf-method"><option>המחאה</option><option>העברה בנקאית</option><option>אשראי</option><option>מזומן</option><option>אחר</option></select></div>
+        <div><label>טלפון</label><input id="sf-phone" placeholder="050-0000000"></div>
+      </div>
+      <div style="margin-bottom:11px"><label>הערות</label><input id="sf-notes"></div>
+      <div style="display:flex;gap:7px">
+        <button class="bp" id="sup-save-btn" onclick="saveSup()">${supEditId?'עדכן ספק':'הוסף ספק'}</button>
+        ${supEditId?'<button class="bg" onclick="supEditId=null;renderSuppliers()">ביטול</button>':''}
+      </div>
+    </div>
+    <input placeholder="🔍 חיפוש…" style="max-width:260px;margin-bottom:13px" oninput="supSearch=this.value;renderSuppliers()" value="${supSearch}">
+    <div class="card" style="overflow:hidden">
+      <table>
+        <thead><tr><th>שם ספק</th><th>תנאי תשלום</th><th>אמצעי תשלום</th><th>חשבוניות</th><th>שולם</th><th>יתרה</th><th>פעולות</th></tr></thead>
+        <tbody>
+          ${list.map(sup=>{const st=stats(sup);return`<tr>
+            <td style="font-weight:700">${sup.name}${sup.phone?`<div style="font-size:11px;color:var(--mu2)">${sup.phone}</div>`:''}</td>
+            <td><span class="mono" style="font-size:12px;color:var(--mu2)">שוטף+${sup.paymentTerms}</span></td>
+            <td style="font-size:12px;color:var(--mu2)">${sup.paymentMethod||'המחאה'}</td>
+            <td class="mono" style="color:var(--warn);font-weight:600">${fmt(st.tInv)}</td>
+            <td class="mono" style="color:var(--ok);font-weight:600">${fmt(st.tChk)}</td>
+            <td class="mono" style="font-weight:700;color:${st.bal>0?'var(--err)':'var(--ok)'}">${fmt(st.bal)}</td>
+            <td><div style="display:flex;gap:5px">
+              <button class="bg" style="padding:3px 8px;font-size:11px" onclick="goLedger('${sup.id}')">כרטסת</button>
+              <button class="bg" style="padding:3px 8px;font-size:11px" onclick="editSup('${sup.id}')">עריכה</button>
+              <button class="bd" style="padding:3px 8px;font-size:11px" onclick="delSup('${sup.id}')">מחק</button>
+            </div></td>
+          </tr>`}).join('')}
+          ${list.length===0?`<tr><td colspan="7" class="empty">${supSearch?'לא נמצאו ספקים':'הוסף ספק ראשון'}</td></tr>`:''}
+        </tbody>
+      </table>
+    </div>
+  `;
+  if(supEditId){
+    const s=S.suppliers.find(x=>x.id===supEditId);
+    if(s){
+      el('sf-name').value=s.name||'';
+      el('sf-terms').value=s.paymentTerms||30;
+      el('sf-method').value=s.paymentMethod||'המחאה';
+      el('sf-phone').value=s.phone||'';
+      el('sf-notes').value=s.notes||'';
+      el('sup-form-title').textContent='✏ עריכת ספק';
+      el('page-suppliers').querySelector('.bp').textContent='עדכן ספק';
     }
-  }, /*#__PURE__*/React.createElement("h3", {
-    style: {
-      fontSize: 15,
-      fontWeight: 700,
-      marginBottom: 14
-    }
-  }, editId ? "✏ עריכת ספק" : "➕ הוסף ספק"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr",
-      gap: 12,
-      marginBottom: 12
-    }
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05E9\u05DD \u05E1\u05E4\u05E7 *"), /*#__PURE__*/React.createElement("input", {
-    value: form.name,
-    onChange: e => up("name")(e.target.value),
-    placeholder: "\u05E9\u05DD \u05D4\u05E1\u05E4\u05E7"
-  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05EA\u05E0\u05D0\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD (\u05D9\u05DE\u05D9\u05DD)"), /*#__PURE__*/React.createElement("input", {
-    type: "number",
-    value: form.paymentTerms,
-    onChange: e => up("paymentTerms")(e.target.value)
-  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05D0\u05DE\u05E6\u05E2\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD"), /*#__PURE__*/React.createElement("select", {
-    value: form.paymentMethod,
-    onChange: e => up("paymentMethod")(e.target.value)
-  }, ["המחאה", "העברה בנקאית", "אשראי", "מזומן", "אחר"].map(m => /*#__PURE__*/React.createElement("option", {
-    key: m
-  }, m)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05D8\u05DC\u05E4\u05D5\u05DF"), /*#__PURE__*/React.createElement("input", {
-    value: form.phone || "",
-    onChange: e => up("phone")(e.target.value),
-    placeholder: "050-0000000"
-  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05D0\u05D9\u05DE\u05D9\u05D9\u05DC"), /*#__PURE__*/React.createElement("input", {
-    value: form.email || "",
-    onChange: e => up("email")(e.target.value),
-    placeholder: "supplier@..."
-  }))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginBottom: 12
-    }
-  }, /*#__PURE__*/React.createElement("label", null, "\u05D4\u05E2\u05E8\u05D5\u05EA"), /*#__PURE__*/React.createElement("input", {
-    value: form.notes || "",
-    onChange: e => up("notes")(e.target.value)
-  })), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 8
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "btn-p",
-    onClick: submit
-  }, editId ? "עדכן" : "הוסף ספק"), editId && /*#__PURE__*/React.createElement("button", {
-    className: "btn-g",
-    onClick: () => {
-      setEditId(null);
-      setForm(blank);
-    }
-  }, "\u05D1\u05D9\u05D8\u05D5\u05DC"))), /*#__PURE__*/React.createElement("input", {
-    value: search,
-    onChange: e => setSearch(e.target.value),
-    placeholder: "\uD83D\uDD0D \u05D7\u05D9\u05E4\u05D5\u05E9\u2026",
-    style: {
-      maxWidth: 280,
-      marginBottom: 14
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    style: {
-      overflow: "hidden"
-    }
-  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05E9\u05DD \u05E1\u05E4\u05E7"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05E0\u05D0\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05D0\u05DE\u05E6\u05E2\u05D9 \u05EA\u05E9\u05DC\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA"), /*#__PURE__*/React.createElement("th", null, "\u05E9\u05D5\u05DC\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05D9\u05EA\u05E8\u05D4"), /*#__PURE__*/React.createElement("th", null, "\u05E4\u05E2\u05D5\u05DC\u05D5\u05EA"))), /*#__PURE__*/React.createElement("tbody", null, list.map(sup => {
-    const st = stats(sup);
-    return /*#__PURE__*/React.createElement("tr", {
-      key: sup.id
-    }, /*#__PURE__*/React.createElement("td", {
-      style: {
-        fontWeight: 700
-      }
-    }, sup.name, sup.phone && /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 11,
-        color: "var(--mu2)"
-      }
-    }, sup.phone)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("span", {
-      className: "mono",
-      style: {
-        fontSize: 12,
-        color: "var(--mu2)"
-      }
-    }, "\u05E9\u05D5\u05D8\u05E3+", sup.paymentTerms)), /*#__PURE__*/React.createElement("td", {
-      style: {
-        fontSize: 13,
-        color: "var(--mu2)"
-      }
-    }, sup.paymentMethod), /*#__PURE__*/React.createElement("td", {
-      className: "mono",
-      style: {
-        color: "var(--warn)",
-        fontWeight: 600
-      }
-    }, fmt(st.tInv)), /*#__PURE__*/React.createElement("td", {
-      className: "mono",
-      style: {
-        color: "var(--ok)",
-        fontWeight: 600
-      }
-    }, fmt(st.tChk)), /*#__PURE__*/React.createElement("td", {
-      className: "mono",
-      style: {
-        fontWeight: 700,
-        color: st.bal > 0 ? "var(--err)" : "var(--ok)"
-      }
-    }, fmt(st.bal)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: "flex",
-        gap: 5
-      }
-    }, /*#__PURE__*/React.createElement("button", {
-      className: "btn-g",
-      style: {
-        padding: "3px 9px",
-        fontSize: 12
-      },
-      onClick: () => {
-        setSelSup(sup.id);
-        setTab("ledger");
-      }
-    }, "\u05DB\u05E8\u05D8\u05E1\u05EA"), /*#__PURE__*/React.createElement("button", {
-      className: "btn-g",
-      style: {
-        padding: "3px 9px",
-        fontSize: 12
-      },
-      onClick: () => {
-        setForm({
-          name: sup.name,
-          paymentTerms: String(sup.paymentTerms || 30),
-          paymentMethod: sup.paymentMethod || "המחאה",
-          phone: sup.phone || "",
-          email: sup.email || "",
-          notes: sup.notes || ""
-        });
-        setEditId(sup.id);
-      }
-    }, "\u05E2\u05E8\u05D9\u05DB\u05D4"), /*#__PURE__*/React.createElement("button", {
-      className: "btn-d",
-      style: {
-        padding: "3px 9px",
-        fontSize: 12
-      },
-      onClick: () => confirm("למחוק ספק זה?") && setSuppliers(s => s.filter(x => x.id !== sup.id))
-    }, "\u05DE\u05D7\u05E7"))));
-  }), list.length === 0 && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
-    colSpan: 7,
-    style: {
-      textAlign: "center",
-      color: "var(--mu2)",
-      padding: 50
-    }
-  }, search ? "לא נמצאו" : "הוסף ספק ראשון"))))));
+  }
+}
+function saveSup(){
+  const name=el('sf-name').value.trim();
+  if(!name) return;
+  const obj={name,paymentTerms:parseInt(el('sf-terms').value)||30,paymentMethod:el('sf-method').value,phone:el('sf-phone').value,notes:el('sf-notes').value};
+  if(supEditId){S.suppliers=S.suppliers.map(x=>x.id===supEditId?{...x,...obj}:x);supEditId=null;}
+  else S.suppliers.push({...obj,id:uid()});
+  save();renderSuppliers();renderSidebar();
+}
+function editSup(id){
+  supEditId=id;
+  renderSuppliers();
+  const s=S.suppliers.find(x=>x.id===id);
+  if(!s) return;
+  el('sf-name').value=s.name||'';
+  el('sf-terms').value=String(s.paymentTerms||30);
+  el('sf-method').value=s.paymentMethod||'המחאה';
+  el('sf-phone').value=s.phone||'';
+  el('sf-notes').value=s.notes||'';
+}
+function delSup(id){if(confirm('למחוק ספק זה?')){S.suppliers=S.suppliers.filter(x=>x.id!==id);save();renderSuppliers();renderSidebar();}}
+function goLedger(id){S._ledgerSup=id;navigate('ledger');}
+
+// ── Manual check entry ───────────────────────────────────────────
+let chkEditId=null;
+function openAddCheck(editId){
+  chkEditId=editId||null;
+  const c=editId?S.checks.find(x=>x.id===editId):null;
+  openModal(c?'עריכת המחאה':'הוספת המחאה ידנית',`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div><label>ספק *</label><select id="chk-sup">
+        <option value="">— בחר ספק —</option>
+        ${S.suppliers.map(s=>`<option value="${s.id}"${c&&c.supplierId===s.id?' selected':''}>${s.name}</option>`).join('')}
+      </select></div>
+      <div><label>תאריך *</label><input type="date" id="chk-date" value="${c?c.date:''}"></div>
+      <div><label>סכום (₪) *</label><input type="number" id="chk-amount" placeholder="0" value="${c?c.amount:''}"></div>
+      <div><label>מס׳ המחאה</label><input id="chk-num" placeholder="מספר המחאה" value="${c?c.checkNumber||'':''}"></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="bp" onclick="saveManualCheck()">${c?'עדכן':'הוסף המחאה'}</button>
+      <button class="bg" onclick="closeModal()">ביטול</button>
+    </div>
+  `);
+}
+function saveManualCheck(){
+  const supId=el('chk-sup').value;
+  const sup=S.suppliers.find(s=>s.id===supId);
+  const date=el('chk-date').value;
+  const amount=parseFloat(el('chk-amount').value)||0;
+  const checkNumber=el('chk-num').value.trim();
+  if(!sup||!date||!amount){alert('יש למלא ספק, תאריך וסכום');return;}
+  if(chkEditId){
+    S.checks=S.checks.map(x=>x.id===chkEditId?{...x,supplierName:sup.name,supplierId:sup.id,date,amount,checkNumber}:x);
+  } else {
+    S.checks.push({id:uid(),supplierName:sup.name,supplierId:sup.id,date,amount,checkNumber});
+  }
+  save();closeModal();
+  navigate(S.activeTab);
+}
+function editCheck(id){openAddCheck(id);}
+function delCheck(id){if(confirm('למחוק המחאה זו?')){S.checks=S.checks.filter(x=>x.id!==id);save();renderLedger();renderSidebar();}}
+
+// ═══════════════════════════════════════════════════════════════
+// LEDGER
+// ═══════════════════════════════════════════════════════════════
+function renderLedger(){
+  const pg = el('page-ledger');
+  const sid = S._ledgerSup || (S.suppliers[0]?.id||'');
+  const sup = S.suppliers.find(s=>s.id===sid);
+  const today=new Date(); today.setHours(0,0,0,0);
+
+  if(!sup){
+    pg.innerHTML=`<h1>כרטסת ספק</h1><div class="sub-title">חשבוניות והמחאות לפי ספק</div>
+      <select style="max-width:240px;margin-bottom:20px" onchange="S._ledgerSup=this.value;renderLedger()">
+        <option value="">— בחר ספק —</option>
+        ${S.suppliers.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}
+      </select>
+      <div class="empty" style="padding:80px">בחר ספק לצפייה בכרטסת</div>`;
+    return;
+  }
+
+  const sInv = [...S.invoices.filter(i=>i.supplierId===sup.id||i.supplierName===sup.name)];
+  const sChk = [...S.checks.filter(c=>c.supplierId===sup.id||c.supplierName===sup.name)];
+  const tInv=sInv.reduce((s,i)=>s+(i.amount||0),0);
+  const tChk=sChk.reduce((s,c)=>s+(c.amount||0),0);
+
+  // Merge + sort by date for combined ledger
+  const allRows = [
+    ...sInv.map(i=>({...i,rowType:'invoice',sortDate:i.date||''})),
+    ...sChk.map(c=>({...c,rowType:'check',sortDate:c.date||''}))
+  ].sort((a,b)=>a.sortDate.localeCompare(b.sortDate));
+
+  let running=0;
+
+  pg.innerHTML=`
+    <h1>כרטסת ספק</h1>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap">
+      <select style="max-width:220px" onchange="S._ledgerSup=this.value;renderLedger()">
+        <option value="">— בחר ספק —</option>
+        ${S.suppliers.map(s=>`<option value="${s.id}"${s.id===sid?' selected':''}>${s.name}</option>`).join('')}
+      </select>
+      <button class="bp" style="font-size:12px;padding:6px 12px" onclick="openAddCheck()">+ הוסף המחאה</button>
+      <button class="bg" style="font-size:12px;padding:6px 12px" onclick="printLedger()">🖨 הדפסה</button>
+    </div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:18px">
+      ${[['חשבוניות',fmt(tInv),'var(--warn)'],['שולם',fmt(tChk),'var(--ok)'],['יתרה לתשלום',fmt(tInv-tChk),(tInv-tChk)>0?'var(--err)':'var(--ok)'],['תנאי תשלום',`שוטף+${sup.paymentTerms||30}`,'var(--mu2)']].map(([l,v,c])=>`<div style="text-align:center"><div style="font-size:11px;color:var(--mu2);margin-bottom:2px">${l}</div><div class="mono" style="font-size:13px;font-weight:700;color:${c}">${v}</div></div>`).join('')}
+    </div>
+    <div class="card" style="overflow:hidden" id="ledger-table-wrap">
+      <table>
+        <thead><tr><th>תאריך</th><th>סוג</th><th>מס׳ מסמך</th><th>חובה (חשבונית)</th><th>זכות (המחאה)</th><th>יתרה</th><th>פעולות</th></tr></thead>
+        <tbody>
+          ${allRows.map(r=>{
+            const isInv = r.rowType==='invoice';
+            if(isInv) running+=(r.amount||0);
+            else running-=(r.amount||0);
+            const pay = isInv ? addDays(eom(new Date(r.date)),sup.paymentTerms||30) : null;
+            const late = pay && pay<today;
+            return `<tr>
+              <td style="font-size:12px;color:var(--mu2);white-space:nowrap">${fmtD(r.sortDate)}</td>
+              <td><span class="tag ${isInv?'t-invoice':'t-check'}">${isInv?'חשבונית':'המחאה'}</span></td>
+              <td style="font-size:12px">${isInv?(r.invoiceNumber||'—'):(r.checkNumber||'—')}${isInv&&pay?`<div style="font-size:10px;color:${late?'var(--err)':'var(--mu2)'}">לתשלום: ${fmtD(pay)}${late?' ⚠':''}</div>`:''}</td>
+              <td class="mono" style="color:var(--warn);font-weight:${isInv?700:400}">${isInv?fmt(r.amount):'—'}</td>
+              <td class="mono" style="color:var(--ok);font-weight:${!isInv?700:400}">${!isInv?fmt(r.amount):'—'}</td>
+              <td class="mono" style="font-weight:700;color:${running>0?'var(--err)':'var(--ok)'}">${fmt(running)}</td>
+              <td>${!isInv?`<div style="display:flex;gap:4px">
+                <button class="bg" style="padding:2px 7px;font-size:11px" onclick="editCheck('${r.id}')">עריכה</button>
+                <button class="bd" style="padding:2px 7px;font-size:11px" onclick="delCheck('${r.id}')">מחק</button>
+              </div>`:''}</td>
+            </tr>`;
+          }).join('')}
+          ${allRows.length===0?'<tr><td colspan="7" class="empty">אין נתונים לספק זה</td></tr>':''}
+        </tbody>
+      </table>
+    </div>
+  `;
 }
 
-// ── Ledger Tab ────────────────────────────────────────────────────────────────
-function LedgerTab({
-  ctx
-}) {
-  const {
-    suppliers,
-    checks,
-    invoices,
-    selSup,
-    setSelSup,
-    today
-  } = ctx;
-  const [sid, setSid] = useState(selSup || suppliers[0]?.id || "");
-  useEffect(() => {
-    if (selSup) setSid(selSup);
-  }, [selSup]);
-  const sup = suppliers.find(s => s.id === sid);
-  const sInv = sup ? [...invoices.filter(i => i.supplierId === sup.id || i.supplierName === sup.name)].sort((a, b) => (a.date || "").localeCompare(b.date || "")) : [];
-  const sChk = sup ? [...checks.filter(c => c.supplierId === sup.id || c.supplierName === sup.name)].sort((a, b) => (a.date || "").localeCompare(b.date || "")) : [];
-  const tInv = sInv.reduce((s, i) => s + (i.amount || 0), 0);
-  const tChk = sChk.reduce((s, c) => s + (c.amount || 0), 0);
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05DB\u05E8\u05D8\u05E1\u05EA \u05E1\u05E4\u05E7"), /*#__PURE__*/React.createElement("div", {
-    className: "sub"
-  }, "\u05DB\u05DC \u05D4\u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA \u05D5\u05D4\u05D4\u05DE\u05D7\u05D0\u05D5\u05EA \u05DC\u05E4\u05D9 \u05E1\u05E4\u05E7"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      alignItems: "center",
-      gap: 20,
-      marginBottom: 24,
-      flexWrap: "wrap"
-    }
-  }, /*#__PURE__*/React.createElement("select", {
-    value: sid,
-    onChange: e => {
-      setSid(e.target.value);
-      setSelSup(e.target.value);
-    },
-    style: {
-      maxWidth: 250
-    }
-  }, /*#__PURE__*/React.createElement("option", {
-    value: ""
-  }, "\u2014 \u05D1\u05D7\u05E8 \u05E1\u05E4\u05E7 \u2014"), suppliers.map(s => /*#__PURE__*/React.createElement("option", {
-    key: s.id,
-    value: s.id
-  }, s.name))), sup && /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 24,
-      flexWrap: "wrap"
-    }
-  }, [{
-    l: "חשבוניות",
-    v: fmt(tInv),
-    c: "var(--warn)"
-  }, {
-    l: "שולם",
-    v: fmt(tChk),
-    c: "var(--ok)"
-  }, {
-    l: "יתרה לתשלום",
-    v: fmt(tInv - tChk),
-    c: tInv - tChk > 0 ? "var(--err)" : "var(--ok)"
-  }, {
-    l: "תנאי תשלום",
-    v: `שוטף+${sup.paymentTerms || 30}`,
-    c: "var(--mu2)"
-  }].map((k, i) => /*#__PURE__*/React.createElement("div", {
-    key: i,
-    style: {
-      textAlign: "center"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: "var(--mu2)",
-      marginBottom: 2
-    }
-  }, k.l), /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 14,
-      fontWeight: 700,
-      color: k.c
-    }
-  }, k.v))))), sup ? /*#__PURE__*/React.createElement("div", {
-    className: "g2"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    style: {
-      overflow: "hidden"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: "13px 18px",
-      borderBottom: "1px solid var(--bd)",
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center"
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontWeight: 700
-    }
-  }, "\uD83E\uDDFE \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA (", sInv.length, ")"), /*#__PURE__*/React.createElement("span", {
-    className: "mono",
-    style: {
-      color: "var(--warn)",
-      fontWeight: 700
-    }
-  }, fmt(tInv))), /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05DE\u05E1\u05F3 \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05EA"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05DB\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05E9\u05DC\u05D5\u05DD \u05E6\u05E4\u05D5\u05D9"))), /*#__PURE__*/React.createElement("tbody", null, sInv.map(inv => {
-    const pay = addDays(eom(new Date(inv.date)), sup.paymentTerms || 30);
-    const late = pay < today;
-    return /*#__PURE__*/React.createElement("tr", {
-      key: inv.id
-    }, /*#__PURE__*/React.createElement("td", {
-      style: {
-        fontSize: 12,
-        color: "var(--mu2)",
-        whiteSpace: "nowrap"
-      }
-    }, fmtDate(inv.date)), /*#__PURE__*/React.createElement("td", {
-      style: {
-        fontSize: 12
-      }
-    }, inv.invoiceNumber || "—"), /*#__PURE__*/React.createElement("td", {
-      className: "mono",
-      style: {
-        color: "var(--warn)",
-        fontWeight: 700
-      }
-    }, fmt(inv.amount)), /*#__PURE__*/React.createElement("td", {
-      style: {
-        fontSize: 12,
-        color: late ? "var(--err)" : "var(--inf)",
-        whiteSpace: "nowrap"
-      }
-    }, fmtDate(pay), late ? " ⚠" : ""));
-  }), !sInv.length && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
-    colSpan: 4,
-    style: {
-      textAlign: "center",
-      color: "var(--mu2)",
-      padding: 28
-    }
-  }, "\u05D0\u05D9\u05DF \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA"))))), /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    style: {
-      overflow: "hidden"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: "13px 18px",
-      borderBottom: "1px solid var(--bd)",
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center"
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontWeight: 700
-    }
-  }, "\uD83D\uDCC4 \u05D4\u05DE\u05D7\u05D0\u05D5\u05EA (", sChk.length, ")"), /*#__PURE__*/React.createElement("span", {
-    className: "mono",
-    style: {
-      color: "var(--ok)",
-      fontWeight: 700
-    }
-  }, fmt(tChk))), /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05DE\u05E1\u05F3 \u05D4\u05DE\u05D7\u05D0\u05D4"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05DB\u05D5\u05DD"))), /*#__PURE__*/React.createElement("tbody", null, sChk.map(c => /*#__PURE__*/React.createElement("tr", {
-    key: c.id
-  }, /*#__PURE__*/React.createElement("td", {
-    style: {
-      fontSize: 12,
-      color: "var(--mu2)",
-      whiteSpace: "nowrap"
-    }
-  }, fmtDate(c.date)), /*#__PURE__*/React.createElement("td", {
-    style: {
-      fontSize: 12
-    }
-  }, c.checkNumber || "—"), /*#__PURE__*/React.createElement("td", {
-    className: "mono",
-    style: {
-      color: "var(--ok)",
-      fontWeight: 700
-    }
-  }, fmt(c.amount)))), !sChk.length && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
-    colSpan: 3,
-    style: {
-      textAlign: "center",
-      color: "var(--mu2)",
-      padding: 28
-    }
-  }, "\u05D0\u05D9\u05DF \u05D4\u05DE\u05D7\u05D0\u05D5\u05EA")))))) : /*#__PURE__*/React.createElement("div", {
-    style: {
-      textAlign: "center",
-      color: "var(--mu2)",
-      padding: 80,
-      fontSize: 16
-    }
-  }, "\u05D1\u05D7\u05E8 \u05E1\u05E4\u05E7 \u05DC\u05E6\u05E4\u05D9\u05D9\u05D4 \u05D1\u05DB\u05E8\u05D8\u05E1\u05EA"));
+function printLedger(){
+  const sid=S._ledgerSup||(S.suppliers[0]?.id||'');
+  const sup=S.suppliers.find(s=>s.id===sid);
+  if(!sup){alert('בחר ספק תחילה');return;}
+  const w=window.open('','_blank');
+  const tbl=el('ledger-table-wrap')?.innerHTML||'';
+  w.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">
+    <title>כרטסת — ${sup.name}</title>
+    <style>body{font-family:Arial,sans-serif;direction:rtl;padding:20px;font-size:13px}
+    h2{margin-bottom:4px}p{color:#666;margin-bottom:16px}
+    table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:6px 10px;text-align:right}
+    th{background:#f5f5f5;font-weight:600}tr:nth-child(even){background:#fafafa}
+    button{display:none}</style></head>
+    <body><h2>כרטסת ספק: ${sup.name}</h2>
+    <p>תנאי תשלום: שוטף+${sup.paymentTerms||30} | הודפס: ${new Date().toLocaleDateString('he-IL')}</p>
+    ${tbl}<script>window.onload=()=>window.print()<\/script></body></html>`);
+  w.document.close();
 }
 
-// ── Aging Tab ─────────────────────────────────────────────────────────────────
-function AgingTab({
-  ctx
-}) {
-  const {
-    invoices,
-    checks,
-    suppliers,
-    today
-  } = ctx;
-  const rows = useMemo(() => suppliers.map(sup => {
-    const sInv = invoices.filter(i => i.supplierId === sup.id || i.supplierName === sup.name);
-    let pool = checks.filter(c => c.supplierId === sup.id || c.supplierName === sup.name).reduce((s, c) => s + (c.amount || 0), 0);
-    const bkts = {
-      "0-30": 0,
-      "31-60": 0,
-      "61-90": 0,
-      "90+": 0
-    };
-    [...sInv].sort((a, b) => (a.date || "").localeCompare(b.date || "")).forEach(inv => {
-      const age = Math.floor((today - new Date(inv.date)) / 86400000);
-      const amt = inv.amount || 0,
-        cov = Math.min(pool, amt);
-      pool -= cov;
-      const open = amt - cov;
-      if (open <= 0) return;
-      if (age <= 30) bkts["0-30"] += open;else if (age <= 60) bkts["31-60"] += open;else if (age <= 90) bkts["61-90"] += open;else bkts["90+"] += open;
+// ═══════════════════════════════════════════════════════════════
+// AGING
+// ═══════════════════════════════════════════════════════════════
+let agingSup='all';
+function renderAging(){
+  const pg=el('page-aging');
+  const today=new Date(); today.setHours(0,0,0,0);
+  const bc={'0-30':'var(--ok)','31-60':'var(--warn)','61-90':'var(--err)','90+':'#b91c1c'};
+  const blabels={'0-30':'עד 30 יום','31-60':'31–60 יום','61-90':'61–90 יום','90+':'מעל 90 יום'};
+
+  // Summary rows (all suppliers)
+  const summaryRows=S.suppliers.map(sup=>{
+    const sInv=S.invoices.filter(i=>i.supplierId===sup.id||i.supplierName===sup.name);
+    let pool=S.checks.filter(c=>c.supplierId===sup.id||c.supplierName===sup.name).reduce((s,c)=>s+(c.amount||0),0);
+    const bkts={'0-30':0,'31-60':0,'61-90':0,'90+':0};
+    [...sInv].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).forEach(inv=>{
+      const age=Math.floor((today-new Date(inv.date))/86400000);
+      const amt=inv.amount||0,cov=Math.min(pool,amt);pool-=cov;const open=amt-cov;
+      if(open<=0)return;
+      if(age<=30)bkts['0-30']+=open;else if(age<=60)bkts['31-60']+=open;else if(age<=90)bkts['61-90']+=open;else bkts['90+']+=open;
     });
-    const total = Object.values(bkts).reduce((s, v) => s + v, 0);
-    return {
-      sup,
-      bkts,
-      total
-    };
-  }).filter(r => r.total > 0), [invoices, checks, suppliers, today]);
-  const totals = useMemo(() => {
-    const t = {
-      "0-30": 0,
-      "31-60": 0,
-      "61-90": 0,
-      "90+": 0,
-      all: 0
-    };
-    rows.forEach(r => {
-      Object.keys(r.bkts).forEach(k => {
-        t[k] += r.bkts[k];
-      });
-      t.all += r.total;
-    });
-    return t;
-  }, [rows]);
-  const bc = {
-    "0-30": "var(--ok)",
-    "31-60": "var(--warn)",
-    "61-90": "var(--err)",
-    "90+": "#b91c1c"
-  };
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05D2\u05D9\u05D5\u05DC \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA \u05E4\u05EA\u05D5\u05D7\u05D5\u05EA"), /*#__PURE__*/React.createElement("div", {
-    className: "sub"
-  }, "\u05E0\u05D9\u05EA\u05D5\u05D7 \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA \u05E9\u05D8\u05E8\u05DD \u05E9\u05D5\u05DC\u05DE\u05D5 \u05DC\u05E4\u05D9 \u05D2\u05D9\u05DC"), /*#__PURE__*/React.createElement("div", {
-    className: "g4",
-    style: {
-      marginBottom: 20
-    }
-  }, [["0-30", "עד 30 יום"], ["31-60", "31–60 יום"], ["61-90", "61–90 יום"], ["90+", "מעל 90 יום"]].map(([k, l]) => /*#__PURE__*/React.createElement("div", {
-    key: k,
-    className: "card",
-    style: {
-      padding: "16px 18px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: "var(--mu2)",
-      marginBottom: 6
-    }
-  }, l), /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 16,
-      fontWeight: 700,
-      color: bc[k]
-    }
-  }, fmt(totals[k]))))), rows.length > 0 ? /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    style: {
-      overflow: "hidden"
-    }
-  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05E1\u05E4\u05E7"), /*#__PURE__*/React.createElement("th", {
-    style: {
-      color: bc["0-30"]
-    }
-  }, "0\u201330"), /*#__PURE__*/React.createElement("th", {
-    style: {
-      color: bc["31-60"]
-    }
-  }, "31\u201360"), /*#__PURE__*/React.createElement("th", {
-    style: {
-      color: bc["61-90"]
-    }
-  }, "61\u201390"), /*#__PURE__*/React.createElement("th", {
-    style: {
-      color: bc["90+"]
-    }
-  }, "90+"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05D4\"\u05DB \u05E4\u05EA\u05D5\u05D7"))), /*#__PURE__*/React.createElement("tbody", null, rows.map(({
-    sup,
-    bkts,
-    total
-  }) => /*#__PURE__*/React.createElement("tr", {
-    key: sup.id
-  }, /*#__PURE__*/React.createElement("td", {
-    style: {
-      fontWeight: 700
-    }
-  }, sup.name), Object.entries(bkts).map(([k, v]) => /*#__PURE__*/React.createElement("td", {
-    key: k,
-    className: "mono",
-    style: {
-      color: v > 0 ? bc[k] : "var(--mu)",
-      fontWeight: v > 0 ? 700 : 400
-    }
-  }, v > 0 ? fmt(v) : "—")), /*#__PURE__*/React.createElement("td", {
-    className: "mono",
-    style: {
-      fontWeight: 800,
-      color: "var(--err)"
-    }
-  }, fmt(total)))), /*#__PURE__*/React.createElement("tr", {
-    style: {
-      borderTop: "2px solid var(--bd)"
-    }
-  }, /*#__PURE__*/React.createElement("td", {
-    style: {
-      fontWeight: 700,
-      color: "var(--mu2)"
-    }
-  }, "\u05E1\u05D4\"\u05DB"), ["0-30", "31-60", "61-90", "90+"].map(k => /*#__PURE__*/React.createElement("td", {
-    key: k,
-    className: "mono",
-    style: {
-      fontWeight: 700,
-      color: bc[k]
-    }
-  }, fmt(totals[k]))), /*#__PURE__*/React.createElement("td", {
-    className: "mono",
-    style: {
-      fontWeight: 800,
-      color: "var(--err)",
-      fontSize: 15
-    }
-  }, fmt(totals.all)))))) : /*#__PURE__*/React.createElement("div", {
-    style: {
-      textAlign: "center",
-      color: "var(--ok)",
-      padding: 80,
-      fontSize: 16
-    }
-  }, "\u2705 \u05D0\u05D9\u05DF \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA \u05E4\u05EA\u05D5\u05D7\u05D5\u05EA"));
+    return{sup,bkts,total:Object.values(bkts).reduce((s,v)=>s+v,0)};
+  }).filter(r=>r.total>0);
+
+  const totals={'0-30':0,'31-60':0,'61-90':0,'90+':0,all:0};
+  summaryRows.forEach(r=>{Object.keys(r.bkts).forEach(k=>{totals[k]+=r.bkts[k];});totals.all+=r.total;});
+
+  // Combined ledger for selected supplier
+  const selSup = agingSup!=='all' ? S.suppliers.find(s=>s.id===agingSup) : null;
+  let ledgerHtml='';
+  if(selSup){
+    const sInv=[...S.invoices.filter(i=>i.supplierId===selSup.id||i.supplierName===selSup.name)];
+    const sChk=[...S.checks.filter(c=>c.supplierId===selSup.id||c.supplierName===selSup.name)];
+    const allRows=[
+      ...sInv.map(i=>({...i,rowType:'invoice',sortDate:i.date||''})),
+      ...sChk.map(c=>({...c,rowType:'check',sortDate:c.date||''}))
+    ].sort((a,b)=>a.sortDate.localeCompare(b.sortDate));
+    let running=0;
+    ledgerHtml=`
+      <div class="card" style="overflow:hidden;margin-bottom:16px" id="aging-ledger-wrap">
+        <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
+          <span>📒 כרטסת: ${selSup.name}</span>
+          <button class="bg" style="font-size:12px;padding:5px 12px" onclick="printAgingLedger()">🖨 הדפסה</button>
+        </div>
+        <table>
+          <thead><tr><th>תאריך</th><th>סוג</th><th>מס׳ מסמך</th><th>חובה (חשבונית)</th><th>זכות (המחאה)</th><th>יתרה</th></tr></thead>
+          <tbody>
+            ${allRows.map(r=>{
+              const isInv=r.rowType==='invoice';
+              if(isInv) running+=(r.amount||0); else running-=(r.amount||0);
+              const pay=isInv?addDays(eom(new Date(r.date)),selSup.paymentTerms||30):null;
+              const late=pay&&pay<today;
+              return `<tr>
+                <td style="font-size:12px;color:var(--mu2);white-space:nowrap">${fmtD(r.sortDate)}</td>
+                <td><span class="tag ${isInv?'t-invoice':'t-check'}">${isInv?'חשבונית':'המחאה'}</span></td>
+                <td style="font-size:12px">${isInv?(r.invoiceNumber||'—'):(r.checkNumber||'—')}${isInv&&pay?`<div style="font-size:10px;color:${late?'var(--err)':'var(--mu2)'}">לתשלום: ${fmtD(pay)}${late?' ⚠':''}</div>`:''}</td>
+                <td class="mono" style="color:var(--warn);font-weight:${isInv?700:400}">${isInv?fmt(r.amount):'—'}</td>
+                <td class="mono" style="color:var(--ok);font-weight:${!isInv?700:400}">${!isInv?fmt(r.amount):'—'}</td>
+                <td class="mono" style="font-weight:700;color:${running>0?'var(--err)':'var(--ok)'}">${fmt(running)}</td>
+              </tr>`;
+            }).join('')}
+            ${allRows.length===0?'<tr><td colspan="6" class="empty">אין נתונים</td></tr>':''}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  pg.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+      <h1>גיול חובות ספקים</h1>
+      <button class="bg" style="font-size:12px;padding:6px 13px" onclick="printAgingSummary()">🖨 הדפס סיכום</button>
+    </div>
+    <div class="sub-title">ניתוח חשבוניות פתוחות לפי גיל</div>
+    <div class="g4" style="margin-bottom:18px">
+      ${Object.entries(blabels).map(([k,l])=>`<div class="card" style="padding:14px 16px"><div style="font-size:11px;color:var(--mu2);margin-bottom:5px">${l}</div><div class="mono" style="font-size:15px;font-weight:700;color:${bc[k]}">${fmt(totals[k])}</div></div>`).join('')}
+    </div>
+
+    ${summaryRows.length>0?`<div class="card" style="overflow:hidden;margin-bottom:18px" id="aging-summary-wrap">
+      <table>
+        <thead><tr><th>ספק</th>${Object.entries(blabels).map(([k,l])=>`<th style="color:${bc[k]}">${l}</th>`).join('')}<th>סה"כ פתוח</th><th>כרטסת</th></tr></thead>
+        <tbody>
+          ${summaryRows.map(({sup,bkts,total})=>`<tr>
+            <td style="font-weight:700">${sup.name}</td>
+            ${Object.entries(bkts).map(([k,v])=>`<td class="mono" style="color:${v>0?bc[k]:'var(--mu)'};font-weight:${v>0?700:400}">${v>0?fmt(v):'—'}</td>`).join('')}
+            <td class="mono" style="font-weight:800;color:var(--err)">${fmt(total)}</td>
+            <td><button class="bg" style="padding:2px 8px;font-size:11px" onclick="agingSup='${sup.id}';renderAging()">הצג</button></td>
+          </tr>`).join('')}
+          <tr style="border-top:2px solid var(--bd)">
+            <td style="font-weight:700;color:var(--mu2)">סה"כ</td>
+            ${['0-30','31-60','61-90','90+'].map(k=>`<td class="mono" style="font-weight:700;color:${bc[k]}">${fmt(totals[k])}</td>`).join('')}
+            <td class="mono" style="font-weight:800;color:var(--err);font-size:15px">${fmt(totals.all)}</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>`:`<div class="empty" style="color:var(--ok)">✅ אין חשבוניות פתוחות</div>`}
+
+    ${selSup?`<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <span style="font-size:13px;color:var(--mu2)">כרטסת מפורטת:</span>
+      <select style="max-width:220px" onchange="agingSup=this.value;renderAging()">
+        <option value="all">— בחר ספק —</option>
+        ${summaryRows.map(r=>`<option value="${r.sup.id}"${r.sup.id===agingSup?' selected':''}>${r.sup.name}</option>`).join('')}
+      </select>
+      <button class="bg" style="font-size:12px;padding:5px 10px" onclick="agingSup='all';renderAging()">✕ סגור</button>
+    </div>${ledgerHtml}`:''}
+  `;
 }
 
-// ── Import Tab ────────────────────────────────────────────────────────────────
-function ImportTab({
-  ctx
-}) {
-  const {
-    suppliers,
-    setSuppliers,
-    checks,
-    setChecks,
-    invoices,
-    setInvoices
-  } = ctx;
-  const [preview, setPreview] = useState(null);
-  const [map, setMap] = useState({});
-  const [msg, setMsg] = useState("");
-  const detect = (cols, ...cands) => {
-    for (const c of cands) {
-      const f = cols.find(col => col.toLowerCase().includes(c));
-      if (f) return f;
-    }
-    return cols[0] || "";
-  };
-  const parseFile = (file, type) => {
-    const r = new FileReader();
-    r.onload = e => {
-      const wb = XLSX.read(new Uint8Array(e.target.result), {
-        type: "array",
-        cellDates: true
-      });
-      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-        defval: ""
-      });
-      const cols = rows.length ? Object.keys(rows[0]) : [];
-      const fm = type === "checks" ? {
-        supplierName: detect(cols, "ספק", "שם", "supplier", "name"),
-        date: detect(cols, "תאריך", "date"),
-        amount: detect(cols, "סכום", "amount", "סה"),
-        checkNumber: detect(cols, "המחאה", "check", "מספר", "num")
-      } : {
-        supplierName: detect(cols, "ספק", "שם", "supplier", "name"),
-        date: detect(cols, "תאריך", "date"),
-        amount: detect(cols, "סכום", "amount", "סה"),
-        invoiceNumber: detect(cols, "חשבונית", "invoice", "מספר", "num")
-      };
-      setMap(fm);
-      setPreview({
-        type,
-        rows,
-        cols
-      });
-      setMsg("");
-    };
-    r.readAsArrayBuffer(file);
-  };
-  const doImport = () => {
-    if (!preview) return;
-    const {
-      type,
-      rows
-    } = preview;
-    const allSups = [...suppliers];
-    const getOrCreate = name => {
-      let s = allSups.find(x => x.name === name);
-      if (!s) {
-        s = {
-          id: uid(),
-          name,
-          paymentTerms: 30,
-          paymentMethod: "המחאה",
-          notes: ""
-        };
-        allSups.push(s);
-      }
-      return s;
-    };
-    const parse = v => parseFloat(String(v).replace(/[^0-9.-]/g, "")) || 0;
-    if (type === "checks") {
-      const items = rows.map(r => {
-        const name = String(r[map.supplierName] || "").trim();
-        if (!name) return null;
-        const sup = getOrCreate(name);
-        const amt = parse(r[map.amount]);
-        if (!amt) return null;
-        return {
-          id: uid(),
-          supplierName: name,
-          supplierId: sup.id,
-          date: excelDate(r[map.date]),
-          amount: amt,
-          checkNumber: String(r[map.checkNumber] || "")
-        };
-      }).filter(Boolean);
-      setChecks(c => [...c, ...items]);
-      setSuppliers(allSups);
-      setMsg(`✅ יובאו ${items.length} המחאות${allSups.length > suppliers.length ? ` | ${allSups.length - suppliers.length} ספקים חדשים` : ""}`);
-    } else {
-      const items = rows.map(r => {
-        const name = String(r[map.supplierName] || "").trim();
-        if (!name) return null;
-        const sup = getOrCreate(name);
-        const amt = parse(r[map.amount]);
-        if (!amt) return null;
-        return {
-          id: uid(),
-          supplierName: name,
-          supplierId: sup.id,
-          date: excelDate(r[map.date]),
-          amount: amt,
-          invoiceNumber: String(r[map.invoiceNumber] || "")
-        };
-      }).filter(Boolean);
-      setInvoices(i => [...i, ...items]);
-      setSuppliers(allSups);
-      setMsg(`✅ יובאו ${items.length} חשבוניות${allSups.length > suppliers.length ? ` | ${allSups.length - suppliers.length} ספקים חדשים` : ""}`);
-    }
-    setPreview(null);
-  };
-  const UploadBox = ({
-    label,
-    onFile
-  }) => /*#__PURE__*/React.createElement("div", {
-    style: {
-      border: "2px dashed var(--bd2)",
-      borderRadius: 12,
-      padding: "36px 24px",
-      textAlign: "center"
-    },
-    onDragOver: e => {
-      e.preventDefault();
-      e.currentTarget.style.borderColor = "var(--gold)";
-    },
-    onDragLeave: e => {
-      e.currentTarget.style.borderColor = "var(--bd2)";
-    },
-    onDrop: e => {
-      e.preventDefault();
-      e.currentTarget.style.borderColor = "var(--bd2)";
-      const f = e.dataTransfer.files[0];
-      if (f) onFile(f);
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 32,
-      marginBottom: 10
-    }
-  }, "\uD83D\uDCC1"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 15,
-      fontWeight: 600,
-      marginBottom: 6
-    }
-  }, label), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 12,
-      color: "var(--mu2)",
-      marginBottom: 14
-    }
-  }, "\u05D2\u05E8\u05D5\u05E8 \u05E7\u05D5\u05D1\u05E5 \u05DC\u05DB\u05D0\u05DF \u05D0\u05D5 \u05DC\u05D7\u05E5 \u05DC\u05D1\u05D7\u05D9\u05E8\u05D4"), /*#__PURE__*/React.createElement("label", {
-    style: {
-      cursor: "pointer"
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      background: "var(--s2)",
-      border: "1px solid var(--bd2)",
-      borderRadius: 8,
-      padding: "7px 16px",
-      fontSize: 13,
-      fontWeight: 600,
-      color: "var(--gold)"
-    }
-  }, "\u05D1\u05D7\u05E8 \u05E7\u05D5\u05D1\u05E5"), /*#__PURE__*/React.createElement("input", {
-    type: "file",
-    accept: ".xlsx,.xls,.csv",
-    style: {
-      display: "none"
-    },
-    onChange: e => {
-      if (e.target.files[0]) onFile(e.target.files[0]);
-    }
-  })));
-  const fLabels = {
-    supplierName: "שם ספק",
-    date: "תאריך",
-    amount: "סכום",
-    checkNumber: "מס׳ המחאה",
-    invoiceNumber: "מס׳ חשבונית"
-  };
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05D9\u05D1\u05D5\u05D0 \u05E0\u05EA\u05D5\u05E0\u05D9\u05DD \u05DE\u05D0\u05E7\u05E1\u05DC"), /*#__PURE__*/React.createElement("div", {
-    className: "sub"
-  }, "\u05D4\u05E2\u05DC\u05D4 \u05E7\u05D1\u05E6\u05D9 Excel \u2014 \u05D4\u05D0\u05E4\u05DC\u05D9\u05E7\u05E6\u05D9\u05D4 \u05DE\u05D6\u05D4\u05D4 \u05E2\u05DE\u05D5\u05D3\u05D5\u05EA \u05D0\u05D5\u05D8\u05D5\u05DE\u05D8\u05D9\u05EA"), msg && /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "rgba(38,184,135,.07)",
-      border: "1px solid rgba(38,184,135,.25)",
-      borderRadius: 10,
-      padding: "12px 18px",
-      marginBottom: 18,
-      color: "var(--ok)",
-      fontSize: 14
-    }
-  }, msg), !preview && /*#__PURE__*/React.createElement("div", {
-    className: "g2",
-    style: {
-      marginBottom: 24
-    }
-  }, /*#__PURE__*/React.createElement(UploadBox, {
-    label: "\uD83D\uDCC4 \u05D9\u05D9\u05D1\u05D5\u05D0 \u05D4\u05DE\u05D7\u05D0\u05D5\u05EA",
-    onFile: f => parseFile(f, "checks")
-  }), /*#__PURE__*/React.createElement(UploadBox, {
-    label: "\uD83E\uDDFE \u05D9\u05D9\u05D1\u05D5\u05D0 \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA",
-    onFile: f => parseFile(f, "invoices")
-  })), preview && /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    style: {
-      padding: 22,
-      marginBottom: 20
-    }
-  }, /*#__PURE__*/React.createElement("h3", {
-    style: {
-      fontSize: 15,
-      fontWeight: 700,
-      marginBottom: 4
-    }
-  }, preview.type === "checks" ? "תצוגה מקדימה — המחאות" : "תצוגה מקדימה — חשבוניות"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 13,
-      color: "var(--mu2)",
-      marginBottom: 18
-    }
-  }, preview.rows.length, " \u05E9\u05D5\u05E8\u05D5\u05EA"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))",
-      gap: 14,
-      marginBottom: 20
-    }
-  }, Object.entries(map).map(([field, col]) => /*#__PURE__*/React.createElement("div", {
-    key: field
-  }, /*#__PURE__*/React.createElement("label", null, fLabels[field]), /*#__PURE__*/React.createElement("select", {
-    value: col,
-    onChange: e => setMap(m => ({
-      ...m,
-      [field]: e.target.value
-    }))
-  }, preview.cols.map(c => /*#__PURE__*/React.createElement("option", {
-    key: c
-  }, c)))))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      overflowX: "auto",
-      marginBottom: 18
-    }
-  }, /*#__PURE__*/React.createElement("table", {
-    style: {
-      minWidth: 500
-    }
-  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05E9\u05DD \u05E1\u05E4\u05E7"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05DB\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, preview.type === "checks" ? "מס׳ המחאה" : "מס׳ חשבונית"))), /*#__PURE__*/React.createElement("tbody", null, preview.rows.slice(0, 5).map((r, i) => {
-    const name = String(r[map.supplierName] || "").trim();
-    const amt = parseFloat(String(r[map.amount]).replace(/[^0-9.-]/g, "")) || 0;
-    const num = String(r[preview.type === "checks" ? map.checkNumber : map.invoiceNumber] || "");
-    return /*#__PURE__*/React.createElement("tr", {
-      key: i
-    }, /*#__PURE__*/React.createElement("td", null, name || /*#__PURE__*/React.createElement("span", {
-      style: {
-        color: "var(--err)"
-      }
-    }, "\u05D7\u05E1\u05E8")), /*#__PURE__*/React.createElement("td", {
-      style: {
-        fontSize: 12,
-        color: "var(--mu2)"
-      }
-    }, fmtDate(excelDate(r[map.date]))), /*#__PURE__*/React.createElement("td", {
-      className: "mono",
-      style: {
-        color: amt ? "var(--warn)" : "var(--err)"
-      }
-    }, amt ? fmt(amt) : "חסר"), /*#__PURE__*/React.createElement("td", {
-      style: {
-        fontSize: 12,
-        color: "var(--mu2)"
-      }
-    }, num || "—"));
-  })))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 8
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "btn-p",
-    onClick: doImport
-  }, "\u05D9\u05D9\u05D1\u05D0 ", preview.rows.length, " ", preview.type === "checks" ? "המחאות" : "חשבוניות"), /*#__PURE__*/React.createElement("button", {
-    className: "btn-g",
-    onClick: () => setPreview(null)
-  }, "\u05D1\u05D9\u05D8\u05D5\u05DC"))), /*#__PURE__*/React.createElement("div", {
-    className: "g2"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    style: {
-      padding: "16px 18px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 13,
-      color: "var(--mu2)",
-      marginBottom: 8
-    }
-  }, "\uD83D\uDCC4 \u05D4\u05DE\u05D7\u05D0\u05D5\u05EA \u05DE\u05D9\u05D5\u05D1\u05D0\u05D5\u05EA"), /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 20,
-      fontWeight: 700,
-      color: "var(--inf)"
-    }
-  }, ctx.checks.length), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 12,
-      color: "var(--mu2)",
-      marginTop: 4
-    }
-  }, "\u05E1\u05D4\"\u05DB: ", fmt(ctx.checks.reduce((s, c) => s + (c.amount || 0), 0))), ctx.checks.length > 0 && /*#__PURE__*/React.createElement("button", {
-    className: "btn-d",
-    style: {
-      marginTop: 12,
-      fontSize: 12,
-      padding: "4px 10px"
-    },
-    onClick: () => confirm("למחוק את כל ההמחאות?") && ctx.setChecks([])
-  }, "\u05E0\u05E7\u05D4 \u05D4\u05DB\u05DC")), /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    style: {
-      padding: "16px 18px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 13,
-      color: "var(--mu2)",
-      marginBottom: 8
-    }
-  }, "\uD83E\uDDFE \u05D7\u05E9\u05D1\u05D5\u05E0\u05D9\u05D5\u05EA \u05DE\u05D9\u05D5\u05D1\u05D0\u05D5\u05EA"), /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 20,
-      fontWeight: 700,
-      color: "var(--warn)"
-    }
-  }, ctx.invoices.length), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 12,
-      color: "var(--mu2)",
-      marginTop: 4
-    }
-  }, "\u05E1\u05D4\"\u05DB: ", fmt(ctx.invoices.reduce((s, i) => s + (i.amount || 0), 0))), ctx.invoices.length > 0 && /*#__PURE__*/React.createElement("button", {
-    className: "btn-d",
-    style: {
-      marginTop: 12,
-      fontSize: 12,
-      padding: "4px 10px"
-    },
-    onClick: () => confirm("למחוק את כל החשבוניות?") && ctx.setInvoices([])
-  }, "\u05E0\u05E7\u05D4 \u05D4\u05DB\u05DC"))));
+function printAgingSummary(){
+  const w=window.open('','_blank');
+  const tbl=el('aging-summary-wrap')?.innerHTML||'';
+  w.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>גיול חובות ספקים</title>
+    <style>body{font-family:Arial,sans-serif;direction:rtl;padding:20px;font-size:13px}h2{margin-bottom:4px}p{color:#666;margin-bottom:16px}
+    table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:6px 10px;text-align:right}th{background:#f5f5f5;font-weight:600}tr:nth-child(even){background:#fafafa}button{display:none}</style></head>
+    <body><h2>גיול חובות ספקים</h2><p>הודפס: ${new Date().toLocaleDateString('he-IL')}</p>${tbl}
+    <script>window.onload=()=>window.print()<\/script></body></html>`);
+  w.document.close();
 }
 
-// ── Recurring Tab ─────────────────────────────────────────────────────────────
-function RecurringTab({
-  ctx
-}) {
-  const {
-    fixedItems,
-    setFixedItems
-  } = ctx;
-  const blank = {
-    name: "",
-    amount: "",
-    type: "expense",
-    recurrence: "monthly",
-    dayOfMonth: "1",
-    date: ""
-  };
-  const [form, setForm] = useState(blank);
-  const [editId, setEditId] = useState(null);
-  const up = k => v => setForm(f => ({
-    ...f,
-    [k]: v
-  }));
-  const submit = () => {
-    if (!form.name.trim() || !form.amount) return;
-    const item = {
-      ...form,
-      id: editId || uid(),
-      amount: +form.amount,
-      dayOfMonth: +form.dayOfMonth
-    };
-    if (editId) {
-      setFixedItems(s => s.map(x => x.id === editId ? item : x));
-      setEditId(null);
-    } else setFixedItems(s => [...s, item]);
-    setForm(blank);
-  };
-  const expenses = fixedItems.filter(f => f.type === "expense");
-  const incomes = fixedItems.filter(f => f.type === "income");
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "\u05D4\u05DB\u05E0\u05E1\u05D5\u05EA \u05D5\u05D4\u05D5\u05E6\u05D0\u05D5\u05EA \u05E7\u05D1\u05D5\u05E2\u05D5\u05EA"), /*#__PURE__*/React.createElement("div", {
-    className: "sub"
-  }, "\u05E4\u05E8\u05D9\u05D8\u05D9\u05DD \u05D7\u05D5\u05D6\u05E8\u05D9\u05DD \u05D7\u05D5\u05D3\u05E9\u05D9\u05D9\u05DD \u05D0\u05D5 \u05D7\u05D3-\u05E4\u05E2\u05DE\u05D9\u05D9\u05DD"), /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    style: {
-      padding: 20,
-      marginBottom: 22
-    }
-  }, /*#__PURE__*/React.createElement("h3", {
-    style: {
-      fontSize: 15,
-      fontWeight: 700,
-      marginBottom: 14
-    }
-  }, editId ? "✏ עריכה" : "➕ הוסף פריט"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr",
-      gap: 12,
-      marginBottom: 12
-    }
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05E9\u05DD"), /*#__PURE__*/React.createElement("input", {
-    value: form.name,
-    onChange: e => up("name")(e.target.value),
-    placeholder: "\u05E9\u05DD \u05D4\u05D4\u05D5\u05E6\u05D0\u05D4/\u05D4\u05DB\u05E0\u05E1\u05D4"
-  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05E1\u05DB\u05D5\u05DD (\u20AA)"), /*#__PURE__*/React.createElement("input", {
-    type: "number",
-    value: form.amount,
-    onChange: e => up("amount")(e.target.value),
-    placeholder: "0"
-  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05E1\u05D5\u05D2"), /*#__PURE__*/React.createElement("select", {
-    value: form.type,
-    onChange: e => up("type")(e.target.value)
-  }, /*#__PURE__*/React.createElement("option", {
-    value: "expense"
-  }, "\u05D4\u05D5\u05E6\u05D0\u05D4"), /*#__PURE__*/React.createElement("option", {
-    value: "income"
-  }, "\u05D4\u05DB\u05E0\u05E1\u05D4"))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05EA\u05D3\u05D9\u05E8\u05D5\u05EA"), /*#__PURE__*/React.createElement("select", {
-    value: form.recurrence,
-    onChange: e => up("recurrence")(e.target.value)
-  }, /*#__PURE__*/React.createElement("option", {
-    value: "monthly"
-  }, "\u05D7\u05D5\u05D3\u05E9\u05D9"), /*#__PURE__*/React.createElement("option", {
-    value: "once"
-  }, "\u05D7\u05D3-\u05E4\u05E2\u05DE\u05D9"))), form.recurrence === "monthly" ? /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05D9\u05D5\u05DD \u05D1\u05D7\u05D5\u05D3\u05E9"), /*#__PURE__*/React.createElement("input", {
-    type: "number",
-    min: "1",
-    max: "28",
-    value: form.dayOfMonth,
-    onChange: e => up("dayOfMonth")(e.target.value)
-  })) : /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", null, "\u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("input", {
-    type: "date",
-    value: form.date,
-    onChange: e => up("date")(e.target.value)
-  }))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 8
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "btn-p",
-    onClick: submit
-  }, editId ? "עדכן" : "הוסף"), editId && /*#__PURE__*/React.createElement("button", {
-    className: "btn-g",
-    onClick: () => {
-      setEditId(null);
-      setForm(blank);
-    }
-  }, "\u05D1\u05D9\u05D8\u05D5\u05DC"))), /*#__PURE__*/React.createElement("div", {
-    className: "g2",
-    style: {
-      marginBottom: 20
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    style: {
-      padding: "14px 18px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: "var(--mu2)",
-      marginBottom: 3
-    }
-  }, "\u05E1\u05D4\"\u05DB \u05D4\u05D5\u05E6\u05D0\u05D5\u05EA / \u05D7\u05D5\u05D3\u05E9"), /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 18,
-      fontWeight: 700,
-      color: "var(--err)"
-    }
-  }, fmt(expenses.reduce((s, f) => s + (f.amount || 0), 0)))), /*#__PURE__*/React.createElement("div", {
-    className: "card",
-    style: {
-      padding: "14px 18px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: "var(--mu2)",
-      marginBottom: 3
-    }
-  }, "\u05E1\u05D4\"\u05DB \u05D4\u05DB\u05E0\u05E1\u05D5\u05EA / \u05D7\u05D5\u05D3\u05E9"), /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 18,
-      fontWeight: 700,
-      color: "var(--ok)"
-    }
-  }, fmt(incomes.reduce((s, f) => s + (f.amount || 0), 0))))), [{
-    title: "🔴 הוצאות קבועות",
-    items: expenses,
-    col: "var(--err)"
-  }, {
-    title: "🟢 הכנסות קבועות",
-    items: incomes,
-    col: "var(--ok)"
-  }].map(({
-    title,
-    items,
-    col
-  }) => /*#__PURE__*/React.createElement("div", {
-    key: title,
-    className: "card",
-    style: {
-      overflow: "hidden",
-      marginBottom: 14
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: "13px 18px",
-      borderBottom: "1px solid var(--bd)",
-      fontWeight: 700,
-      fontSize: 14
-    }
-  }, title), /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "\u05E9\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05E1\u05DB\u05D5\u05DD"), /*#__PURE__*/React.createElement("th", null, "\u05EA\u05D3\u05D9\u05E8\u05D5\u05EA"), /*#__PURE__*/React.createElement("th", null, "\u05D9\u05D5\u05DD / \u05EA\u05D0\u05E8\u05D9\u05DA"), /*#__PURE__*/React.createElement("th", null, "\u05E4\u05E2\u05D5\u05DC\u05D5\u05EA"))), /*#__PURE__*/React.createElement("tbody", null, items.map(fi => /*#__PURE__*/React.createElement("tr", {
-    key: fi.id
-  }, /*#__PURE__*/React.createElement("td", {
-    style: {
-      fontWeight: 600
-    }
-  }, fi.name), /*#__PURE__*/React.createElement("td", {
-    className: "mono",
-    style: {
-      color: col,
-      fontWeight: 700
-    }
-  }, fmt(fi.amount)), /*#__PURE__*/React.createElement("td", {
-    style: {
-      fontSize: 12,
-      color: "var(--mu2)"
-    }
-  }, fi.recurrence === "monthly" ? "חודשי" : "חד-פעמי"), /*#__PURE__*/React.createElement("td", {
-    style: {
-      fontSize: 12,
-      color: "var(--mu2)"
-    }
-  }, fi.recurrence === "monthly" ? `יום ${fi.dayOfMonth}` : fmtDate(fi.date)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 5
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "btn-g",
-    style: {
-      padding: "3px 9px",
-      fontSize: 12
-    },
-    onClick: () => {
-      setForm({
-        name: fi.name,
-        amount: String(fi.amount),
-        type: fi.type,
-        recurrence: fi.recurrence,
-        dayOfMonth: String(fi.dayOfMonth || 1),
-        date: fi.date || ""
-      });
-      setEditId(fi.id);
-    }
-  }, "\u05E2\u05E8\u05D9\u05DB\u05D4"), /*#__PURE__*/React.createElement("button", {
-    className: "btn-d",
-    style: {
-      padding: "3px 9px",
-      fontSize: 12
-    },
-    onClick: () => confirm("למחוק?") && setFixedItems(s => s.filter(x => x.id !== fi.id))
-  }, "\u05DE\u05D7\u05E7"))))), items.length === 0 && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
-    colSpan: 5,
-    style: {
-      textAlign: "center",
-      color: "var(--mu2)",
-      padding: 30
-    }
-  }, "\u05D0\u05D9\u05DF \u05E4\u05E8\u05D9\u05D8\u05D9\u05DD")))))));
+function printAgingLedger(){
+  const sup=S.suppliers.find(s=>s.id===agingSup);
+  const w=window.open('','_blank');
+  const tbl=el('aging-ledger-wrap')?.innerHTML||'';
+  w.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>כרטסת ${sup?.name||''}</title>
+    <style>body{font-family:Arial,sans-serif;direction:rtl;padding:20px;font-size:13px}h2{margin-bottom:4px}p{color:#666;margin-bottom:16px}
+    table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:6px 10px;text-align:right}th{background:#f5f5f5;font-weight:600}tr:nth-child(even){background:#fafafa}button{display:none}</style></head>
+    <body><h2>כרטסת ספק: ${sup?.name||''}</h2><p>תנאי תשלום: שוטף+${sup?.paymentTerms||30} | הודפס: ${new Date().toLocaleDateString('he-IL')}</p>${tbl}
+    <script>window.onload=()=>window.print()<\/script></body></html>`);
+  w.document.close();
 }
 
-// ── Mount ──────────────────────────────────────────────────────────────────────
-ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(App, null));
-
-try {
-  ReactDOM.createRoot(document.getElementById('root'))
-    .render(React.createElement(App, null));
-} catch(e) {
-  document.getElementById('root').innerHTML =
-    '<div style="color:#e05454;padding:40px;font-family:monospace;background:#0c1018;min-height:100vh">' +
-    '<b>Error:</b><br>' + e.message + '</div>';
+// ═══════════════════════════════════════════════════════════════
+// IMPORT
+// ═══════════════════════════════════════════════════════════════
+let importMsg='', importPreview=null, importMap={};
+function renderImport(){
+  const pg=el('page-import');
+  pg.innerHTML=`
+    <h1>יבוא נתונים מאקסל</h1><div class="sub-title">העלה קבצי Excel — האפליקציה מזהה עמודות אוטומטית</div>
+    ${importMsg?`<div class="success-msg">${importMsg}</div>`:''}
+    ${!importPreview?`
+    <div class="g2" style="margin-bottom:20px">
+      <div class="drop-zone" id="dz-checks" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="dzDrop(event,'checks')">
+        <div class="dz-icon">📄</div><div class="dz-title">ייבוא המחאות</div><div class="dz-sub">גרור קובץ xlsx לכאן</div>
+        <label style="cursor:pointer"><span style="background:var(--s2);border:1px solid var(--bd2);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--gold)">בחר קובץ</span><input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="fileImport(this,'checks')"></label>
+      </div>
+      <div class="drop-zone" id="dz-inv" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="dzDrop(event,'invoices')">
+        <div class="dz-icon">🧾</div><div class="dz-title">ייבוא חשבוניות</div><div class="dz-sub">גרור קובץ xlsx לכאן</div>
+        <label style="cursor:pointer"><span style="background:var(--s2);border:1px solid var(--bd2);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--gold)">בחר קובץ</span><input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="fileImport(this,'invoices')"></label>
+      </div>
+    </div>`:`
+    <div class="card" style="padding:20px;margin-bottom:18px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">${importPreview.type==='checks'?'תצוגה מקדימה — המחאות':'תצוגה מקדימה — חשבוניות'}</div>
+      <div style="font-size:12px;color:var(--mu2);margin-bottom:16px">${importPreview.rows.length} שורות זוהו</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:12px;margin-bottom:16px" id="map-fields"></div>
+      <div style="overflow-x:auto;margin-bottom:16px"><table style="min-width:420px" id="preview-tbl"></table></div>
+      <div style="display:flex;gap:8px">
+        <button class="bp" onclick="doImport()">ייבא ${importPreview.rows.length} ${importPreview.type==='checks'?'המחאות':'חשבוניות'}</button>
+        <button class="bg" onclick="importPreview=null;renderImport()">ביטול</button>
+      </div>
+    </div>`}
+    <div class="g2">
+      <div class="card" style="padding:14px 16px">
+        <div style="font-size:12px;color:var(--mu2);margin-bottom:6px">📄 המחאות מיובאות</div>
+        <div class="mono" style="font-size:18px;font-weight:700;color:var(--inf)">${S.checks.length}</div>
+        <div style="font-size:12px;color:var(--mu2);margin-top:3px">סה"כ: ${fmt(S.checks.reduce((s,c)=>s+(c.amount||0),0))}</div>
+        ${S.checks.length>0?`<button class="bd" style="margin-top:10px;font-size:12px;padding:3px 9px" onclick="if(confirm('למחוק את כל ההמחאות?')){S.checks=[];save();renderImport();}">נקה הכל</button>`:''}
+      </div>
+      <div class="card" style="padding:14px 16px">
+        <div style="font-size:12px;color:var(--mu2);margin-bottom:6px">🧾 חשבוניות מיובאות</div>
+        <div class="mono" style="font-size:18px;font-weight:700;color:var(--warn)">${S.invoices.length}</div>
+        <div style="font-size:12px;color:var(--mu2);margin-top:3px">סה"כ: ${fmt(S.invoices.reduce((s,i)=>s+(i.amount||0),0))}</div>
+        ${S.invoices.length>0?`<button class="bd" style="margin-top:10px;font-size:12px;padding:3px 9px" onclick="if(confirm('למחוק את כל החשבוניות?')){S.invoices=[];save();renderImport();}">נקה הכל</button>`:''}
+      </div>
+    </div>
+  `;
+  if(importPreview) renderMapFields();
 }
 
+function detect(cols,...cands){for(const c of cands){const f=cols.find(col=>col.toLowerCase().includes(c));if(f)return f;}return cols[0]||'';}
+function dzDrop(e,type){e.preventDefault();e.currentTarget.classList.remove('drag');const f=e.dataTransfer.files[0];if(f)parseXL(f,type);}
+function fileImport(input,type){if(input.files[0])parseXL(input.files[0],type);}
+function parseXL(file,type){
+  const r=new FileReader();
+  r.onload=e=>{
+    const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
+    const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});
+    const cols=rows.length?Object.keys(rows[0]):[];
+    importMap=type==='checks'
+      ?{supplierName:detect(cols,'ספק','שם','supplier','name'),date:detect(cols,'תאריך','date'),amount:detect(cols,'סכום','amount','סה'),checkNumber:detect(cols,'המחאה','check','מספר','num')}
+      :{supplierName:detect(cols,'ספק','שם','supplier','name'),date:detect(cols,'תאריך','date'),amount:detect(cols,'סכום','amount','סה'),invoiceNumber:detect(cols,'חשבונית','invoice','מספר','num')};
+    importPreview={type,rows,cols};importMsg='';renderImport();
+  };
+  r.readAsArrayBuffer(file);
+}
+function renderMapFields(){
+  const fLabels={supplierName:'שם ספק',date:'תאריך',amount:'סכום',checkNumber:"מס' המחאה",invoiceNumber:"מס' חשבונית"};
+  const cont=el('map-fields');
+  if(!cont)return;
+  cont.innerHTML=Object.entries(importMap).map(([field,col])=>`
+    <div><label>${fLabels[field]||field}</label>
+    <select onchange="importMap['${field}']=this.value;renderPreviewTable()">
+      ${importPreview.cols.map(c=>`<option${c===col?' selected':''}>${c}</option>`).join('')}
+    </select></div>`).join('');
+  renderPreviewTable();
+}
+function renderPreviewTable(){
+  const tbl=el('preview-tbl');if(!tbl)return;
+  const parse=v=>parseFloat(String(v).replace(/[^0-9.-]/g,''))||0;
+  tbl.innerHTML=`<thead><tr><th>שם ספק</th><th>תאריך</th><th>סכום</th><th>${importPreview.type==='checks'?"מס' המחאה":"מס' חשבונית"}</th></tr></thead>
+  <tbody>${importPreview.rows.slice(0,5).map(r=>{
+    const name=String(r[importMap.supplierName]||'').trim();
+    const amt=parse(r[importMap.amount]);
+    const num=String(r[importPreview.type==='checks'?importMap.checkNumber:importMap.invoiceNumber]||'');
+    return`<tr><td>${name||'<span style="color:var(--err)">חסר</span>'}</td><td style="font-size:12px;color:var(--mu2)">${fmtD(xlDate(r[importMap.date]))}</td><td class="mono" style="color:${amt?'var(--warn)':'var(--err)'}">${amt?fmt(amt):'חסר'}</td><td style="font-size:12px;color:var(--mu2)">${num||'—'}</td></tr>`;
+  }).join('')}</tbody>`;
+}
+function doImport(){
+  if(!importPreview)return;
+  const {type,rows}=importPreview;
+  const allSups=[...S.suppliers];
+  const getOrCreate=name=>{let s=allSups.find(x=>x.name===name);if(!s){s={id:uid(),name,paymentTerms:30,paymentMethod:'המחאה',notes:''};allSups.push(s);}return s;};
+  const parse=v=>parseFloat(String(v).replace(/[^0-9.-]/g,''))||0;
+  const prevLen=allSups.length;
+  if(type==='checks'){
+    const items=rows.map(r=>{const name=String(r[importMap.supplierName]||'').trim();if(!name)return null;const sup=getOrCreate(name);const amt=parse(r[importMap.amount]);if(!amt)return null;return{id:uid(),supplierName:name,supplierId:sup.id,date:xlDate(r[importMap.date]),amount:amt,checkNumber:String(r[importMap.checkNumber]||'')};}).filter(Boolean);
+    S.checks.push(...items);S.suppliers=allSups;save();
+    importMsg=`✅ יובאו ${items.length} המחאות${allSups.length>prevLen?` | ${allSups.length-prevLen} ספקים חדשים`:''}`;
+  }else{
+    const items=rows.map(r=>{const name=String(r[importMap.supplierName]||'').trim();if(!name)return null;const sup=getOrCreate(name);const amt=parse(r[importMap.amount]);if(!amt)return null;return{id:uid(),supplierName:name,supplierId:sup.id,date:xlDate(r[importMap.date]),amount:amt,invoiceNumber:String(r[importMap.invoiceNumber]||'')};}).filter(Boolean);
+    S.invoices.push(...items);S.suppliers=allSups;save();
+    importMsg=`✅ יובאו ${items.length} חשבוניות${allSups.length>prevLen?` | ${allSups.length-prevLen} ספקים חדשים`:''}`;
+  }
+  importPreview=null;renderImport();renderSidebar();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RECURRING
+// ═══════════════════════════════════════════════════════════════
+let recEditId=null;
+function renderRecurring(){
+  const pg=el('page-recurring');
+  const expenses=S.fixedItems.filter(f=>f.type==='expense');
+  const incomes=S.fixedItems.filter(f=>f.type==='income');
+  pg.innerHTML=`
+    <h1>הכנסות והוצאות קבועות</h1><div class="sub-title">פריטים חוזרים חודשיים או חד-פעמיים</div>
+    <div class="card" style="padding:18px;margin-bottom:18px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px">${recEditId?'✏ עריכה':'➕ הוסף פריט'}</div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:11px;margin-bottom:11px">
+        <div><label>שם</label><input id="rf-name" placeholder="שם ההוצאה/הכנסה"></div>
+        <div><label>סכום (₪)</label><input id="rf-amount" type="number" placeholder="0"></div>
+        <div><label>סוג</label><select id="rf-type"><option value="expense">הוצאה</option><option value="income">הכנסה</option></select></div>
+        <div><label>תדירות</label><select id="rf-rec" onchange="renderRecurring()"><option value="monthly">חודשי</option><option value="once">חד-פעמי</option></select></div>
+        <div id="rf-day-wrap"><label>יום בחודש</label><input id="rf-day" type="number" min="1" max="28" value="1"></div>
+      </div>
+      <div style="display:flex;gap:7px">
+        <button class="bp" onclick="saveRec()">${recEditId?'עדכן':'הוסף'}</button>
+        ${recEditId?'<button class="bg" onclick="recEditId=null;renderRecurring()">ביטול</button>':''}
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:16px">
+      <div class="card" style="padding:13px 16px"><div style="font-size:11px;color:var(--mu2);margin-bottom:3px">סה"כ הוצאות / חודש</div><div class="mono" style="font-size:17px;font-weight:700;color:var(--err)">${fmt(expenses.reduce((s,f)=>s+(f.amount||0),0))}</div></div>
+      <div class="card" style="padding:13px 16px"><div style="font-size:11px;color:var(--mu2);margin-bottom:3px">סה"כ הכנסות / חודש</div><div class="mono" style="font-size:17px;font-weight:700;color:var(--ok)">${fmt(incomes.reduce((s,f)=>s+(f.amount||0),0))}</div></div>
+    </div>
+    ${[['🔴 הוצאות קבועות',expenses,'var(--err)'],['🟢 הכנסות קבועות',incomes,'var(--ok)']].map(([title,items,col])=>`
+    <div class="card" style="overflow:hidden;margin-bottom:13px">
+      <div class="section-title">${title}</div>
+      <table><thead><tr><th>שם</th><th>סכום</th><th>תדירות</th><th>יום / תאריך</th><th>פעולות</th></tr></thead><tbody>
+        ${items.map(fi=>`<tr>
+          <td style="font-weight:600">${fi.name}</td>
+          <td class="mono" style="color:${col};font-weight:700">${fmt(fi.amount)}</td>
+          <td style="font-size:12px;color:var(--mu2)">${fi.recurrence==='monthly'?'חודשי':'חד-פעמי'}</td>
+          <td style="font-size:12px;color:var(--mu2)">${fi.recurrence==='monthly'?`יום ${fi.dayOfMonth}`:fmtD(fi.date)}</td>
+          <td><div style="display:flex;gap:5px">
+            <button class="bg" style="padding:3px 8px;font-size:11px" onclick="editRec('${fi.id}')">עריכה</button>
+            <button class="bd" style="padding:3px 8px;font-size:11px" onclick="if(confirm('למחוק?')){S.fixedItems=S.fixedItems.filter(x=>x.id!=='${fi.id}');save();renderRecurring();}">מחק</button>
+          </div></td>
+        </tr>`).join('')}
+        ${items.length===0?'<tr><td colspan="5" class="empty">אין פריטים</td></tr>':''}
+      </tbody></table>
+    </div>`).join('')}
+  `;
+  if(recEditId){
+    const fi=S.fixedItems.find(x=>x.id===recEditId);
+    if(fi){
+      el('rf-name').value=fi.name||'';el('rf-amount').value=fi.amount||'';
+      el('rf-type').value=fi.type||'expense';el('rf-rec').value=fi.recurrence||'monthly';
+      if(fi.recurrence==='once'){el('rf-day-wrap').innerHTML='<label>תאריך</label><input id="rf-day" type="date">';el('rf-day').value=fi.date||'';}
+      else el('rf-day').value=fi.dayOfMonth||1;
+    }
+  }
+  el('rf-rec').addEventListener('change',function(){
+    const w=el('rf-day-wrap');
+    if(this.value==='once'){w.innerHTML='<label>תאריך</label><input id="rf-day" type="date">';}
+    else{w.innerHTML='<label>יום בחודש</label><input id="rf-day" type="number" min="1" max="28" value="1">';}
+  });
+}
+function saveRec(){
+  const name=el('rf-name').value.trim();const amount=parseFloat(el('rf-amount').value)||0;
+  if(!name||!amount)return;
+  const rec=el('rf-rec').value;
+  const item={name,amount,type:el('rf-type').value,recurrence:rec,id:recEditId||uid()};
+  if(rec==='monthly')item.dayOfMonth=parseInt(el('rf-day').value)||1;
+  else item.date=el('rf-day').value||'';
+  if(recEditId)S.fixedItems=S.fixedItems.map(x=>x.id===recEditId?item:x);
+  else S.fixedItems.push(item);
+  recEditId=null;save();renderRecurring();renderSidebar();
+}
+function editRec(id){recEditId=id;renderRecurring();}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDERS MAP
+// ═══════════════════════════════════════════════════════════════
+const renders = {
+  dashboard: renderDashboard,
+  forecast:  renderForecast,
+  suppliers: renderSuppliers,
+  ledger:    renderLedger,
+  aging:     renderAging,
+  import:    renderImport,
+  recurring: renderRecurring,
+};
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+renderSidebar();
+navigate('dashboard');
 </script>
 </body>
 </html>
