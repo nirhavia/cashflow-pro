@@ -157,7 +157,19 @@ function xlDate(v) {
   if (!v) return '';
   if (v instanceof Date) return toISO(v);
   if (typeof v === 'number') return toISO(new Date(Math.round((v-25569)*86400000)));
-  return toISO(new Date(v));
+  if (typeof v === 'string') {
+    var ilMatch = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+    if (ilMatch) {
+      var day = parseInt(ilMatch[1], 10);
+      var mon = parseInt(ilMatch[2], 10) - 1;
+      var yr  = parseInt(ilMatch[3], 10);
+      if (yr < 100) yr += 2000;
+      return toISO(new Date(yr, mon, day));
+    }
+    var d2 = new Date(v);
+    if (!isNaN(d2)) return toISO(d2);
+  }
+  return '';
 }
 function typeLabel(t) {
   return {check:'המחאה',invoice:'חשבונית',income:'הכנסה',fixed:'הוצאה קבועה'}[t] || t;
