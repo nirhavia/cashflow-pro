@@ -154,19 +154,28 @@ function eom(d) {
   var dt = new Date(d); return new Date(dt.getFullYear(), dt.getMonth()+1, 0);
 }
 function xlDate(v) {
-  if (!v) return '';
+  if (!v && v !== 0) return '';
   if (v instanceof Date) return toISO(v);
-  if (typeof v === 'number') return toISO(new Date(Math.round((v-25569)*86400000)));
+  if (typeof v === 'number') {
+    // Excel serial: only convert if plausible date (> 1900)
+    if (v > 1) return toISO(new Date(Math.round((v-25569)*86400000)));
+    return '';
+  }
   if (typeof v === 'string') {
-    var ilMatch = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+    var s = v.trim();
+    if (!s) return '';
+    // פורמט ישראלי: DD/M/YY או DD/MM/YYYY
+    var ilMatch = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
     if (ilMatch) {
       var day = parseInt(ilMatch[1], 10);
       var mon = parseInt(ilMatch[2], 10) - 1;
       var yr  = parseInt(ilMatch[3], 10);
       if (yr < 100) yr += 2000;
-      return toISO(new Date(yr, mon, day));
+      var d = new Date(yr, mon, day);
+      if (!isNaN(d)) return toISO(d);
     }
-    var d2 = new Date(v);
+    // ISO or other standard formats
+    var d2 = new Date(s);
     if (!isNaN(d2)) return toISO(d2);
   }
   return '';
@@ -748,8 +757,8 @@ function parseXL(file, type) {
     var rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {defval:''});
     var cols = rows.length ? Object.keys(rows[0]) : [];
     importMap = type==='checks'
-      ? {supplierName:detect(cols,'ספק','שם','supplier','name'), date:detect(cols,'תאריך','date'), amount:detect(cols,'סכום','amount','סה'), checkNumber:detect(cols,'המחאה','check','מספר','num')}
-      : {supplierName:detect(cols,'ספק','שם','supplier','name'), date:detect(cols,'תאריך','date'), amount:detect(cols,'סכום','amount','סה'), invoiceNumber:detect(cols,'חשבונית','invoice','מספר','num')};
+      ? {supplierName:detect(cols,'ספק','שם','supplier','name'), date:detect(cols,'תאריך','date','פרעון','ת.פ','ת. פ'), amount:detect(cols,'סכום','amount','סה'), checkNumber:detect(cols,'המחאה','check','מספר','num')}
+      : {supplierName:detect(cols,'ספק','שם','supplier','name'), date:detect(cols,'תאריך','date','פרעון'), amount:detect(cols,'סכום','amount','סה'), invoiceNumber:detect(cols,'חשבונית','invoice','מספר','num')};
     importPreview = {type:type, rows:rows, cols:cols};
     importMsg = '';
     renderImport();
