@@ -125,6 +125,11 @@ var S = {
   ledgerSup:  null,
   agingSup:   'all'
 };
+function clearAllImported() {
+  if (confirm('למחוק את כל ההמחאות והחשבוניות המיובאות?')) {
+    S.checks = []; S.invoices = []; save(); renderImport(); renderSidebar();
+  }
+}
 function save() {
   localStorage.setItem('cf-sup', JSON.stringify(S.suppliers));
   localStorage.setItem('cf-chk', JSON.stringify(S.checks));
@@ -696,6 +701,7 @@ function renderImport() {
   var pg = el('page-import');
   var msgHtml = importMsg ? '<div class="success-msg">' + importMsg + '</div>' : '';
   var currentData =
+    '<div style="margin-bottom:12px;text-align:center"><button class="bd" style="font-size:13px;padding:7px 18px" onclick="clearAllImported()">נקה את כל הנתונים המיובאים</button></div>' +
     '<div class="g2"><div class="card" style="padding:14px 16px">' +
     '<div style="font-size:12px;color:var(--mu2);margin-bottom:6px">המחאות מיובאות</div>' +
     '<div class="mono" style="font-size:18px;font-weight:700;color:var(--inf)">' + S.checks.length + '</div>' +
@@ -746,7 +752,7 @@ function detect(cols) {
     var f = cols.find(function(col){return col.toLowerCase().includes(cands[i]);});
     if (f) return f;
   }
-  return cols[0]||'';
+  return ''; // אל תחזור לעמודה ראשונה אם לא נמצא התאם
 }
 function dzDrop(e, type) { e.preventDefault(); e.currentTarget.classList.remove('drag'); var f = e.dataTransfer.files[0]; if (f) parseXL(f, type); }
 function fileImport(input, type) { if (input.files[0]) parseXL(input.files[0], type); }
@@ -757,8 +763,8 @@ function parseXL(file, type) {
     var rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {defval:''});
     var cols = rows.length ? Object.keys(rows[0]) : [];
     importMap = type==='checks'
-      ? {supplierName:detect(cols,'ספק','שם','supplier','name'), date:detect(cols,'תאריך','date','פרעון','ת.פ','ת. פ'), amount:detect(cols,'סכום','amount','סה'), checkNumber:detect(cols,'המחאה','check','מספר','num')}
-      : {supplierName:detect(cols,'ספק','שם','supplier','name'), date:detect(cols,'תאריך','date','פרעון'), amount:detect(cols,'סכום','amount','סה'), invoiceNumber:detect(cols,'חשבונית','invoice','מספר','num')};
+      ? {supplierName:detect(cols,'מוטב','ספק','שם','supplier','name'), date:detect(cols,'פרעון','ת. פ','תאריך','date'), amount:detect(cols,'סכום','amount'), checkNumber:detect(cols,'המחאה','check','מספר','num')}
+      : {supplierName:detect(cols,'ספק','שם','supplier','name'), date:detect(cols,'תאריך','date','פרעון'), amount:detect(cols,'סכום','amount'), invoiceNumber:detect(cols,'חשבונית','invoice','מספר','num')};
     importPreview = {type:type, rows:rows, cols:cols};
     importMsg = '';
     renderImport();
@@ -789,11 +795,11 @@ function doImport() {
   var parse = function(v){return parseFloat(String(v).replace(/[^0-9.-]/g,''))||0;};
   var prevLen = allSups.length;
   if (type==='checks') {
-    var items = rows.map(function(r){ var name=String(r[importMap.supplierName]||'').trim(); if(!name)return null; var sup=getOrCreate(name); var amt=parse(r[importMap.amount]); if(!amt)return null; return {id:uid(),supplierName:name,supplierId:sup.id,date:xlDate(r[importMap.date]),amount:amt,checkNumber:String(r[importMap.checkNumber]||'')}; }).filter(Boolean);
+    var items = rows.map(function(r){ var name=String(r[importMap.supplierName]||'').trim(); if(!name)return null; var sup=getOrCreate(name); var amt=parse(r[importMap.amount]||0); if(!amt)return null; var chkNum = importMap.checkNumber ? String(r[importMap.checkNumber]||'') : ''; return {id:uid(),supplierName:name,supplierId:sup.id,date:xlDate(r[importMap.date]),amount:amt,checkNumber:chkNum}; }).filter(Boolean);
     S.checks = S.checks.concat(items); S.suppliers = allSups; save();
     importMsg = 'יובאו ' + items.length + ' המחאות' + (allSups.length>prevLen?' | '+( allSups.length-prevLen)+' ספקים חדשים':'');
   } else {
-    var items2 = rows.map(function(r){ var name=String(r[importMap.supplierName]||'').trim(); if(!name)return null; var sup=getOrCreate(name); var amt=parse(r[importMap.amount]); if(!amt)return null; return {id:uid(),supplierName:name,supplierId:sup.id,date:xlDate(r[importMap.date]),amount:amt,invoiceNumber:String(r[importMap.invoiceNumber]||'')}; }).filter(Boolean);
+    var items2 = rows.map(function(r){ var name=String(r[importMap.supplierName]||'').trim(); if(!name)return null; var sup=getOrCreate(name); var amt=parse(r[importMap.amount]||0); if(!amt)return null; var invNum = importMap.invoiceNumber ? String(r[importMap.invoiceNumber]||'') : ''; return {id:uid(),supplierName:name,supplierId:sup.id,date:xlDate(r[importMap.date]),amount:amt,invoiceNumber:invNum}; }).filter(Boolean);
     S.invoices = S.invoices.concat(items2); S.suppliers = allSups; save();
     importMsg = 'יובאו ' + items2.length + ' חשבוניות' + (allSups.length>prevLen?' | '+(allSups.length-prevLen)+' ספקים חדשים':'');
   }
