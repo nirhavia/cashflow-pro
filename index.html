@@ -158,13 +158,9 @@ function addDays(d, n) {
 function eom(d) {
   var dt = new Date(d); return new Date(dt.getFullYear(), dt.getMonth()+1, 0);
 }
-var importDateOrder = 'DMY';
-
 function xlDate(v) {
   if (!v && v !== 0) return '';
-  // Date object (XLSX.js cellDates:true)
   if (v instanceof Date) return toISO(v);
-  // Excel serial number
   if (typeof v === 'number') {
     if (v > 1) return toISO(new Date(Math.round((v-25569)*86400000)));
     return '';
@@ -172,30 +168,23 @@ function xlDate(v) {
   if (typeof v === 'string') {
     var s = v.trim();
     if (!s) return '';
-    // ISO YYYY-MM-DD (returned by XLSX.js with dateNF:'yyyy-mm-dd')
+    // ISO YYYY-MM-DD (XLSX.js with dateNF returns this for date cells)
     if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
-      var iso = new Date(s + 'T00:00:00');
-      if (!isNaN(iso)) return toISO(iso);
+      var iso = new Date(s + 'T12:00:00');
+      if (!isNaN(iso) && iso.getFullYear() > 1900) return toISO(iso);
     }
-    // סלאש D/M/Y (ישראלי) או M/D/Y (אמריקאי) — לתאי טקסט בלבד
-    var slashMatch = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
-    if (slashMatch) {
-      var a = parseInt(slashMatch[1], 10);
-      var b = parseInt(slashMatch[2], 10);
-      var yr = parseInt(slashMatch[3], 10);
+    // ישראלי DD/M/YY
+    var ilMatch = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+    if (ilMatch) {
+      var day = parseInt(ilMatch[1], 10);
+      var mon = parseInt(ilMatch[2], 10) - 1;
+      var yr  = parseInt(ilMatch[3], 10);
       if (yr < 100) yr += 2000;
-      var day, mon;
-      if (importDateOrder === 'DMY') { day = a; mon = b - 1; }
-      else                           { mon = a - 1; day = b; }
       var d = new Date(yr, mon, day);
       if (!isNaN(d) && d.getFullYear() > 1900) return toISO(d);
     }
-    // DD-MM-YYYY
-    var dashMatch = s.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
-    if (dashMatch) {
-      var dd = new Date(parseInt(dashMatch[3]), parseInt(dashMatch[2])-1, parseInt(dashMatch[1]));
-      if (!isNaN(dd)) return toISO(dd);
-    }
+    var d2 = new Date(s);
+    if (!isNaN(d2) && d2.getFullYear() > 1900) return toISO(d2);
   }
   return '';
 }
@@ -541,43 +530,6 @@ function saveManualCheck() {
 function editCheck(id) { openAddCheck(id); }
 function delCheck(id) { if (confirm('למחוק המחאה זו?')) { S.checks = S.checks.filter(function(x){return x.id!==id;}); save(); renderLedger(); renderSidebar(); } }
 
-// ── Manual invoice add/edit ──────────────────────────────────────────────────
-var invEditId = null;
-function openAddInvoice(editId) {
-  invEditId = editId || null;
-  var c = editId ? S.invoices.find(function(x){return x.id===editId;}) : null;
-  var supOptions = S.suppliers.map(function(s) {
-    return '<option value="' + s.id + '"' + (c&&c.supplierId===s.id?' selected':'') + '>' + s.name + '</option>';
-  }).join('');
-  openModal(c ? 'עריכת חשבונית' : 'הוספת חשבונית ידנית',
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">' +
-    '<div><label>ספק *</label><select id="inv-sup"><option value="">— בחר ספק —</option>' + supOptions + '</select></div>' +
-    '<div><label>תאריך חשבונית *</label><input type="date" id="inv-date" value="' + (c?c.date:'') + '"></div>' +
-    '<div><label>סכום (&#8362;) *</label><input type="number" id="inv-amount" placeholder="0" value="' + (c?c.amount:'') + '"></div>' +
-    '<div><label>מס׳ חשבונית</label><input id="inv-num" placeholder="מספר חשבונית" value="' + (c?c.invoiceNumber||'':'') + '"></div>' +
-    '</div>' +
-    '<div style="display:flex;gap:8px">' +
-    '<button class="bp" onclick="saveManualInvoice()">' + (c?'עדכן':'הוסף חשבונית') + '</button>' +
-    '<button class="bg" onclick="closeModal()">ביטול</button></div>'
-  );
-}
-function saveManualInvoice() {
-  var supId = el('inv-sup').value;
-  var sup = S.suppliers.find(function(s){return s.id===supId;});
-  var date = el('inv-date').value;
-  var amount = parseFloat(el('inv-amount').value)||0;
-  var invoiceNumber = el('inv-num').value.trim();
-  if (!sup || !date || !amount) { alert('יש למלא ספק, תאריך וסכום'); return; }
-  if (invEditId) {
-    S.invoices = S.invoices.map(function(x){ return x.id===invEditId ? {id:x.id,supplierName:sup.name,supplierId:sup.id,date:date,amount:amount,invoiceNumber:invoiceNumber} : x; });
-  } else {
-    S.invoices.push({id:uid(), supplierName:sup.name, supplierId:sup.id, date:date, amount:amount, invoiceNumber:invoiceNumber});
-  }
-  save(); closeModal(); navigate(S.activeTab);
-}
-function editInvoice(id) { openAddInvoice(id); }
-function delInvoice(id) { if (confirm('למחוק חשבונית זו?')) { S.invoices = S.invoices.filter(function(x){return x.id!==id;}); save(); renderLedger(); renderSidebar(); } }
-
 // ── Ledger ────────────────────────────────────────────────────────────────────
 function renderLedger() {
   var pg = el('page-ledger');
@@ -611,11 +563,7 @@ function renderLedger() {
     var late = pay && pay < today;
     var docNum = isInv ? (r.invoiceNumber||'—') : (r.checkNumber||'—');
     var payInfo = (isInv && pay) ? '<div style="font-size:10px;color:' + (late?'var(--err)':'var(--mu2)') + '">לתשלום: ' + fmtD(pay) + (late?' &#9888;':'') + '</div>' : '';
-        var editBtn = '<button class=\"bg\" style=\"padding:2px 7px;font-size:11px\"';
-    var delBtn  = '<button class=\"bd\" style=\"padding:2px 7px;font-size:11px\"';
-    var actions = isInv
-      ? '<div style=\"display:flex;gap:4px\">' + editBtn + ' onclick=\"editInvoice(\\'' + r.id + '\\')\">עריכה</button>' + delBtn + ' onclick=\"delInvoice(\\'' + r.id + '\\')\">מחק</button></div>'
-      : '<div style=\"display:flex;gap:4px\">' + editBtn + ' onclick=\"editCheck(\\'' + r.id + '\\')\">עריכה</button>' + delBtn + ' onclick=\"delCheck(\\'' + r.id + '\\')\">מחק</button></div>';
+    var actions = isInv ? '' : '<div style="display:flex;gap:4px"><button class="bg" style="padding:2px 7px;font-size:11px" onclick="editCheck(\'' + r.id + '\')">עריכה</button><button class="bd" style="padding:2px 7px;font-size:11px" onclick="delCheck(\'' + r.id + '\')">מחק</button></div>';
     return '<tr>' +
       '<td style="font-size:12px;color:var(--mu2);white-space:nowrap">' + fmtD(r.sortDate) + '</td>' +
       '<td><span class="tag ' + (isInv?'t-invoice':'t-check') + '">' + (isInv?'חשבונית':'המחאה') + '</span></td>' +
@@ -634,7 +582,6 @@ function renderLedger() {
     '<h1>כרטסת ספק</h1>' +
     '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">' + supSel +
     '<button class="bp" style="font-size:12px;padding:6px 12px" onclick="openAddCheck()">+ הוסף המחאה</button>' +
-    '<button class="bg" style="font-size:12px;padding:6px 12px" onclick="openAddInvoice()">+ הוסף חשבונית</button>' +
     '<button class="bg" style="font-size:12px;padding:6px 12px" onclick="printLedger()">הדפסה</button></div>' +
     '<div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:18px">' + summary + '</div>' +
     '<div class="card" style="overflow:hidden" id="ledger-tbl">' +
@@ -772,11 +719,6 @@ function renderImport() {
 
   if (!importPreview) {
     pg.innerHTML = '<h1>יבוא נתונים מאקסל</h1><div class="sub-title">העלה קבצי Excel</div>' + msgHtml +
-      '<div class="card" style="padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">' +
-      '<span style="font-size:13px;font-weight:600;color:var(--mu2)">פורמט תאריך:</span>' +
-      '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="radio" name="dorder" value="DMY" checked onchange="importDateOrder=this.value"> יום/חודש/שנה (ישראלי: 19/3/25)</label>' +
-      '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px"><input type="radio" name="dorder" value="MDY" onchange="importDateOrder=this.value"> חודש/יום/שנה (אמריקאי: 3/19/25)</label>' +
-      '</div>' +
       '<div class="g2" style="margin-bottom:20px">' +
       dropZone('המחאות','checks') + dropZone('חשבוניות','invoices') + '</div>' + currentData;
     return;
