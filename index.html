@@ -158,12 +158,13 @@ function addDays(d, n) {
 function eom(d) {
   var dt = new Date(d); return new Date(dt.getFullYear(), dt.getMonth()+1, 0);
 }
-// dateOrder: 'DMY' = ישראלי (DD/MM/YY), 'MDY' = אמריקאי (MM/DD/YY)
 var importDateOrder = 'DMY';
 
 function xlDate(v) {
   if (!v && v !== 0) return '';
+  // Date object (XLSX.js cellDates:true)
   if (v instanceof Date) return toISO(v);
+  // Excel serial number
   if (typeof v === 'number') {
     if (v > 1) return toISO(new Date(Math.round((v-25569)*86400000)));
     return '';
@@ -171,7 +172,12 @@ function xlDate(v) {
   if (typeof v === 'string') {
     var s = v.trim();
     if (!s) return '';
-    // פורמט עם סלאש: D/M/Y או M/D/Y
+    // ISO YYYY-MM-DD (returned by XLSX.js with dateNF:'yyyy-mm-dd')
+    if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+      var iso = new Date(s + 'T00:00:00');
+      if (!isNaN(iso)) return toISO(iso);
+    }
+    // סלאש D/M/Y (ישראלי) או M/D/Y (אמריקאי) — לתאי טקסט בלבד
     var slashMatch = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
     if (slashMatch) {
       var a = parseInt(slashMatch[1], 10);
@@ -179,28 +185,16 @@ function xlDate(v) {
       var yr = parseInt(slashMatch[3], 10);
       if (yr < 100) yr += 2000;
       var day, mon;
-      if (importDateOrder === 'DMY') {
-        day = a; mon = b - 1; // ישראלי: DD/MM
-      } else {
-        mon = a - 1; day = b; // אמריקאי: MM/DD
-      }
+      if (importDateOrder === 'DMY') { day = a; mon = b - 1; }
+      else                           { mon = a - 1; day = b; }
       var d = new Date(yr, mon, day);
       if (!isNaN(d) && d.getFullYear() > 1900) return toISO(d);
     }
-    // פורמט עם מקף: DD-MM-YYYY
-    var dashMatch = s.match(/^(\d{1,2})-(\d{1,2})-(\d{2,4})$/);
+    // DD-MM-YYYY
+    var dashMatch = s.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
     if (dashMatch) {
-      var da = parseInt(dashMatch[1], 10);
-      var db = parseInt(dashMatch[2], 10) - 1;
-      var dy = parseInt(dashMatch[3], 10);
-      if (dy < 100) dy += 2000;
-      var dd = new Date(dy, db, da);
+      var dd = new Date(parseInt(dashMatch[3]), parseInt(dashMatch[2])-1, parseInt(dashMatch[1]));
       if (!isNaN(dd)) return toISO(dd);
-    }
-    // ISO format: YYYY-MM-DD
-    if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
-      var d3 = new Date(s);
-      if (!isNaN(d3)) return toISO(d3);
     }
   }
   return '';
@@ -826,8 +820,8 @@ function fileImport(input, type) { if (input.files[0]) parseXL(input.files[0], t
 function parseXL(file, type) {
   var r = new FileReader();
   r.onload = function(e) {
-    var wb = XLSX.read(new Uint8Array(e.target.result), {type:'array', cellDates:true});
-    var rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {defval:''});
+    var wb = XLSX.read(new Uint8Array(e.target.result), {type:'array', cellDates:true, dateNF:'yyyy-mm-dd'});
+    var rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {defval:'', raw:false, dateNF:'yyyy-mm-dd'});
     var cols = rows.length ? Object.keys(rows[0]) : [];
     importMap = type==='checks'
       ? {supplierName:detect(cols,'מוטב','ספק','שם','supplier','name'), date:detect(cols,'פרעון','ת. פ','תאריך','date'), amount:detect(cols,'סכום','amount'), checkNumber:detect(cols,'המחאה','check','מספר','num')}
