@@ -145,7 +145,15 @@ function fmt(n) {
   return new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS',minimumFractionDigits:0,maximumFractionDigits:0}).format(n||0);
 }
 function fmtD(d) {
-  return d ? new Date(d).toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
+  if (!d) return '—';
+  var dt;
+  if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+    var p = d.split('-');
+    dt = new Date(+p[0], +p[1]-1, +p[2]); // local midnight — no UTC timezone issue
+  } else {
+    dt = d instanceof Date ? d : new Date(d);
+  }
+  return isNaN(dt) ? '—' : dt.toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric'});
 }
 function toISO(d) {
   if (!d) return '';
@@ -509,7 +517,7 @@ function openAddCheck(editId) {
   openModal(c ? 'עריכת המחאה' : 'הוספת המחאה',
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">' +
     '<div><label>ספק *</label><select id="chk-sup"><option value="">— בחר ספק —</option>' + supOptions + '</select></div>' +
-    '<div><label>תאריך *</label><input type="date" id="chk-date" value="' + (c?c.date:'') + '"></div>' +
+    '<div><label>תאריך *</label><input type="date" id="chk-date" value="' + (c?c.date:'') + '" oninput="document.getElementById(\'chk-date-lbl\').textContent=fmtD(this.value)"><div id="chk-date-lbl" style="font-size:11px;color:var(--gold);margin-top:3px">' + (c?fmtD(c.date):'') + '</div></div>' +
     '<div><label>סכום (&#8362;) *</label><input type="number" id="chk-amount" placeholder="0" value="' + (c?c.amount:'') + '"></div>' +
     '<div><label>מס׳ המחאה</label><input id="chk-num" placeholder="מספר המחאה" value="' + (c?c.checkNumber||'':'') + '"></div></div>' +
     '<div style="display:flex;gap:8px">' +
@@ -546,7 +554,7 @@ function openAddInvoice(editId) {
   openModal(c ? 'עריכת חשבונית' : 'הוספת חשבונית',
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">' +
     '<div><label>ספק *</label><select id="inv-sup"><option value="">— בחר ספק —</option>' + supOptions + '</select></div>' +
-    '<div><label>תאריך חשבונית *</label><input type="date" id="inv-date" value="' + (c?c.date:'') + '"></div>' +
+    '<div><label>תאריך חשבונית *</label><input type="date" id="inv-date" value="' + (c?c.date:'') + '" oninput="document.getElementById(\'inv-date-lbl\').textContent=fmtD(this.value)"><div id="inv-date-lbl" style="font-size:11px;color:var(--gold);margin-top:3px">' + (c?fmtD(c.date):'') + '</div></div>' +
     '<div><label>סכום (&#8362;) *</label><input type="number" id="inv-amount" placeholder="0" value="' + (c?c.amount:'') + '"></div>' +
     '<div><label>מס׳ חשבונית</label><input id="inv-num" placeholder="מספר חשבונית" value="' + (c?c.invoiceNumber||'':'') + '"></div>' +
     '</div>' +
