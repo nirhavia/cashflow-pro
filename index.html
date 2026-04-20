@@ -150,7 +150,11 @@ function fmtD(d) {
 function toISO(d) {
   if (!d) return '';
   var dt = d instanceof Date ? d : new Date(d);
-  return isNaN(dt) ? '' : dt.toISOString().split('T')[0];
+  if (isNaN(dt)) return '';
+  var y = dt.getFullYear();
+  var m = String(dt.getMonth()+1).padStart(2,'0');
+  var day = String(dt.getDate()).padStart(2,'0');
+  return y + '-' + m + '-' + day;
 }
 function addDays(d, n) {
   var r = new Date(d); r.setDate(r.getDate() + n); return r;
@@ -530,6 +534,46 @@ function saveManualCheck() {
 function editCheck(id) { openAddCheck(id); }
 function delCheck(id) { if (confirm('למחוק המחאה זו?')) { S.checks = S.checks.filter(function(x){return x.id!==id;}); save(); renderLedger(); renderSidebar(); } }
 
+var invEditId = null;
+function openAddInvoice(editId) {
+  invEditId = editId || null;
+  var c = editId ? S.invoices.find(function(x){return x.id===editId;}) : null;
+  var sid = S.ledgerSup || '';
+  var supOptions = S.suppliers.map(function(s) {
+    var sel = (c && c.supplierId===s.id) || (!c && s.id===sid) ? ' selected' : '';
+    return '<option value="' + s.id + '"' + sel + '>' + s.name + '</option>';
+  }).join('');
+  openModal(c ? 'עריכת חשבונית' : 'הוספת חשבונית',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">' +
+    '<div><label>ספק *</label><select id="inv-sup"><option value="">— בחר ספק —</option>' + supOptions + '</select></div>' +
+    '<div><label>תאריך חשבונית *</label><input type="date" id="inv-date" value="' + (c?c.date:'') + '"></div>' +
+    '<div><label>סכום (&#8362;) *</label><input type="number" id="inv-amount" placeholder="0" value="' + (c?c.amount:'') + '"></div>' +
+    '<div><label>מס׳ חשבונית</label><input id="inv-num" placeholder="מספר חשבונית" value="' + (c?c.invoiceNumber||'':'') + '"></div>' +
+    '</div>' +
+    '<div style="display:flex;gap:8px">' +
+    '<button class="bp" onclick="saveManualInvoice()">' + (c?'עדכן':'הוסף חשבונית') + '</button>' +
+    '<button class="bg" onclick="closeModal()">ביטול</button></div>'
+  );
+}
+function saveManualInvoice() {
+  var supId = el('inv-sup').value;
+  var sup = S.suppliers.find(function(s){return s.id===supId;});
+  var date = el('inv-date').value;
+  var amount = parseFloat(el('inv-amount').value)||0;
+  var invoiceNumber = el('inv-num').value.trim();
+  if (!sup || !date || !amount) { alert('יש למלא ספק, תאריך וסכום'); return; }
+  if (invEditId) {
+    S.invoices = S.invoices.map(function(x){
+      return x.id===invEditId ? {id:x.id,supplierName:sup.name,supplierId:sup.id,date:date,amount:amount,invoiceNumber:invoiceNumber} : x;
+    });
+  } else {
+    S.invoices.push({id:uid(),supplierName:sup.name,supplierId:sup.id,date:date,amount:amount,invoiceNumber:invoiceNumber});
+  }
+  save(); closeModal(); navigate(S.activeTab);
+}
+function editInvoice(id) { openAddInvoice(id); }
+function delInvoice(id) { if (confirm('למחוק חשבונית זו?')) { S.invoices = S.invoices.filter(function(x){return x.id!==id;}); save(); renderLedger(); renderSidebar(); } }
+
 // ── Ledger ────────────────────────────────────────────────────────────────────
 function renderLedger() {
   var pg = el('page-ledger');
@@ -563,7 +607,10 @@ function renderLedger() {
     var late = pay && pay < today;
     var docNum = isInv ? (r.invoiceNumber||'—') : (r.checkNumber||'—');
     var payInfo = (isInv && pay) ? '<div style="font-size:10px;color:' + (late?'var(--err)':'var(--mu2)') + '">לתשלום: ' + fmtD(pay) + (late?' &#9888;':'') + '</div>' : '';
-    var actions = isInv ? '' : '<div style="display:flex;gap:4px"><button class="bg" style="padding:2px 7px;font-size:11px" onclick="editCheck(\'' + r.id + '\')">עריכה</button><button class="bd" style="padding:2px 7px;font-size:11px" onclick="delCheck(\'' + r.id + '\')">מחק</button></div>';
+        var editBt = '<button class="bg" style="padding:2px 7px;font-size:11px"'; var delBt = '<button class="bd" style="padding:2px 7px;font-size:11px"';
+    var actions = isInv
+      ? '<div style="display:flex;gap:4px">' + editBt + ' onclick="editInvoice(\'' + r.id + '\')">עריכה</button>' + delBt + ' onclick="delInvoice(\'' + r.id + '\')">מחק</button></div>'
+      : '<div style="display:flex;gap:4px">' + editBt + ' onclick="editCheck(\'' + r.id + '\')">עריכה</button>' + delBt + ' onclick="delCheck(\'' + r.id + '\')">מחק</button></div>';
     return '<tr>' +
       '<td style="font-size:12px;color:var(--mu2);white-space:nowrap">' + fmtD(r.sortDate) + '</td>' +
       '<td><span class="tag ' + (isInv?'t-invoice':'t-check') + '">' + (isInv?'חשבונית':'המחאה') + '</span></td>' +
@@ -582,6 +629,7 @@ function renderLedger() {
     '<h1>כרטסת ספק</h1>' +
     '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">' + supSel +
     '<button class="bp" style="font-size:12px;padding:6px 12px" onclick="openAddCheck()">+ הוסף המחאה</button>' +
+    '<button class="bg" style="font-size:12px;padding:6px 12px" onclick="openAddInvoice()">+ הוסף חשבונית</button>' +
     '<button class="bg" style="font-size:12px;padding:6px 12px" onclick="printLedger()">הדפסה</button></div>' +
     '<div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:18px">' + summary + '</div>' +
     '<div class="card" style="overflow:hidden" id="ledger-tbl">' +
