@@ -758,7 +758,22 @@ function printAgingLedger() {
 var importMsg = '', importPreview = null, importMap = {};
 function renderImport() {
   var pg = el('page-import');
+  var exportSection =
+    '<div class="card" style="padding:14px 18px;margin-bottom:16px">' +
+    '<div style="font-size:14px;font-weight:700;margin-bottom:12px">&#128229; ייצוא לאקסל</div>' +
+    '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+    '<button class="bg" onclick="exportToExcel(this)" data-type="checks" style="font-size:13px;padding:8px 16px">ייצא המחאות (' + S.checks.length + ')</button>' +
+    '<button class="bg" onclick="exportToExcel(this)" data-type="invoices" style="font-size:13px;padding:8px 16px">ייצא חשבוניות (' + S.invoices.length + ')</button>' +
+    '</div></div>';
   var msgHtml = importMsg ? '<div class="success-msg">' + importMsg + '</div>' : '';
+  var exportSection =
+    '<div class="card" style="padding:14px 18px;margin-bottom:16px">' +
+    '<div style="font-size:14px;font-weight:700;margin-bottom:12px">&#128229; ייצוא לאקסל</div>' +
+    '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+    '<button class="bg" onclick="exportToExcel(this)" data-type="checks" style="font-size:13px;padding:8px 16px">ייצא המחאות (' + S.checks.length + ')</button>' +
+    '<button class="bg" onclick="exportToExcel(this)" data-type="invoices" style="font-size:13px;padding:8px 16px">ייצא חשבוניות (' + S.invoices.length + ')</button>' +
+    '</div></div>';
+
   var currentData =
     '<div style="margin-bottom:12px;text-align:center"><button class="bd" style="font-size:13px;padding:7px 18px" onclick="clearAllImported()">נקה את כל הנתונים המיובאים</button></div>' +
     '<div class="g2"><div class="card" style="padding:14px 16px">' +
@@ -774,7 +789,8 @@ function renderImport() {
     '</div></div>';
 
   if (!importPreview) {
-    pg.innerHTML = '<h1>יבוא נתונים מאקסל</h1><div class="sub-title">העלה קבצי Excel</div>' + msgHtml +
+    pg.innerHTML = '<h1>יבוא וייצוא נתונים</h1><div class="sub-title">ייבא מאקסל או ייצא נתונים קיימים</div>' + msgHtml +
+      exportSection +
       '<div class="g2" style="margin-bottom:20px">' +
       dropZone('המחאות','checks') + dropZone('חשבוניות','invoices') + '</div>' + currentData;
     return;
@@ -786,7 +802,7 @@ function renderImport() {
     return '<div><label>'+fLabels[field]+'</label><select onchange="importMap[\''+field+'\']=this.value;renderImportPreview()">' + opts + '</select></div>';
   }).join('');
 
-  pg.innerHTML = '<h1>יבוא נתונים מאקסל</h1><div class="sub-title">העלה קבצי Excel</div>' + msgHtml +
+  pg.innerHTML = '<h1>יבוא וייצוא נתונים</h1><div class="sub-title">ייבא מאקסל או ייצא נתונים קיימים</div>' + msgHtml +
     '<div class="card" style="padding:20px;margin-bottom:18px">' +
     '<div style="font-size:14px;font-weight:700;margin-bottom:4px">' + (importPreview.type==='checks'?'תצוגה מקדימה — המחאות':'תצוגה מקדימה — חשבוניות') + '</div>' +
     '<div style="font-size:12px;color:var(--mu2);margin-bottom:16px">' + importPreview.rows.length + ' שורות</div>' +
@@ -818,8 +834,8 @@ function fileImport(input, type) { if (input.files[0]) parseXL(input.files[0], t
 function parseXL(file, type) {
   var r = new FileReader();
   r.onload = function(e) {
-    var wb = XLSX.read(new Uint8Array(e.target.result), {type:'array', cellDates:true, dateNF:'yyyy-mm-dd'});
-    var rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {defval:'', raw:false, dateNF:'yyyy-mm-dd'});
+    var wb = XLSX.read(new Uint8Array(e.target.result), {type:'array', cellDates:true});
+    var rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {defval:'', raw:true});
     var cols = rows.length ? Object.keys(rows[0]) : [];
     // זיהוי עמודות יום/חודש/שנה נפרדות
     var hasYMD = detect(cols,'יום') && detect(cols,'חודש') && (detect(cols,'שנה') || detect(cols,'year'));
@@ -970,6 +986,32 @@ function saveRec() {
 }
 function editRec(id) { recEditId = id; renderRecurring(); }
 function delRec(id) { S.fixedItems = S.fixedItems.filter(function(x){return x.id!==id;}); save(); renderRecurring(); renderSidebar(); }
+
+// ── Export to Excel ──────────────────────────────────────────────────────────
+function exportToExcel(btn) {
+  var type = btn ? btn.getAttribute('data-type') : 'checks';
+  var data, filename, headers;
+  if (type === 'checks') {
+    headers = ['שם מוטב', 'תאריך', 'סכום', "מספר צ'ק"];
+    data = S.checks.map(function(c) {
+      return [c.supplierName||'', fmtD(c.date), c.amount||0, c.checkNumber||''];
+    });
+    filename = 'המחאות.xlsx';
+  } else {
+    headers = ['שם ספק', 'תאריך', 'סכום', 'מספר חשבונית'];
+    data = S.invoices.map(function(i) {
+      return [i.supplierName||'', fmtD(i.date), i.amount||0, i.invoiceNumber||''];
+    });
+    filename = 'חשבוניות.xlsx';
+  }
+  if (!data.length) { alert('אין נתונים לייצוא'); return; }
+  var ws = XLSX.utils.aoa_to_sheet([headers].concat(data));
+  // Column widths
+  ws['!cols'] = [{wch:20},{wch:14},{wch:12},{wch:14}];
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, type==='checks'?'המחאות':'חשבוניות');
+  XLSX.writeFile(wb, filename);
+}
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 renderSidebar();
