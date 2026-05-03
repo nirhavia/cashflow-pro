@@ -555,7 +555,7 @@ function openAddInvoice(editId) {
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">' +
     '<div><label>ספק *</label><select id="inv-sup"><option value="">— בחר ספק —</option>' + supOptions + '</select></div>' +
     '<div><label>תאריך חשבונית *</label><input type="date" id="inv-date" value="' + (c?c.date:'') + '" oninput="document.getElementById(\'inv-date-lbl\').textContent=fmtD(this.value)"><div id="inv-date-lbl" style="font-size:11px;color:var(--gold);margin-top:3px">' + (c?fmtD(c.date):'') + '</div></div>' +
-    '<div><label>סכום (&#8362;) *</label><input type="number" id="inv-amount" placeholder="0" value="' + (c?c.amount:'') + '"></div>' +
+    '<div><label>סכום (&#8362;) * <span style="font-size:10px;color:var(--mu2)">(מינוס לזיכוי)</span></label><input type="number" id="inv-amount" placeholder="0" value="' + (c?c.amount:'') + '"></div>' +
     '<div><label>מס׳ חשבונית</label><input id="inv-num" placeholder="מספר חשבונית" value="' + (c?c.invoiceNumber||'':'') + '"></div>' +
     '</div>' +
     '<div style="display:flex;gap:8px">' +
@@ -567,9 +567,9 @@ function saveManualInvoice() {
   var supId = el('inv-sup').value;
   var sup = S.suppliers.find(function(s){return s.id===supId;});
   var date = el('inv-date').value;
-  var amount = parseFloat(el('inv-amount').value)||0;
+  var amount = parseFloat(el('inv-amount').value);
   var invoiceNumber = el('inv-num').value.trim();
-  if (!sup || !date || !amount) { alert('יש למלא ספק, תאריך וסכום'); return; }
+  if (!sup || !date || isNaN(amount) || amount === 0) { alert('יש למלא ספק, תאריך וסכום'); return; }
   if (invEditId) {
     S.invoices = S.invoices.map(function(x){
       return x.id===invEditId ? {id:x.id,supplierName:sup.name,supplierId:sup.id,date:date,amount:amount,invoiceNumber:invoiceNumber} : x;
@@ -590,6 +590,10 @@ function renderLedger() {
   var supSel = '<select style="max-width:220px" onchange="S.ledgerSup=this.value;renderLedger()"><option value="">— בחר ספק —</option>' +
     S.suppliers.map(function(s){return '<option value="'+s.id+'"'+(s.id===sid?' selected':'')+'>'+s.name+'</option>';}).join('') + '</select>';
 
+  // Date filter state
+  if (!S.ledgerDateFrom) S.ledgerDateFrom = '';
+  if (!S.ledgerDateTo)   S.ledgerDateTo   = '';
+
   if (!sup) {
     pg.innerHTML = '<h1>כרטסת ספק</h1><div class="sub-title">חשבוניות והמחאות לפי ספק</div>' +
       '<div style="margin-bottom:20px">' + supSel + '</div>' +
@@ -606,6 +610,10 @@ function renderLedger() {
   var allRows = sInv.map(function(i){return {id:i.id,rowType:'invoice',sortDate:i.date||'',amount:i.amount||0,invoiceNumber:i.invoiceNumber||'',date:i.date||''};})
     .concat(sChk.map(function(c){return {id:c.id,rowType:'check',sortDate:c.date||'',amount:c.amount||0,checkNumber:c.checkNumber||'',date:c.date||''};}));
   allRows.sort(function(a,b){return a.sortDate.localeCompare(b.sortDate);});
+
+  // Apply date filter
+  if (S.ledgerDateFrom) allRows = allRows.filter(function(r){return r.sortDate >= S.ledgerDateFrom;});
+  if (S.ledgerDateTo)   allRows = allRows.filter(function(r){return r.sortDate <= S.ledgerDateTo;});
 
   var running = 0;
   var tableRows = allRows.map(function(r) {
@@ -633,12 +641,29 @@ function renderLedger() {
     return '<div style="text-align:center"><div style="font-size:11px;color:var(--mu2);margin-bottom:2px">'+k[0]+'</div><div class="mono" style="font-size:13px;font-weight:700;color:'+k[2]+'">'+k[1]+'</div></div>';
   }).join('');
 
+  var dateFilter =
+    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:10px 14px;background:var(--s2);border-radius:9px;border:1px solid var(--bd)">' +
+    '<span style="font-size:12px;color:var(--mu2);font-weight:600">סינון תאריכים:</span>' +
+    '<div style="display:flex;align-items:center;gap:6px">' +
+    '<label style="font-size:11px;color:var(--mu2);margin:0">מ:</label>' +
+    '<input type="date" id="ldr-from" value="' + S.ledgerDateFrom + '" oninput="S.ledgerDateFrom=this.value;renderLedger()" style="width:130px;font-size:12px;padding:4px 8px">' +
+    '<div id="ldr-from-lbl" style="font-size:10px;color:var(--gold)">' + (S.ledgerDateFrom?fmtD(S.ledgerDateFrom):'') + '</div>' +
+    '</div>' +
+    '<div style="display:flex;align-items:center;gap:6px">' +
+    '<label style="font-size:11px;color:var(--mu2);margin:0">עד:</label>' +
+    '<input type="date" id="ldr-to" value="' + S.ledgerDateTo + '" oninput="S.ledgerDateTo=this.value;renderLedger()" style="width:130px;font-size:12px;padding:4px 8px">' +
+    '<div id="ldr-to-lbl" style="font-size:10px;color:var(--gold)">' + (S.ledgerDateTo?fmtD(S.ledgerDateTo):'') + '</div>' +
+    '</div>' +
+    (S.ledgerDateFrom||S.ledgerDateTo ? '<button class="bg" style="padding:3px 8px;font-size:11px" onclick="S.ledgerDateFrom=\'\';S.ledgerDateTo=\'\';renderLedger()">נקה סינון</button>' : '') +
+    '</div>';
+
   pg.innerHTML =
     '<h1>כרטסת ספק</h1>' +
-    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">' + supSel +
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">' + supSel +
     '<button class="bp" style="font-size:12px;padding:6px 12px" onclick="openAddCheck()">+ הוסף המחאה</button>' +
     '<button class="bg" style="font-size:12px;padding:6px 12px" onclick="openAddInvoice()">+ הוסף חשבונית</button>' +
     '<button class="bg" style="font-size:12px;padding:6px 12px" onclick="printLedger()">הדפסה</button></div>' +
+    dateFilter +
     '<div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:18px">' + summary + '</div>' +
     '<div class="card" style="overflow:hidden" id="ledger-tbl">' +
     '<table><thead><tr><th>תאריך</th><th>סוג</th><th>מס׳ מסמך</th><th>חובה (חשבונית)</th><th>זכות (המחאה)</th><th>יתרה</th><th>פעולות</th></tr></thead>' +
@@ -850,9 +875,13 @@ function parseXL(file, type) {
         checkNumber:  detect(cols,'מספר','check','המחאה','num')
       };
     } else {
+      var hasYMD_inv = detect(cols,'יום') && detect(cols,'חודש') && detect(cols,'שנה');
       importMap = {
-        supplierName:  detect(cols,'ספק','שם','supplier','name'),
-        date:          detect(cols,'תאריך','date','פרעון'),
+        supplierName:  detect(cols,'ספק','שם','מוטב','supplier','name'),
+        date:          hasYMD_inv ? '__YMD__' : detect(cols,'תאריך','date','פרעון'),
+        dateDay:       hasYMD_inv ? detect(cols,'יום','day') : '',
+        dateMon:       hasYMD_inv ? detect(cols,'חודש','month') : '',
+        dateYr:        hasYMD_inv ? detect(cols,'שנה','year') : '',
         amount:        detect(cols,'סכום','amount'),
         invoiceNumber: detect(cols,'חשבונית','invoice','מספר','num')
       };
@@ -901,7 +930,7 @@ function doImport() {
     S.checks = S.checks.concat(items); S.suppliers = allSups; save();
     importMsg = 'יובאו ' + items.length + ' המחאות' + (allSups.length>prevLen?' | '+( allSups.length-prevLen)+' ספקים חדשים':'');
   } else {
-    var items2 = rows.map(function(r){ var name=String(r[importMap.supplierName]||'').trim(); if(!name)return null; var sup=getOrCreate(name); var amt=parse(r[importMap.amount]||0); if(!amt)return null; var invNum = importMap.invoiceNumber ? String(r[importMap.invoiceNumber]||'') : ''; return {id:uid(),supplierName:name,supplierId:sup.id,date:xlDate(r[importMap.date]),amount:amt,invoiceNumber:invNum}; }).filter(Boolean);
+    var items2 = rows.map(function(r){ var name=String(r[importMap.supplierName]||'').trim(); if(!name)return null; var sup=getOrCreate(name); var amt=parse(r[importMap.amount]||0); if(!amt)return null; var invNum = importMap.invoiceNumber ? String(r[importMap.invoiceNumber]||'') : ''; var dt2 = importMap.date==='__YMD__' ? dateFromYMD(r) : xlDate(r[importMap.date]); return {id:uid(),supplierName:name,supplierId:sup.id,date:dt2,amount:amt,invoiceNumber:invNum}; }).filter(Boolean);
     S.invoices = S.invoices.concat(items2); S.suppliers = allSups; save();
     importMsg = 'יובאו ' + items2.length + ' חשבוניות' + (allSups.length>prevLen?' | '+(allSups.length-prevLen)+' ספקים חדשים':'');
   }
@@ -990,26 +1019,33 @@ function delRec(id) { S.fixedItems = S.fixedItems.filter(function(x){return x.id
 // ── Export to Excel ──────────────────────────────────────────────────────────
 function exportToExcel(btn) {
   var type = btn ? btn.getAttribute('data-type') : 'checks';
-  var data, filename, headers;
+  var data, filename, sheetName;
+  function splitDate(iso) {
+    if (!iso) return ['','',''];
+    var p = iso.split('-');
+    if (p.length === 3) return [parseInt(p[2],10), parseInt(p[1],10), parseInt(p[0],10)];
+    return ['','',''];
+  }
   if (type === 'checks') {
-    headers = ['שם מוטב', 'תאריך', 'סכום', "מספר צ'ק"];
+    var headers = ['שם מוטב', 'יום', 'חודש', 'שנה', 'סכום', "מספר צ'ק"];
     data = S.checks.map(function(c) {
-      return [c.supplierName||'', fmtD(c.date), c.amount||0, c.checkNumber||''];
+      var d = splitDate(c.date);
+      return [c.supplierName||'', d[0], d[1], d[2], c.amount||0, c.checkNumber||''];
     });
-    filename = 'המחאות.xlsx';
+    filename = 'המחאות.xlsx'; sheetName = 'המחאות';
   } else {
-    headers = ['שם ספק', 'תאריך', 'סכום', 'מספר חשבונית'];
+    var headers = ['שם ספק', 'יום', 'חודש', 'שנה', 'סכום', 'מספר חשבונית'];
     data = S.invoices.map(function(i) {
-      return [i.supplierName||'', fmtD(i.date), i.amount||0, i.invoiceNumber||''];
+      var d = splitDate(i.date);
+      return [i.supplierName||'', d[0], d[1], d[2], i.amount||0, i.invoiceNumber||''];
     });
-    filename = 'חשבוניות.xlsx';
+    filename = 'חשבוניות.xlsx'; sheetName = 'חשבוניות';
   }
   if (!data.length) { alert('אין נתונים לייצוא'); return; }
   var ws = XLSX.utils.aoa_to_sheet([headers].concat(data));
-  // Column widths
-  ws['!cols'] = [{wch:20},{wch:14},{wch:12},{wch:14}];
+  ws['!cols'] = [{wch:20},{wch:6},{wch:7},{wch:7},{wch:12},{wch:14}];
   var wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, type==='checks'?'המחאות':'חשבוניות');
+  XLSX.utils.book_append_sheet(wb, ws, sheetName);
   XLSX.writeFile(wb, filename);
 }
 
